@@ -12,44 +12,69 @@
 #include <string>
 #ifndef POLYMER_VECTOR_H
 #define POLYMER_VECTOR_H
-namespace math {
-    // struct vector contains x, y, z coordinates
-    // is used to represent all 3d vectors in the simulation
-    // e.g. position, velocity, acceleration, force, angular momentum
-    typedef struct vector_t {
-        double x;
-        double y;
-        double z;
-    } Vector;
-    // Operations on vectors
-    // Addition
-    inline Vector add(Vector v1,  Vector v2);
-    inline Vector add(Vector v1,  double s);
-    // Subtraction
-    inline Vector subtract(Vector v1,  Vector v2);
-    inline Vector subtract(Vector v1,  double s);
-    // Multiplication
-    /**
-    * Takes two vectors v1, v2 and outputs a vector
-    *   v = (v1.x * v2.x, v1.y * v2.y, v1.z * v2.z)
-    */
-    inline Vector multiply(Vector v1, Vector v2);
-    inline Vector multiply(Vector v1, double s);
-    inline double dot(Vector v1, Vector v2);
-    inline Vector cross(Vector v1, Vector v2);
-    // Division
-    inline Vector divide(Vector v1, Vector v2);
-    /**
-    * Takes a vector v1, and a scalar s outputs a vector v = v1 / s
-    */
-    inline Vector divide(Vector v1, double s);
-    /**
-    * Takes a scalar s and a vector v1 and outputs a vector v = s / v1
-    */
-    inline Vector divide(double s, Vector v1);
-    /**
-    * Takes a vector and ouptuts its std::string representation
-    */
-    inline std::string get_string(Vector v1);
-}   // namespace math
+// struct vector contains x, y, z coordinates
+// is used to represent all 3d vectors in the simulation
+// e.g. position, velocity, acceleration, force, angular momentum
+struct vector_t {
+    double x;
+    double y;
+    double z;
+    vector_t& operator=(const vector_t& v)
+    {
+        x=v.x;
+        y=v.y;
+        z=v.z;
+        return *this;
+    }
+    vector_t& operator-()
+    {
+        x = -x;
+        y = -y;
+        z = -z;
+        return *this;
+    }
+    bool operator==(const vector_t& v) const
+    {
+        return (x == v.x && y == v.y && z == v.z);
+    }
+    bool operator!=(const vector_t& v) const
+    {
+        return (x != v.x || y != v.y || z != v.z);
+    }
+};
+typedef struct vector_t Vector;
+// Operations on vectors
+// Addition
+Vector add(Vector v1,  Vector v2);
+Vector add(Vector v1,  double s);
+// Subtraction
+Vector subtract(Vector v1,  Vector v2);
+Vector subtract(Vector v1,  double s);
+// Multiplication
+/**
+* Takes two vectors v1, v2 and outputs a vector
+*   v = (v1.x * v2.x, v1.y * v2.y, v1.z * v2.z)
+*/
+Vector multiply(Vector v1, Vector v2);
+Vector multiply(Vector v1, double s);
+double dot(Vector v1, Vector v2);
+Vector cross(Vector v1, Vector v2);
+// Division
+Vector divide(Vector v1, Vector v2);
+// Exponentiaion
+Vector pow(Vector v1, double s);
+/**
+* Takes a vector v1, and a scalar s outputs a vector v = v1 / s
+*/
+Vector divide(Vector v1, double s);
+/**
+* Takes a scalar s and a vector v1 and outputs a vector v = s / v1
+*/
+Vector divide(double s, Vector v1);
+double normsq(Vector v);
+double norm(Vector v);
+/**
+* Takes a vector and ouptuts its std::string representation
+*/
+std::string get_string(Vector v1);
 #endif
