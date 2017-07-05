@@ -8,7 +8,11 @@
     Additionally, dot product and cross product functions are defined.
 */
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
 #include <cmath>
+#include <stdexcept>
 #include "../include/vector.h"
 // Operations on vectors
 // Addition
@@ -90,26 +94,40 @@ Vector divide(Vector v1, double s) {
     v.z = v1.z / s;
     return v;
 };
-Vector divide(double s, Vector v1) {
-    Vector v;
-    v.x = s / v1.x;
-    v.y = s / v1.y;
-    v.z = s / v1.z;
-    return v;
-};
 double normsq(Vector v) {
     return dot(v, v);
 };
 double norm(Vector v) {
     return sqrt(normsq(v));
 }
-std::string get_string(Vector v1) {
+std::string vector_to_string(Vector v1) {
     std::string v_str_x = std::to_string(v1.x);
     std::string v_str_y = std::to_string(v1.y);
     std::string v_str_z = std::to_string(v1.z);
-    std::string v_str = "(" + v_str_x + ", " + v_str_y + ", " + v_str_z + ")";
+    std::string v_str = v_str_x + " " + v_str_y + " " + v_str_z;
     return v_str;
 };
 ::std::ostream& operator<<(::std::ostream& os, const Vector& v) {
-    return os << get_string(v).c_str();
+    return os << vector_to_string(v).c_str();
+};
+Vector string_to_vector(std::string v_str) {
+    char delimeter = ' ';
+    std::stringstream ss(v_str);
+    std::string item;
+    std::vector<std::string> v_str_split;
+    while (std::getline(ss, item, delimeter))
+    {
+       v_str_split.push_back(item);
+    }
+    if (v_str_split.size() != 3) {
+        std::string err_msg = "string_to_vector: string does not contain 3 elements.";
+        throw std::invalid_argument( err_msg );
+    }
+    else{
+        Vector v;
+        v.x = atof(v_str_split[0].c_str());
+        v.y = atof(v_str_split[1].c_str());
+        v.z = atof(v_str_split[2].c_str());
+        return v;
+    }
 };

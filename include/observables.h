@@ -4,17 +4,16 @@
 #ifndef POLYMER_OBSERVABLES_H
 #define POLYMER_OBSERVABLES_H
 #include <string>
-#include <map>
+#include <utility>      // std::pair, std::make_pair
+#include <vector>
 #include "vector.h"
     typedef struct scalar_observable_t {
-        double value;
-        double time;
+        std::vector<std::pair<double, double>> value_time;
         std::string name;
         std::string units;
     } ScalarObservable;
     typedef struct vector_observable_t {
-        Vector value;
-        double time;
+        std::vector<std::pair<Vector, double>> value_time;
         std::string name;
         std::string units;
     } VectorObservable;

@@ -31,9 +31,19 @@ include_directories("${gtest_SOURCE_DIR}/include")
 
 # Add header files from include/ directory
 include_directories(include)
-add_library(vector src/vector.cpp)
-add_executable(vector_test src/vector_test.cpp)
+add_library(vector SHARED src/vector.cpp)
+add_library(atom SHARED src/atom.cpp src/vector.cpp)
+add_library(bond SHARED src/bond.cpp src/atom.cpp src/vector.cpp)
+add_library(ljpotential SHARED src/vector src/ljpotential.cpp)
+# Build executables for testing
+add_executable(vector_test src/vector.cpp src/vector_test.cpp)
+add_executable(atom_test src/atom.cpp src/atom_test.cpp)
+add_executable(bond_test src/bond.cpp src/bond_test.cpp)
+add_executable(molecule_test src/molecule.cpp src/molecule_test.cpp)
+add_executable(ljpotential_test src/ljpotential.cpp src/ljpotential_test.cpp)
 # Link with what we want to test and the GTest and pthread libraries
-target_link_libraries(vector_test vector)
 target_link_libraries(vector_test gtest_main)
-add_test(NAME vector_test COMMAND vector_test)
+target_link_libraries(atom_test gtest_main vector)
+target_link_libraries(bond_test gtest_main vector atom)
+target_link_libraries(molecule_test gtest_main vector atom bond)
+target_link_libraries(ljpotential_test gtest_main vector ljpotential)

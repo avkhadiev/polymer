@@ -14,13 +14,15 @@ class Simulation {
         LJPotential &_potential;
         Integrator &_integrator;
         ObservableContainer &_observables;
+        std::vector<Molecule *> _molecules;
         typedef struct indicators_t {
             double time;
             int step;
         } _Indicators;
         typedef struct parameters_t {
+            double timestep;
             double measurestep;
-        } Parameters;
+        } _Parameters;
     public:
         // Getters
         LJPotential &get_potential();

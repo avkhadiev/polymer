@@ -10,6 +10,7 @@
     Function get_string converts a vector into a string.
 */
 #include <string>
+#include <iostream>
 #ifndef POLYMER_VECTOR_H
 #define POLYMER_VECTOR_H
 // struct vector contains x, y, z coordinates
@@ -67,14 +68,15 @@ Vector pow(Vector v1, double s);
 * Takes a vector v1, and a scalar s outputs a vector v = v1 / s
 */
 Vector divide(Vector v1, double s);
-/**
-* Takes a scalar s and a vector v1 and outputs a vector v = s / v1
-*/
-Vector divide(double s, Vector v1);
 double normsq(Vector v);
 double norm(Vector v);
 /**
 * Takes a vector and ouptuts its std::string representation
 */
-std::string get_string(Vector v1);
+std::string vector_to_string(Vector v1);
+::std::ostream& operator<<(::std::ostream& os, const Vector& v);
+/**
+* Takes an std::string representation of a vector and outputs the vector
+*/
+Vector string_to_vector(std::string v_str);
 #endif

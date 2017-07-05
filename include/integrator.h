@@ -6,11 +6,13 @@
 #include <vector>
 #include <ljpotential.h>
 #include <molecule.h>
+#include "observable_container.h"
 class Integrator {
 public:
-    virtual void get_timestep() = 0;
-    virtual void set_timestep(double timestep) = 0;
-    virtual void move(LJPotential &potential, std::vector<Molecule> molecules) = 0;
+    virtual void move(double timestep,
+        LJPotential &potential,
+        std::vector<Molecule> molecules,
+        bool calculate_observables = false);
     virtual ~Integrator();
 };
 #endif
