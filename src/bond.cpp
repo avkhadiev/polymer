@@ -55,17 +55,26 @@ Bond initialize_bond(Atom *atom1, Atom *atom2, double fixed_length) {
         }
     }
 }
-std::string bond_to_string(Bond bond){
+std::string bond_to_string(Bond bond, bool verbose){
     std::string b_str_header = "BOND: \n";
-    std::string b_fixed_sq_str = "fixedsq: " + std::to_string(bond.fixed_length_sq) + "\n";
-    std::string b_current_sq_value_str = std::to_string(bond.current_length_sq.first);
-    std::string b_current_sq_time_str = std::to_string(bond.current_length_sq.second);
-    std::string b_current_sq_str = "currentsq: t = "
-        + b_current_sq_time_str
-        + " lsq: " + b_current_sq_value_str;
-    std::string b_str = b_str_header
-        + b_fixed_sq_str
-        + b_current_sq_str;
+    std::string b_fixed_sq_header = "fixedsq = ";
+    std::string b_fixed_sq_value = std::to_string(bond.fixed_length_sq);
+    std::string b_current_sq_header = "currentsq:";
+    std::string b_current_sq_value_header = "lsq = ";
+    std::string b_current_sq_value = std::to_string(bond.current_length_sq.first);
+    std::string b_current_sq_time_header = "t = ";
+    std::string b_current_sq_time = std::to_string(bond.current_length_sq.second);
+    std::string b_str;
+    if (verbose) {
+        b_str = b_str_header
+            + b_fixed_sq_header + b_fixed_sq_value + "\n"
+            + b_current_sq_header + " "
+                + b_current_sq_time_header + b_current_sq_time + " "
+                + b_current_sq_value_header + b_current_sq_value;
+    }
+    else {
+        b_str = b_fixed_sq_value;
+    }
     return b_str;
 }
 ::std::ostream& operator<<(::std::ostream& os, const Bond& bond) {

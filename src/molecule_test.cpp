@@ -35,6 +35,11 @@ TEST(MoleculeTest, Initialization) {
     mol.bonds.push_back(b);
     EXPECT_THROW(check_molecule(mol), std::invalid_argument);
     EXPECT_THROW(molecule_to_string(mol), std::invalid_argument);
+    EXPECT_EQ(true, is_time_consistent(mol, t));
+    EXPECT_EQ(false, is_time_consistent(mol, 2*t));
+    mol.atoms.at(0).position.second = 2 * t;
+    mol.atoms.at(0).velocity.second = 2 * t;
+    EXPECT_EQ(false, is_time_consistent(mol));
 }
 
 int main(int argc, char **argv){

@@ -38,7 +38,7 @@ Bond initialize_bond(Atom *atom1, Atom *atom2, double fixed_length);
 /**
 * Takes a bond and ouptuts its std::string representation
 */
-std::string bond_to_string(Bond bond);
+std::string bond_to_string(Bond bond, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Bond& bond);
 /*
 * Checks if the atom pointers in the given bond point to one of the atoms in

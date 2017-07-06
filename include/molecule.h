@@ -11,7 +11,7 @@
 typedef struct molecule_t {
     int na;                         /*>> number of atoms */
     int nb;                         /*>> number of fixed bonds */
-    std::map<int, Atom> atoms;      /*>> ordered atoms */
+    std::vector<Atom> atoms;        /*>> list of atoms */
     std::vector<Bond> bonds;        /*>> list of bonds */
 } Molecule;
 Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds);
@@ -24,8 +24,19 @@ Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds);
 */
 void check_molecule(Molecule m);
 /**
+* Takes a molecule and ensures all time records on positions and velocities coincide.
+* If the second argument is specified, ensures these times also equal to the
+* second argument
+*/
+bool is_time_consistent(Molecule molecule, double time = -1);
+/**
 * Takes a molecule and ouptuts its std::string representation
 */
-std::string molecule_to_string(Molecule m);
+std::string molecule_to_string(Molecule m, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Molecule& m);
+/**
+* Takes a non-verbose represenation of a molecule from molecule_to_string and
+* returns the corresponding molecule
+*/
+Atom string_to_atoms(std::string nonverbose_str);
 #endif

@@ -29,8 +29,20 @@ struct atom_t {
 typedef struct atom_t Atom;
 Atom initialize_atom(double mass, Vector r, Vector v, double t = 0);
 /**
-* Takes an atom and ouptuts its std::string representation
+* Takes an atom and ensures all time records on positions and velocities coincide.
+* If the second argument is specified, ensures these times also equal to the
+* second argument
 */
-std::string atom_to_string(Atom a);
+bool is_time_consistent(Atom atom, double time = -1);
+/**
+* Takes an atom and ouptuts its std::string representation
+* the representaion is verbose by default
+*/
+std::string atom_to_string(Atom a, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Atom& a);
+/**
+* Takes a non-verbose represenation of an atom from atom_to_string and
+* returns the corresponding atom
+*/
+Atom string_to_atoms(std::string nonverbose_str);
 #endif

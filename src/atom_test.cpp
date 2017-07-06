@@ -26,9 +26,13 @@ TEST(AtomTest, Initialization) {
     EXPECT_EQ(a_expect, a_check);
     a_expect.mass = m * 2;
     EXPECT_NE(a_expect, a_check);
+    EXPECT_EQ(true, is_time_consistent(a_expect));
+    EXPECT_EQ(true, is_time_consistent(a_expect, t));
+    EXPECT_EQ(false, is_time_consistent(a_expect, t*3));
     a_expect.mass = m;
     a_expect.position.second = 3 * t;
     EXPECT_NE(a_expect, a_check);
+    EXPECT_EQ(false, is_time_consistent(a_expect));
 }
 
 int main(int argc, char **argv){
