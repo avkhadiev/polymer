@@ -3,7 +3,7 @@
 */
 #ifndef POLYMER_OBSERVABLE_CONTAINER_H
 #define POLYMER_OBSERVABLE_CONTAINER_H
-#include <observables.h>
+#include "observables.h"
 #include <map>
     class ObservableContainer {
     public:

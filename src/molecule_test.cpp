@@ -31,6 +31,10 @@ TEST(MoleculeTest, Initialization) {
     EXPECT_EQ(mol.na, atoms.size());
     EXPECT_EQ(mol.nb, bonds.size());
     std::cout << mol << std::endl;
+    b.atom2 = &a1;
+    mol.bonds.push_back(b);
+    EXPECT_THROW(check_molecule(mol), std::invalid_argument);
+    EXPECT_THROW(molecule_to_string(mol), std::invalid_argument);
 }
 
 int main(int argc, char **argv){

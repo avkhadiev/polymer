@@ -170,6 +170,19 @@ atom_test/fast:
 .PHONY : atom_test/fast
 
 #=============================================================================
+# Target rules for targets named observables_test
+
+# Build rule for target.
+observables_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 observables_test
+.PHONY : observables_test
+
+# fast build rule for target.
+observables_test/fast:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/build
+.PHONY : observables_test/fast
+
+#=============================================================================
 # Target rules for targets named ljpotential_test
 
 # Build rule for target.
@@ -235,19 +248,6 @@ bond_test/fast:
 .PHONY : bond_test/fast
 
 #=============================================================================
-# Target rules for targets named ljpotential
-
-# Build rule for target.
-ljpotential: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ljpotential
-.PHONY : ljpotential
-
-# fast build rule for target.
-ljpotential/fast:
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/build
-.PHONY : ljpotential/fast
-
-#=============================================================================
 # Target rules for targets named vector
 
 # Build rule for target.
@@ -272,6 +272,19 @@ atom: cmake_check_build_system
 atom/fast:
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/build
 .PHONY : atom/fast
+
+#=============================================================================
+# Target rules for targets named ljpotential
+
+# Build rule for target.
+ljpotential: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ljpotential
+.PHONY : ljpotential
+
+# fast build rule for target.
+ljpotential/fast:
+	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/build
+.PHONY : ljpotential/fast
 
 #=============================================================================
 # Target rules for targets named gmock
@@ -553,6 +566,60 @@ src/molecule_test.cpp.s:
 	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule_test.cpp.s
 .PHONY : src/molecule_test.cpp.s
 
+src/observables.o: src/observables.cpp.o
+
+.PHONY : src/observables.o
+
+# target to build an object file
+src/observables.cpp.o:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.o
+.PHONY : src/observables.cpp.o
+
+src/observables.i: src/observables.cpp.i
+
+.PHONY : src/observables.i
+
+# target to preprocess a source file
+src/observables.cpp.i:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.i
+.PHONY : src/observables.cpp.i
+
+src/observables.s: src/observables.cpp.s
+
+.PHONY : src/observables.s
+
+# target to generate assembly for a file
+src/observables.cpp.s:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.s
+.PHONY : src/observables.cpp.s
+
+src/observables_test.o: src/observables_test.cpp.o
+
+.PHONY : src/observables_test.o
+
+# target to build an object file
+src/observables_test.cpp.o:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables_test.cpp.o
+.PHONY : src/observables_test.cpp.o
+
+src/observables_test.i: src/observables_test.cpp.i
+
+.PHONY : src/observables_test.i
+
+# target to preprocess a source file
+src/observables_test.cpp.i:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables_test.cpp.i
+.PHONY : src/observables_test.cpp.i
+
+src/observables_test.s: src/observables_test.cpp.s
+
+.PHONY : src/observables_test.s
+
+# target to generate assembly for a file
+src/observables_test.cpp.s:
+	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables_test.cpp.s
+.PHONY : src/observables_test.cpp.s
+
 src/vector.o: src/vector.cpp.o
 
 .PHONY : src/vector.o
@@ -561,9 +628,9 @@ src/vector.o: src/vector.cpp.o
 src/vector.cpp.o:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.o
 .PHONY : src/vector.cpp.o
 
 src/vector.i: src/vector.cpp.i
@@ -574,9 +641,9 @@ src/vector.i: src/vector.cpp.i
 src/vector.cpp.i:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.i
 .PHONY : src/vector.cpp.i
 
 src/vector.s: src/vector.cpp.s
@@ -587,9 +654,9 @@ src/vector.s: src/vector.cpp.s
 src/vector.cpp.s:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.s
 .PHONY : src/vector.cpp.s
 
 src/vector_test.o: src/vector_test.cpp.o
@@ -631,15 +698,16 @@ help:
 	@echo "... list_install_components"
 	@echo "... atom_test"
 	@echo "... edit_cache"
+	@echo "... observables_test"
 	@echo "... ljpotential_test"
 	@echo "... bond"
 	@echo "... molecule_test"
 	@echo "... vector_test"
 	@echo "... bond_test"
-	@echo "... ljpotential"
-	@echo "... rebuild_cache"
 	@echo "... vector"
 	@echo "... atom"
+	@echo "... rebuild_cache"
+	@echo "... ljpotential"
 	@echo "... gmock"
 	@echo "... gmock_main"
 	@echo "... gtest_main"
@@ -668,6 +736,12 @@ help:
 	@echo "... src/molecule_test.o"
 	@echo "... src/molecule_test.i"
 	@echo "... src/molecule_test.s"
+	@echo "... src/observables.o"
+	@echo "... src/observables.i"
+	@echo "... src/observables.s"
+	@echo "... src/observables_test.o"
+	@echo "... src/observables_test.i"
+	@echo "... src/observables_test.s"
 	@echo "... src/vector.o"
 	@echo "... src/vector.i"
 	@echo "... src/vector.s"
