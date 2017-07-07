@@ -80,8 +80,8 @@ bool is_time_consistent(Molecule molecule, double time) {
     return consistent;
 }
 void set_time(Molecule *molecule, double time) {
-    for (Atom atom : molecule->atoms) {
-        set_time(&atom, time);
+    for (int i = 0; i < molecule->atoms.size(); ++i) {
+        set_time(&(molecule->atoms.at(i)), time);
     }
 }
 std::string molecule_to_string(Molecule m, bool verbose){
@@ -113,45 +113,16 @@ std::string molecule_to_string(Molecule m, bool verbose){
     Bond b;
     std::string m_str_bonds = "";
     for (int i = 0; i < m.bonds.size(); ++i) {
-        // find the indices of the two atoms that the bond is pointing to
         b = m.bonds.at(i);
-        Atom atom1 = *(b.atom1);
-        Atom atom2 = *(b.atom2);
-        std::vector<Atom>::iterator it1, it2;
-        it1 = std::find(m.atoms.begin(), m.atoms.end(), atom1);
-        it2 = std::find(m.atoms.begin(), m.atoms.end(), atom2);
-        if (it1 != m.atoms.end() && it2 != m.atoms.end()){
-            // get the atom indices
-            int index1 = std::distance(m.atoms.begin(), it1);
-            int index2 = std::distance(m.atoms.begin(), it2);
-            if (index1 != index2) {
-                // append the bond string
-                if (verbose) {
-                    m_str_bonds += std::to_string(i)
-                        + " "
-                        + std::to_string(index1)+ "-" + std::to_string(index2)
-                        + " "
-                        + bond_to_string(b, verbose)
-                        + "\n";
-                }
-                else {
-                    m_str_bonds += std::to_string(index1)+ " " + std::to_string(index2)
-                        + " "
-                        + bond_to_string(b, verbose)
-                        + "\n";
-                }
-            }
-            else {
-                // atom1 and atom2 are the same atom!
-                std::string err_msg = "molecule_to_string: bond in molecule is not valid, contains same-atom pointers";
-                throw std::invalid_argument( err_msg );
-            }
+        // find the indicthe bond string
+        if (verbose) {
+            m_str_bonds += std::to_string(i)
+                + " "
+                + bond_to_string(b, verbose)
+                + "\n";
         }
         else {
-            // bond was pointing to atom that was not in the list;
-            // throw exception
-            std::string err_msg = "molecule_to_string: bond in molecule is not valid, points to atom not in molecule";
-            throw std::invalid_argument( err_msg );
+            m_str_bonds += bond_to_string(b, verbose) + "\n";
         }
     }
     std::string m_str;
@@ -167,5 +138,5 @@ std::string molecule_to_string(Molecule m, bool verbose){
     return m_str;
 }
 ::std::ostream& operator<<(::std::ostream& os, const Molecule& m) {
-    return os << molecule_to_string(m, false).c_str();
+    return os << molecule_to_string(m).c_str();
 }
