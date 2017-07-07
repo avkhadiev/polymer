@@ -12,7 +12,8 @@ Atom initialize_atom(double mass, Vector r, Vector v, double t){
     Vector f = {.x = 0.0, .y = 0.0, .z = 0.0};
     std::pair<Vector, double> position = std::make_pair(r, t);
     std::pair<Vector, double> velocity = std::make_pair(v, t);
-    std::pair<Vector, double> force = std::make_pair(f, t);
+    // force always has to be recalculated; time is not defined until then
+    std::pair<Vector, double> force = std::make_pair(f, -1.0);
     Atom atom = {.mass = mass,
         .position = position,
         .velocity = velocity,
@@ -34,6 +35,10 @@ bool is_time_consistent(Atom atom, double time) {
         }
     }
     return consistent;
+}
+void set_time(Atom *atom, double time) {
+    atom->position.second = time;
+    atom->velocity.second = time;
 }
 std::string atom_to_string(Atom a, bool verbose) {
     std::string a_str_header = "ATOM:\n";
@@ -76,8 +81,8 @@ std::string atom_to_string(Atom a, bool verbose) {
     }
     else {
         // do not include headers nor times nor forces
-        a_str = a_str_m_value + "\n"
-            + a_str_position_value + "\n"
+        a_str = a_str_m_value + " "
+            + a_str_position_value + " "
             + a_str_velocity_value;
     }
     return a_str;
@@ -85,15 +90,25 @@ std::string atom_to_string(Atom a, bool verbose) {
 ::std::ostream& operator<<(::std::ostream& os, const Atom& a) {
     return os << atom_to_string(a).c_str();
 };
-Atom string_to_atoms(std::string nonverbose_str){
-    std::stringstream ss(nonverbose_str.c_str());
-    std::string line;
-    std::vector<std::string> line_vector;
-    while(std::getline(ss, line, '\n')){
-      // do something with the line
-      line_vector.push_back(line);
-    }
-    // retrieve information line-by-line;
-    // see this
-    //https://stackoverflow.com/questions/5607589/right-way-to-split-an-stdstring-into-a-vectorstring
+Atom string_to_atom(std::string nonverbose_str){
+    // in non-verbose lines, the information about an atom is one line
+    std::istringstream ss(nonverbose_str.c_str());
+    std::istream_iterator<std::string> begin(ss);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> words(begin, end);
+    // convert strings to data
+    double mass = atof(words.at(0).c_str());
+    double rx = atof(words.at(1).c_str());
+    double ry = atof(words.at(2).c_str());
+    double rz = atof(words.at(3).c_str());
+    double vx = atof(words.at(4).c_str());
+    double vy = atof(words.at(5).c_str());
+    double vz = atof(words.at(6).c_str());
+    Vector r = {.x = rx, .y = ry, .z = rz};
+    Vector v = {.x = vx, .y = vy, .z = vz};
+    // force will be calculated later
+    Vector f = {.x = 0.0, .y = 0.0, .z = 0.0};
+    // time will be assigned later
+    Atom atom = initialize_atom(mass, r, v);
+    return atom;
 };

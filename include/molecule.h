@@ -30,6 +30,11 @@ void check_molecule(Molecule m);
 */
 bool is_time_consistent(Molecule molecule, double time = -1);
 /**
+* Takes a pointer to a molecule and a time and sets all records of positions and velocities
+* of all the atoms in the to that time
+*/
+void set_time(Molecule *molecule, double time);
+/**
 * Takes a molecule and ouptuts its std::string representation
 */
 std::string molecule_to_string(Molecule m, bool verbose = true);

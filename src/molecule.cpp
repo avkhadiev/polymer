@@ -79,6 +79,11 @@ bool is_time_consistent(Molecule molecule, double time) {
     }
     return consistent;
 }
+void set_time(Molecule *molecule, double time) {
+    for (Atom atom : molecule->atoms) {
+        set_time(&atom, time);
+    }
+}
 std::string molecule_to_string(Molecule m, bool verbose){
     try
     {
@@ -162,5 +167,5 @@ std::string molecule_to_string(Molecule m, bool verbose){
     return m_str;
 }
 ::std::ostream& operator<<(::std::ostream& os, const Molecule& m) {
-    return os << molecule_to_string(m).c_str();
+    return os << molecule_to_string(m, false).c_str();
 }

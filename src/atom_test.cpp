@@ -9,20 +9,38 @@
 #include "../include/vector.h"
 #include "../include/atom.h"
 
-TEST(AtomTest, Initialization) {
-    Vector r = {.x = 1.0, .y = 2.0, .z = 3.0};
-    Vector v = {.x = 4.0, .y = 4.0, .z = 4.0};
-    Vector f = {.x = 0.0, .y = 0.0, .z = 0.0};
-    double t = 3;
-    std::pair<Vector, double> position = std::make_pair(r, t);
-    std::pair<Vector, double> velocity = std::make_pair(v, t);
-    std::pair<Vector, double> force = std::make_pair(f, t);
-    double m = 3;
-    Atom a_expect = {.mass = m,
-        .position = position,
-        .velocity = velocity,
-        .force = force};
-    Atom a_check = initialize_atom(m, r, v, t);
+class AtomTest : public ::testing::Test {
+ protected:
+     Vector r;
+     Vector v;
+     Vector f;
+     double t;
+     std::pair<Vector, double> position;
+     std::pair<Vector, double> velocity;
+     std::pair<Vector, double> force;
+     double m;
+     Atom a_expect;
+     Atom a_check;
+     std::string a_str;
+     virtual void SetUp() {
+         r.x = 1.0; r.y = 2.0; r.z = 3.0;
+         v.x = 4.0; v.y = 5.0; v.z = 6.0;
+         f.x = 0.0; f.y = 0.0; f.z = 0.0;
+         t = 3.0;
+         position = std::make_pair(r, t);
+         velocity = std::make_pair(v, t);
+         force = std::make_pair(f, -1.0);
+         m = 3;
+         a_expect.mass = m;
+         a_expect.position = position;
+         a_expect.velocity = velocity;
+         a_expect.force = force;
+         a_check = initialize_atom(m, r, v, t);
+     }
+  // virtual void TearDown() {}
+};
+
+TEST_F(AtomTest, Initialization) {
     EXPECT_EQ(a_expect, a_check);
     a_expect.mass = m * 2;
     EXPECT_NE(a_expect, a_check);
@@ -33,6 +51,13 @@ TEST(AtomTest, Initialization) {
     a_expect.position.second = 3 * t;
     EXPECT_NE(a_expect, a_check);
     EXPECT_EQ(false, is_time_consistent(a_expect));
+}
+
+TEST_F(AtomTest, IOTest) {
+    std::string a_str = atom_to_string(a_expect, false);
+    a_check = string_to_atom(a_str);
+    set_time(&a_check, t);
+    EXPECT_EQ(a_expect, a_check);
 }
 
 int main(int argc, char **argv){
