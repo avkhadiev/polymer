@@ -37,12 +37,17 @@ typedef struct bond_t Bond;
 * argument exception.
 */
 void update_bond_length(Bond *bond, std::vector<Atom> atoms);
-Bond initialize_bond(int atom1, int atom2, double fixed_length);
+Bond initialize_bond(int atom1, int atom2, double fixed_length_sq);
 /**
 * Takes a bond and ouptuts its std::string representation
 */
 std::string bond_to_string(Bond bond, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Bond& bond);
+/**
+* Takes a non-verbose represenation of a bond from bond_to_string and
+* returns the corresponding bond
+*/
+Bond string_to_bond(std::string nonverbose_str);
 /*
 * Checks if the bond has different atom1 and atom2 and that these indices are
 * not greater than the size of the atom vector.

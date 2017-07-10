@@ -44,6 +44,8 @@ struct vector_t {
     }
 };
 typedef struct vector_t Vector;
+// Constructors of vectors
+Vector vector(double x, double y, double z);
 // Operations on vectors
 // Addition
 Vector add(Vector v1,  Vector v2);

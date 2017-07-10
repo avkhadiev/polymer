@@ -14,7 +14,7 @@ typedef struct molecule_t {
     std::vector<Atom> atoms;        /*>> list of atoms */
     std::vector<Bond> bonds;        /*>> list of bonds */
 } Molecule;
-Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds);
+Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds, double t = -1.0);
 /**
 * Checks if a molecule is valid:
 *   that number of contrained bonds is less than or equal to the number of atoms;
@@ -40,8 +40,8 @@ void set_time(Molecule *molecule, double time);
 std::string molecule_to_string(Molecule m, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Molecule& m);
 /**
-* Takes a non-verbose represenation of a molecule from molecule_to_string and
-* returns the corresponding molecule
+* Reads the stream from the current position, advancing the position until after
+* the molecule struct; converts input data to a molecule struct
 */
-Atom string_to_atoms(std::string nonverbose_str);
+Molecule string_to_molecule(std::ifstream& input_stream);
 #endif

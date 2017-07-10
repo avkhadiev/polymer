@@ -5,6 +5,7 @@
 #include <utility>                  /* std::pair, std::make_pair */
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <cmath>                    /* pow */
@@ -32,14 +33,13 @@ void update_bond_length(Bond *bond, std::vector<Atom> atoms) {
     }
     return;
 }
-Bond initialize_bond(int atom1, int atom2, double fixed_length) {
+Bond initialize_bond(int atom1, int atom2, double fixed_length_sq) {
     // check if two atoms are the same
     if ( atom1 == atom2 ){
         std::string err_msg = "check_bond: two atoms are the same";
         throw std::invalid_argument( err_msg );
     }
     else {
-        double fixed_length_sq = pow(fixed_length, 2.0);
         Bond bond = {.atom1 = atom1, .atom2 = atom2,
             .fixed_length_sq = fixed_length_sq,
             .current_length_sq = std::make_pair(-1, -1)};
@@ -59,6 +59,7 @@ std::string bond_to_string(Bond bond, bool verbose){
     std::string b_current_sq_time = std::to_string(bond.current_length_sq.second);
     std::string b_str;
     if (verbose) {
+        // verbose output
         b_str = b_atom1_str + "-" + b_atom2_str + " " + b_str_header
             + b_fixed_sq_header + b_fixed_sq_value + "\n"
             + b_current_sq_header + " "
@@ -66,6 +67,7 @@ std::string bond_to_string(Bond bond, bool verbose){
                 + b_current_sq_value_header + b_current_sq_value;
     }
     else {
+        // non-verbose output
         b_str = b_atom1_str + " " + b_atom2_str + + " " + b_fixed_sq_value;
     }
     return b_str;
@@ -73,6 +75,25 @@ std::string bond_to_string(Bond bond, bool verbose){
 ::std::ostream& operator<<(::std::ostream& os, const Bond& bond) {
     return os << bond_to_string(bond).c_str();
 };
+Bond string_to_bond(std::string nonverbose_str){
+    std::istringstream ss(nonverbose_str.c_str());
+    std::istream_iterator<std::string> begin(ss);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> words(begin, end);
+    // convert strings to data
+    int atom1 = atoi(words.at(0).c_str());
+    int atom2 = atoi(words.at(1).c_str());
+    double fixed_length_sq = atof(words.at(2).c_str());
+    try
+    {
+        Bond b = initialize_bond(atom1, atom2, fixed_length_sq);
+        return b;
+    }
+    catch (std::invalid_argument &e)
+    {
+        throw;
+    }
+}
 void check_bond(Bond bond, std::vector<Atom> atoms) {
     if ( bond.atom1 == bond.atom2 ){
         std::string err_msg = "check_bond: two atoms are the same";

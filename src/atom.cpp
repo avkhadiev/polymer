@@ -90,7 +90,7 @@ std::string atom_to_string(Atom a, bool verbose) {
 ::std::ostream& operator<<(::std::ostream& os, const Atom& a) {
     return os << atom_to_string(a).c_str();
 };
-Atom string_to_atom(std::string nonverbose_str){
+Atom string_to_atom(std::string nonverbose_str, double t){
     // in non-verbose lines, the information about an atom is one line
     std::istringstream ss(nonverbose_str.c_str());
     std::istream_iterator<std::string> begin(ss);
@@ -107,8 +107,7 @@ Atom string_to_atom(std::string nonverbose_str){
     Vector r = {.x = rx, .y = ry, .z = rz};
     Vector v = {.x = vx, .y = vy, .z = vz};
     // force will be calculated later
-    Vector f = {.x = 0.0, .y = 0.0, .z = 0.0};
     // time will be assigned later
-    Atom atom = initialize_atom(mass, r, v);
+    Atom atom = initialize_atom(mass, r, v, t);
     return atom;
 };

@@ -18,7 +18,7 @@ class MoleculeTest : public ::testing::Test {
      Vector f;
      double m;
      double t;
-     double fixed_length;
+     double fixed_length_sq;
      Atom a1;
      Atom a2;
      std::vector<Atom> atoms;
@@ -32,12 +32,12 @@ class MoleculeTest : public ::testing::Test {
          f.x = 0.0; f.y = 0.0; f.z = 0.0;
          m = 1.0;
          t = 3.0;
-         fixed_length = 1.0;
+         fixed_length_sq = 12.0;
          a1 = initialize_atom(m, r1, v, t);
          a2 = initialize_atom(m, r2, v, t);
          atoms.push_back(a1);
          atoms.push_back(a2);
-         b = initialize_bond(0, 1, fixed_length);
+         b = initialize_bond(0, 1, fixed_length_sq);
          bonds.push_back(b);
      }
   // virtual void TearDown() {}
@@ -48,15 +48,26 @@ TEST_F(MoleculeTest, Initialization) {
     Molecule mol = initialize_molecule(atoms, bonds);
     EXPECT_EQ(mol.na, atoms.size());
     EXPECT_EQ(mol.nb, bonds.size());
+    // mix up time records in atoms
     mol.atoms.at(1).position.second = -1 * t;
     mol.atoms.at(1).velocity.second = 2 * t;
     mol.atoms.at(0).position.second = 3 * t;
     mol.atoms.at(0).velocity.second = 4 * t;
     EXPECT_EQ(false, is_time_consistent(mol));
-    std::cout << mol << std::endl;
     set_time(&mol, t);
-    std::cout << mol << std::endl;
     EXPECT_EQ(true, is_time_consistent(mol, t));
+}
+
+TEST_F(MoleculeTest, IOTest) {
+    Molecule m_check = initialize_molecule(atoms, bonds, t);
+    std::cout << "**************************" << std::endl;
+    std::cout << "Verbose output of molecule:" << std::endl;
+    std::cout << "**************************" << std::endl;
+    std::cout << molecule_to_string(m_check, true) << std::endl;
+    std::cout << "**************************" << std::endl;
+    std::cout << "Non-verbose output of molecule:" << std::endl;
+    std::cout << "**************************" << std::endl;
+    std::cout << molecule_to_string(m_check, false) << std::endl;
 }
 
 int main(int argc, char **argv){

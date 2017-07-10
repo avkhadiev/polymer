@@ -7,6 +7,13 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 #include "../include/vector.h"
+
+TEST(VectorTest, VectorInitialization) {
+    Vector v_expect = {.x = 1.0, .y = 2.0, .z = 3.0};
+    Vector v_check = vector(1.0, 2.0, 3.0);
+    EXPECT_EQ(v_expect, v_check);
+}
+
 TEST(VectorTest, VectorToVectorAddition) {
     Vector v1 = {.x = 1.0, .y = 1.0, .z = 1.0};
     Vector v2 = {.x = -1.0, .y = -1.0, .z = -1.0};

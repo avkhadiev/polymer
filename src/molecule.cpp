@@ -4,12 +4,14 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <fstream>
+#include <sstream>
 #include <algorithm>                        /* std::find */
 #include <iterator>                         /* std::distance */
 #include <../include/atom.h>
 #include <../include/bond.h>
 #include <../include/molecule.h>
-Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds) {
+Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds, double t) {
     Molecule molecule;
     int na = atoms.size();
     int nb = bonds.size();
@@ -22,11 +24,27 @@ Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds) {
     }
     else{
         try{
+            // check if all bonds have pairs of different atom indices,
+            // and that no two bonds have the same pair
             check_bonds(bonds, atoms);
             molecule.na = na;
             molecule.nb = nb;
             molecule.atoms = atoms;
             molecule.bonds = bonds;
+            // set the time of all atoms' positions and velocities to t
+            set_time(&molecule, t);
+            // update all bonds' current length squared according to the atoms'
+            // positions at time t.
+            Bond *bond_ptr;
+            for(int i = 0; i < nb; ++i) {
+                bond_ptr = &(molecule.bonds.at(i));
+                try {
+                    update_bond_length(bond_ptr, molecule.atoms);
+                }
+                catch (std::invalid_argument &e) {
+                    throw;
+                }
+            }
         }
         catch(std::invalid_argument &e){
             throw;
@@ -52,7 +70,8 @@ void check_molecule(Molecule m) {
     catch (std::invalid_argument &e)
     {
         valid = false;
-        err_msg += "check_bonds threw an exception.";
+        std::string check_bonds_err(e.what());
+        err_msg += check_bonds_err;
     }
     if (!valid) {
         throw std::invalid_argument( err_msg );
@@ -100,6 +119,7 @@ std::string molecule_to_string(Molecule m, bool verbose){
     std::string m_str_nb = std::to_string(m.nb);
     std::string m_str_atoms = "";
     for (int i = 0; i < m.atoms.size(); ++i) {
+        // verbose output
         if (verbose) {
             m_str_atoms += std::to_string(i)
                 + " "
@@ -107,6 +127,7 @@ std::string molecule_to_string(Molecule m, bool verbose){
                 + "\n";
         }
         else {
+        // non-verbose output
             m_str_atoms += atom_to_string(m.atoms.at(i), verbose) + "\n";
         }
     }
@@ -127,16 +148,66 @@ std::string molecule_to_string(Molecule m, bool verbose){
     }
     std::string m_str;
     if (verbose) {
+        // verbose output
         m_str = m_str_header
             + m_str_na_header + m_str_na + "\n"
             + m_str_nb_header + m_str_nb + "\n"
             + m_str_atoms + m_str_bonds;
     }
     else {
-        m_str = m_str_na + "\n" + m_str_nb + "\n" + m_str_atoms + m_str_bonds;
+        // non-verbose output
+        m_str = m_str_na + " " + m_str_nb + "\n" + m_str_atoms + m_str_bonds;
     }
     return m_str;
 }
 ::std::ostream& operator<<(::std::ostream& os, const Molecule& m) {
     return os << molecule_to_string(m).c_str();
+}
+Molecule string_to_molecule(std::ifstream& input_stream){
+    // data format in non-verbose lines:
+    // na nb
+    // ... na atoms strings...
+    // ... nb bond strings...
+    // get all lines in a vector of strings
+    std::string line;
+    std::getline(input_stream, line);
+    // get number of atoms and number of bonds
+    std::istringstream ss(line.c_str());
+    std::istream_iterator<std::string> begin(ss);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> words(begin, end);
+    int na = atoi(words.at(0).c_str());
+    int nb = atoi(words.at(1).c_str());
+    // read all the atoms from the input stream
+    std::vector<Atom> atoms;
+    Atom next_atom;
+    for(int nlines = 0; nlines < na; ++nlines) {
+        std::getline(input_stream, line);
+        next_atom = string_to_atom(line);
+        atoms.push_back(next_atom);
+    }
+    // read all the bonds from the input stream
+    std::vector<Bond> bonds;
+    Bond next_bond;
+    for(int nlines = 0; nlines < nb; ++nlines) {
+        std::getline(input_stream, line);
+        try {
+            next_bond = string_to_bond(line);
+        }
+        catch (std::invalid_argument &e) {
+            throw;
+        }
+        bonds.push_back(next_bond);
+    }
+    // initialize the molecule
+    Molecule m;
+    try
+    {
+        initialize_molecule(atoms, bonds);
+        return m;
+    }
+    catch (std::invalid_argument &e)
+    {
+        throw;
+    }
 }

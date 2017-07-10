@@ -27,7 +27,7 @@ struct atom_t {
     }
 };
 typedef struct atom_t Atom;
-Atom initialize_atom(double mass, Vector r, Vector v, double t = -1);
+Atom initialize_atom(double mass, Vector r, Vector v, double t = -1.0);
 /**
 * Takes an atom and ensures all time records on positions and velocities coincide.
 * If the second argument is specified, ensures these times also equal to the
@@ -47,7 +47,8 @@ std::string atom_to_string(Atom a, bool verbose = true);
 ::std::ostream& operator<<(::std::ostream& os, const Atom& a);
 /**
 * Takes a non-verbose represenation of an atom from atom_to_string and
-* returns the corresponding atom
+* returns the corresponding atom. If time is specified, sets the time of
+* positions and velocities to t.
 */
-Atom string_to_atom(std::string nonverbose_str);
+Atom string_to_atom(std::string nonverbose_str, double t = -1.0);
 #endif

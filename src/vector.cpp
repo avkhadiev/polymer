@@ -14,6 +14,11 @@
 #include <cmath>
 #include <stdexcept>
 #include "../include/vector.h"
+// constructors
+Vector vector(double x, double y, double z) {
+    Vector v = {.x = x, .y = y, .z = z};
+    return v;
+}
 // Operations on vectors
 // Addition
 Vector add(Vector v1,  Vector v2) {

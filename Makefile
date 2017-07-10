@@ -68,18 +68,6 @@ install/strip/fast: preinstall/fast
 	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -124,6 +112,18 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Arthur/stratt/polymer/CMakeFiles /Users/Arthur/stratt/polymer/CMakeFiles/progress.marks
@@ -155,19 +155,6 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-#=============================================================================
-# Target rules for targets named atom_test
-
-# Build rule for target.
-atom_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 atom_test
-.PHONY : atom_test
-
-# fast build rule for target.
-atom_test/fast:
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/build
-.PHONY : atom_test/fast
 
 #=============================================================================
 # Target rules for targets named observables_test
@@ -222,6 +209,19 @@ molecule_test/fast:
 .PHONY : molecule_test/fast
 
 #=============================================================================
+# Target rules for targets named atom_test
+
+# Build rule for target.
+atom_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 atom_test
+.PHONY : atom_test
+
+# fast build rule for target.
+atom_test/fast:
+	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/build
+.PHONY : atom_test/fast
+
+#=============================================================================
 # Target rules for targets named vector_test
 
 # Build rule for target.
@@ -274,6 +274,19 @@ atom/fast:
 .PHONY : atom/fast
 
 #=============================================================================
+# Target rules for targets named initialize_triatomic
+
+# Build rule for target.
+initialize_triatomic: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 initialize_triatomic
+.PHONY : initialize_triatomic
+
+# fast build rule for target.
+initialize_triatomic/fast:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/build
+.PHONY : initialize_triatomic/fast
+
+#=============================================================================
 # Target rules for targets named ljpotential
 
 # Build rule for target.
@@ -285,6 +298,32 @@ ljpotential: cmake_check_build_system
 ljpotential/fast:
 	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/build
 .PHONY : ljpotential/fast
+
+#=============================================================================
+# Target rules for targets named state_test
+
+# Build rule for target.
+state_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 state_test
+.PHONY : state_test
+
+# fast build rule for target.
+state_test/fast:
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/build
+.PHONY : state_test/fast
+
+#=============================================================================
+# Target rules for targets named molecule
+
+# Build rule for target.
+molecule: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 molecule
+.PHONY : molecule
+
+# fast build rule for target.
+molecule/fast:
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/build
+.PHONY : molecule/fast
 
 #=============================================================================
 # Target rules for targets named gmock
@@ -344,9 +383,10 @@ src/atom.o: src/atom.cpp.o
 
 # target to build an object file
 src/atom.cpp.o:
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.o
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.o
+	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.o
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.o
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.o
 .PHONY : src/atom.cpp.o
 
 src/atom.i: src/atom.cpp.i
@@ -355,9 +395,10 @@ src/atom.i: src/atom.cpp.i
 
 # target to preprocess a source file
 src/atom.cpp.i:
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.i
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.i
+	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.i
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.i
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.i
 .PHONY : src/atom.cpp.i
 
 src/atom.s: src/atom.cpp.s
@@ -366,9 +407,10 @@ src/atom.s: src/atom.cpp.s
 
 # target to generate assembly for a file
 src/atom.cpp.s:
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.s
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.s
+	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.s
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.s
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.s
 .PHONY : src/atom.cpp.s
 
 src/atom_test.o: src/atom_test.cpp.o
@@ -406,6 +448,7 @@ src/bond.o: src/bond.cpp.o
 src/bond.cpp.o:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.o
 	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.o
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.o
 .PHONY : src/bond.cpp.o
 
 src/bond.i: src/bond.cpp.i
@@ -416,6 +459,7 @@ src/bond.i: src/bond.cpp.i
 src/bond.cpp.i:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.i
 	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.i
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.i
 .PHONY : src/bond.cpp.i
 
 src/bond.s: src/bond.cpp.s
@@ -426,6 +470,7 @@ src/bond.s: src/bond.cpp.s
 src/bond.cpp.s:
 	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.s
 	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.s
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.s
 .PHONY : src/bond.cpp.s
 
 src/bond_test.o: src/bond_test.cpp.o
@@ -454,6 +499,33 @@ src/bond_test.s: src/bond_test.cpp.s
 src/bond_test.cpp.s:
 	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond_test.cpp.s
 .PHONY : src/bond_test.cpp.s
+
+src/initialize_triatomic.o: src/initialize_triatomic.cpp.o
+
+.PHONY : src/initialize_triatomic.o
+
+# target to build an object file
+src/initialize_triatomic.cpp.o:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/initialize_triatomic.cpp.o
+.PHONY : src/initialize_triatomic.cpp.o
+
+src/initialize_triatomic.i: src/initialize_triatomic.cpp.i
+
+.PHONY : src/initialize_triatomic.i
+
+# target to preprocess a source file
+src/initialize_triatomic.cpp.i:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/initialize_triatomic.cpp.i
+.PHONY : src/initialize_triatomic.cpp.i
+
+src/initialize_triatomic.s: src/initialize_triatomic.cpp.s
+
+.PHONY : src/initialize_triatomic.s
+
+# target to generate assembly for a file
+src/initialize_triatomic.cpp.s:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/initialize_triatomic.cpp.s
+.PHONY : src/initialize_triatomic.cpp.s
 
 src/ljpotential.o: src/ljpotential.cpp.o
 
@@ -519,6 +591,7 @@ src/molecule.o: src/molecule.cpp.o
 # target to build an object file
 src/molecule.cpp.o:
 	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.o
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.o
 .PHONY : src/molecule.cpp.o
 
 src/molecule.i: src/molecule.cpp.i
@@ -528,6 +601,7 @@ src/molecule.i: src/molecule.cpp.i
 # target to preprocess a source file
 src/molecule.cpp.i:
 	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.i
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.i
 .PHONY : src/molecule.cpp.i
 
 src/molecule.s: src/molecule.cpp.s
@@ -537,6 +611,7 @@ src/molecule.s: src/molecule.cpp.s
 # target to generate assembly for a file
 src/molecule.cpp.s:
 	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.s
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.s
 .PHONY : src/molecule.cpp.s
 
 src/molecule_test.o: src/molecule_test.cpp.o
@@ -620,6 +695,63 @@ src/observables_test.cpp.s:
 	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables_test.cpp.s
 .PHONY : src/observables_test.cpp.s
 
+src/state.o: src/state.cpp.o
+
+.PHONY : src/state.o
+
+# target to build an object file
+src/state.cpp.o:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.o
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.o
+.PHONY : src/state.cpp.o
+
+src/state.i: src/state.cpp.i
+
+.PHONY : src/state.i
+
+# target to preprocess a source file
+src/state.cpp.i:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.i
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.i
+.PHONY : src/state.cpp.i
+
+src/state.s: src/state.cpp.s
+
+.PHONY : src/state.s
+
+# target to generate assembly for a file
+src/state.cpp.s:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.s
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.s
+.PHONY : src/state.cpp.s
+
+src/state_test.o: src/state_test.cpp.o
+
+.PHONY : src/state_test.o
+
+# target to build an object file
+src/state_test.cpp.o:
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state_test.cpp.o
+.PHONY : src/state_test.cpp.o
+
+src/state_test.i: src/state_test.cpp.i
+
+.PHONY : src/state_test.i
+
+# target to preprocess a source file
+src/state_test.cpp.i:
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state_test.cpp.i
+.PHONY : src/state_test.cpp.i
+
+src/state_test.s: src/state_test.cpp.s
+
+.PHONY : src/state_test.s
+
+# target to generate assembly for a file
+src/state_test.cpp.s:
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state_test.cpp.s
+.PHONY : src/state_test.cpp.s
+
 src/vector.o: src/vector.cpp.o
 
 .PHONY : src/vector.o
@@ -631,6 +763,7 @@ src/vector.cpp.o:
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.o
 .PHONY : src/vector.cpp.o
 
 src/vector.i: src/vector.cpp.i
@@ -644,6 +777,7 @@ src/vector.cpp.i:
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.i
 .PHONY : src/vector.cpp.i
 
 src/vector.s: src/vector.cpp.s
@@ -657,6 +791,7 @@ src/vector.cpp.s:
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.s
 .PHONY : src/vector.cpp.s
 
 src/vector_test.o: src/vector_test.cpp.o
@@ -693,21 +828,24 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... install/strip"
-	@echo "... install/local"
 	@echo "... install"
 	@echo "... list_install_components"
-	@echo "... atom_test"
-	@echo "... edit_cache"
 	@echo "... observables_test"
 	@echo "... ljpotential_test"
 	@echo "... bond"
 	@echo "... molecule_test"
+	@echo "... edit_cache"
+	@echo "... atom_test"
 	@echo "... vector_test"
 	@echo "... bond_test"
 	@echo "... vector"
 	@echo "... atom"
 	@echo "... rebuild_cache"
+	@echo "... initialize_triatomic"
 	@echo "... ljpotential"
+	@echo "... install/local"
+	@echo "... state_test"
+	@echo "... molecule"
 	@echo "... gmock"
 	@echo "... gmock_main"
 	@echo "... gtest_main"
@@ -724,6 +862,9 @@ help:
 	@echo "... src/bond_test.o"
 	@echo "... src/bond_test.i"
 	@echo "... src/bond_test.s"
+	@echo "... src/initialize_triatomic.o"
+	@echo "... src/initialize_triatomic.i"
+	@echo "... src/initialize_triatomic.s"
 	@echo "... src/ljpotential.o"
 	@echo "... src/ljpotential.i"
 	@echo "... src/ljpotential.s"
@@ -742,6 +883,12 @@ help:
 	@echo "... src/observables_test.o"
 	@echo "... src/observables_test.i"
 	@echo "... src/observables_test.s"
+	@echo "... src/state.o"
+	@echo "... src/state.i"
+	@echo "... src/state.s"
+	@echo "... src/state_test.o"
+	@echo "... src/state_test.i"
+	@echo "... src/state_test.s"
 	@echo "... src/vector.o"
 	@echo "... src/vector.i"
 	@echo "... src/vector.s"
