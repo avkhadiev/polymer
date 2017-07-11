@@ -17,9 +17,10 @@
         // vector observables
         VectorObservable _linear_momentum;
         VectorObservable _angular_momentum;
-        std::map<std::string, ScalarObservable *> _vector_observables;
+        std::map<std::string, VectorObservable *> _vector_observables;
     public:
         // getters
+        // default argument measure_time = -1 returns the most recent observation
         const ScalarObservable **get_bonds(double measure_time = -1);
         const ScalarObservable *get_kinetic_energy(double measure_time = -1);
         const ScalarObservable *get_potential_energy(double measure_time = -1);

@@ -5,18 +5,17 @@
 #define POLYMER_SIMULATION_H
 #include <vector>
 #include <map>
-#include "molecule.h"
+#include "state.h"
 #include "observable_container.h"
 #include "ljpotential.h"
 #include "integrator.h"
 class Simulation {
     private:
-        LJPotential &_potential;
-        Integrator &_integrator;
-        ObservableContainer &_observables;
-        std::vector<Molecule *> _molecules;
+        LJPotential& _potential;
+        Integrator& _integrator;
+        ObservableContainer& _observables;
+        State &_state;
         typedef struct indicators_t {
-            double time;
             int step;
         } _Indicators;
         typedef struct parameters_t {
@@ -25,9 +24,10 @@ class Simulation {
         } _Parameters;
     public:
         // Getters
-        LJPotential &get_potential();
-        Integrator &get_integrator();
-        ObservableContainer &get_observables();
+        LJPotential& get_potential();
+        Integrator& get_integrator();
+        ObservableContainer& get_observables();
+        State& get_state();
         double get_time();
         double get_step();
         double get_timestep();

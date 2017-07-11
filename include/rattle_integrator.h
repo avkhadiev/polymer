@@ -20,11 +20,11 @@ private:
         double tiny;
     } _Parameters;
     void _move_a(double timestep,
-        LJPotential &potential,
-        std::vector<Molecule> molecules);
+        LJPotential& potential,
+        State& state);
     void _move_b(double timestep,
-        LJPotential &potential,
-        std::vector<Molecule> molecules,
+        LJPotential& potential,
+        State& state,
         bool calculate_observables);
 public:
     // getters
@@ -39,8 +39,8 @@ public:
     void set_observables(ObservableContainer &observables);
     virtual void move(double timestep,
         LJPotential &potential,
-        std::vector<Molecule> molecules,
-        bool calculate_observables = false) = 0;
+        State& state,
+        bool calculate_observables = false);
     // constructors and a destructor
     RattleIntegrator();
     RattleIntegrator(double tol, double rvtol, double tiny = pow(10, -7.0));

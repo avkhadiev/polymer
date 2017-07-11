@@ -90,14 +90,6 @@ TEST_F(BondTest, CheckBonds) {
 TEST_F(BondTest, IOTest) {
     b_check = initialize_bond(0, 1, fixed_length_sq);
     b_expect = initialize_bond(0, 1, fixed_length_sq);
-    std::cout << "**************************" << std::endl;
-    std::cout << "Verbose output of bond:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << bond_to_string(b_check, true) << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << "Non-verbose output of bond:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << bond_to_string(b_check, false) << std::endl;
     std::string b_str = bond_to_string(b_check, false);
     EXPECT_EQ(b_expect, string_to_bond(b_str));
 }

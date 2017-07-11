@@ -58,18 +58,6 @@ TEST_F(MoleculeTest, Initialization) {
     EXPECT_EQ(true, is_time_consistent(mol, t));
 }
 
-TEST_F(MoleculeTest, IOTest) {
-    Molecule m_check = initialize_molecule(atoms, bonds, t);
-    std::cout << "**************************" << std::endl;
-    std::cout << "Verbose output of molecule:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << molecule_to_string(m_check, true) << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << "Non-verbose output of molecule:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << molecule_to_string(m_check, false) << std::endl;
-}
-
 int main(int argc, char **argv){
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

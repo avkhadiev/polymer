@@ -56,14 +56,6 @@ TEST_F(AtomTest, Initialization) {
 TEST_F(AtomTest, IOTest) {
     std::string a_str = atom_to_string(a_expect, false);
     a_check = string_to_atom(a_str);
-    std::cout << "**************************" << std::endl;
-    std::cout << "Verbose output of atom:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << atom_to_string(a_check, true) << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << "Non-verbose output of atom:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << atom_to_string(a_check, false) << std::endl;
     set_time(&a_check, t);
     EXPECT_EQ(a_expect, a_check);
 }

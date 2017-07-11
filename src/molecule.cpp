@@ -54,14 +54,33 @@ Molecule initialize_molecule(std::vector<Atom> atoms, std::vector<Bond> bonds, d
 }
 void check_molecule(Molecule m) {
     bool valid = true;
+    std::string na_declared;
+    std::string na_actual;
+    std::string nb_declared;
+    std::string nb_actual;
     std::string err_msg = "check_molecule: ";
+    std::string new_msg;
     if(m.na != m.atoms.size()){
         valid = false;
-        err_msg += "number of atoms is not equal to the one declared; ";
+        na_declared = std::to_string(m.na);
+        na_actual = std::to_string(m.atoms.size());
+        new_msg = "number of atoms ("
+            + na_actual
+            + ") is not equal to the one declared ("
+            + na_declared
+            + "); ";
+        err_msg += new_msg;
     }
     if(m.nb != m.bonds.size()){
         valid = false;
-        err_msg += "number of bonds is not equal to the one declare; ";
+        nb_declared = std::to_string(m.nb);
+        nb_actual = std::to_string(m.bonds.size());
+        new_msg = "number of bonds ("
+            + nb_actual
+            + ") is not equal to the one declared ("
+            + nb_declared
+            + "); ";
+        err_msg += new_msg;
     }
     try
     {
@@ -176,8 +195,20 @@ Molecule string_to_molecule(std::ifstream& input_stream){
     std::istream_iterator<std::string> begin(ss);
     std::istream_iterator<std::string> end;
     std::vector<std::string> words(begin, end);
+#ifdef DEBUG
+    printf("%-45s%-30s%-15s\n",
+        "string_to_molecule reads:",
+        "number of atoms",
+        "number of bonds");
+#endif
     int na = atoi(words.at(0).c_str());
     int nb = atoi(words.at(1).c_str());
+#ifdef DEBUG
+    printf("%-45s%-30d%-15d\n",
+        "data:",
+        na,
+        nb);
+#endif
     // read all the atoms from the input stream
     std::vector<Atom> atoms;
     Atom next_atom;
@@ -203,7 +234,7 @@ Molecule string_to_molecule(std::ifstream& input_stream){
     Molecule m;
     try
     {
-        initialize_molecule(atoms, bonds);
+        m = initialize_molecule(atoms, bonds);
         return m;
     }
     catch (std::invalid_argument &e)

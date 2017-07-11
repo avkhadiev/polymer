@@ -16,27 +16,35 @@ class StateTest : public ::testing::Test {
      static const int nb = 2;
      static const int nm = 2;
      double t;
-     Vector r[na];
-     Vector v[na];
-     double mass[na];
+     Vector r[nm][na];
+     Vector v[nm][na];
+     double mass[nm][na];
      double fixed_length_sq;
-     Atom a[na];
+     Atom a[nm][na];
      std::vector<Atom> atoms;
      Bond b[nb];
      std::vector<Bond> bonds;
      Molecule m[nm];
      std::vector<Molecule> molecules;
+     bool verbose;
+     bool overwrite;
+     std::string fname;
+     std::string outdir;
+     std::string indir;
+     std::vector<State> states;
      virtual void SetUp() {
          t = 3.0;
          // initialize atoms
          // (-1, -1, -1), (0, 0, 0), and (1, 1, 1)
-         for (int i = 0; i < na;  ++i) {
-             double coord = i - 1.0;
-             mass[i] = 1.0;
-             r[i] = vector(coord, coord, coord);
-             v[i] = vector(coord, coord, coord);
-             a[i] = initialize_atom(mass[i], r[i], v[i], t);
-             atoms.push_back(a[i]);
+         for (int j = 0; j < nm; ++j) {
+             for (int i = 0; i < na;  ++i) {
+                 double coord = i - 1.0 + 5.0 * j;
+                 mass[j][i] = 1.0 + j;
+                 r[j][i] = vector(coord, coord, coord);
+                 v[j][i] = vector(coord, coord, coord);
+                 a[j][i] = initialize_atom(mass[j][i], r[j][i], v[j][i], t);
+                 atoms.push_back(a[j][i]);
+             }
          }
          // initialize bonds
          fixed_length_sq = 3.0;
@@ -52,17 +60,26 @@ class StateTest : public ::testing::Test {
              bonds.push_back(b[i]);
          }
          // initialize molecules
-         for (int i = 0; i < nm; ++i) {
+         for (int j = 0; j < nm; ++j) {
              try
              {
-                 m[i] = initialize_molecule(atoms, bonds, t);
+                 std::vector<Atom>::const_iterator first = atoms.begin() + j * na;
+                 std::vector<Atom>::const_iterator last = atoms.begin() + j*na + na;
+                 std::vector<Atom> atoms_for_molecule (first, last);
+                 m[j] = initialize_molecule(atoms_for_molecule, bonds, t);
              }
              catch (std::invalid_argument &e)
              {
                  throw;
              }
-             molecules.push_back(m[i]);
+             molecules.push_back(m[j]);
          }
+         // set up arguments for I/O;
+         verbose = true;
+         overwrite = true;
+         fname = "s_check";
+         outdir = "/Users/Arthur/stratt/polymer/test/";
+         indir = outdir;
      }
   // virtual void TearDown() {}
 };
@@ -87,14 +104,24 @@ TEST_F(StateTest, SetTime) {
 
 TEST_F(StateTest, IOTest) {
     State s_check = initialize_state(molecules, t);
-    std::cout << "**************************" << std::endl;
-    std::cout << "Verbose output of state:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << state_to_string(s_check, true) << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << "Non-verbose output of state:" << std::endl;
-    std::cout << "**************************" << std::endl;
-    std::cout << state_to_string(s_check, false) << std::endl;
+    State s_expect = s_check;
+    // write out s_check to file twice
+    write_state_to_file(s_check, outdir, fname, !verbose, overwrite);
+    // read s_check from file
+    try
+    {
+        states = read_states_from_file(indir, fname);
+    }
+    catch (std::invalid_argument &e)
+    {
+        throw;
+    }
+    // extract the state read
+    s_check = states.back();
+    // check the what has been written vs. read
+    std::string s_str_check = state_to_string(s_check, false);
+    std::string s_str_expect = state_to_string(s_expect, false);
+    EXPECT_EQ(s_str_expect, s_str_check);
 }
 
 int main(int argc, char **argv){

@@ -1,6 +1,15 @@
-# Ignore the build and lib dirs
+# Ignore build, lib and test dirs
 build
 lib/*
+test/*
+
+# Ignore cmake files
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+
+# Ignore google-test folders
+googletest*/*
 
 # Ignore any executables
 bin/*

@@ -2,10 +2,6 @@
 /*! \file initialize_triatomic.cpp
 */
 #include <string>
-#include <utility>              /* std::pair, std::make_pair */
-#include <stdexcept>
-#include <cmath>                /* pow */
-#include <gtest/gtest.h>
 #include "../include/vector.h"
 #include "../include/atom.h"
 #include "../include/bond.h"
@@ -77,8 +73,12 @@ int main(int argc, char **argv){
     * INITIALIZE STATE AND WRITE OUT TO FILE
     */
     State s = initialize_state(molecules, t);
+    std::string outdir = "/Users/Arthur/stratt/polymer/test/";
     std::string fname_verbose = fname + "_verbose";
     std::string fname_nonverbose = fname + "_nonverbose";
-    write_state_to_file(s, fname_verbose, true);
-    write_state_to_file(s, fname_nonverbose, false);
+    bool overwrite = true;
+    bool verbose = true;
+    bool nonverbose = false;
+    write_state_to_file(s, outdir, fname_verbose, verbose, overwrite);
+    write_state_to_file(s, outdir, fname_nonverbose, nonverbose, overwrite);
 }
