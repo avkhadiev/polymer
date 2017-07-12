@@ -145,7 +145,7 @@ void write_state_to_file(State s, std::string outdir, std::string fname, bool ve
     // TODO get this from a config file that contains macros
     fout = outdir + fname + ".cfg";
     std::ofstream writeout;
-    // open writeout for output operations and s
+    // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.
     if (overwrite) {
         // if overwrite is allowed, try to open in truncate mode

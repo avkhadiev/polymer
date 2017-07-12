@@ -8,9 +8,6 @@
 
 TriatomicObservableContainer::TriatomicObservableContainer() :
 {
-    // declare bonds
-    // declare kinetic energy
 }
 TriatomicObservableContainer::~TriatomicObservableContainer() {
-
 }

@@ -4,6 +4,7 @@
 #ifndef POLYMER_SIMULATION_H
 #define POLYMER_SIMULATION_H
 #include <vector>
+#include <string>
 #include <map>
 #include "state.h"
 #include "observable_container.h"
@@ -11,6 +12,7 @@
 #include "integrator.h"
 class Simulation {
     private:
+        std::string _name;
         LJPotential& _potential;
         Integrator& _integrator;
         ObservableContainer& _observables;
@@ -24,6 +26,7 @@ class Simulation {
         } _Parameters;
     public:
         // Getters
+        std::string get_name();
         LJPotential& get_potential();
         Integrator& get_integrator();
         ObservableContainer& get_observables();
@@ -33,6 +36,7 @@ class Simulation {
         double get_timestep();
         double get_measurestep();
         // Setters
+        void set_name(std::string name);
         void set_potential(LJPotential &potential);
         void set_integrator(Integrator &integrator);
         void set_observables(ObservableContainer &observables);
