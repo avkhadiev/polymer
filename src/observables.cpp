@@ -66,21 +66,21 @@ void write_vector_observable_to_file(VectorObservable& vo,
     std::string outdir, std::string sim_name, bool overwrite){
     // add header files?
     bool add_header;
+    // CSV file delimeter
+    std::string delim = ",";
     if (overwrite) {
         add_header = true;
     }
     else {
         add_header = false;
     }
-    // integer for field width
-    int indent = 15;
     // stores path to output file
     std::string fout;
     fout = outdir
         + parse_string(sim_name)
         + "_"
         + parse_string(vo.name)
-        + ".dat";
+        + ".csv";
     std::ofstream writeout;
     // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.
@@ -102,23 +102,20 @@ void write_vector_observable_to_file(VectorObservable& vo,
         // if file could be opened...
         // first write the header file if necessary
         if (add_header) {
-            // FIRST LINE
-            writeout << std::left << std::setw(indent) << "# Time";
-            writeout << std::right << std::setw(indent) << vector_observable_to_string(vo).c_str() << std::endl;
-            // SECOND LINE
-            writeout << std::left << std::setw(indent) << "#";
-            writeout << std::left << std::setw(indent) << "x";
-            writeout << std::left << std::setw(indent) << "y";
-            writeout << std::left << std::setw(indent) << "z" << std::endl;
+            std::string s = vector_observable_to_string(vo);
+            writeout << "\"time\"" << delim;
+            writeout << "\"" << s.c_str() << " (x)\"" << delim;
+            writeout << "\"" << s.c_str() << " (y)\"" <<  delim;
+            writeout << "\"" << s.c_str() << " (z)\"" <<std::endl;
         }
         // then output the data
         std::pair<Vector, double> value_time;
         for (int i = 0; i < vo.value_time.size(); ++i) {
             value_time = vo.value_time.at(i);
-            writeout << std::left << std::setw(indent) << value_time.second;
-            writeout << std::left << std::setw(indent) << value_time.first.x;
-            writeout << std::left << std::setw(indent) << value_time.first.y;
-            writeout << std::left << std::setw(indent) << value_time.first.z << std::endl;
+            writeout << value_time.second << delim;
+            writeout << value_time.first.x << delim;
+            writeout << value_time.first.y << delim;
+            writeout << value_time.first.z << std::endl;
         }
     }
     else {
@@ -133,6 +130,8 @@ void write_scalar_observable_to_file(ScalarObservable& so,
     std::string outdir, std::string sim_name, bool overwrite){
     // add header files?
     bool add_header;
+    // CSV file delimeter
+    std::string delim = ",";
     if (overwrite) {
         add_header = true;
     }
@@ -147,7 +146,7 @@ void write_scalar_observable_to_file(ScalarObservable& so,
         + parse_string(sim_name)
         + "_"
         + parse_string(so.name)
-        + ".dat";
+        + ".csv";
     std::ofstream writeout;
     // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.
@@ -170,15 +169,15 @@ void write_scalar_observable_to_file(ScalarObservable& so,
         // first write the header file if necessary
         if (add_header) {
             // FIRST LINE
-            writeout << std::left << std::setw(indent) << "# Time";
-            writeout << std::left << std::setw(indent) << scalar_observable_to_string(so).c_str() << std::endl;
+            writeout << "\"time\"" << delim;
+            writeout << "\"" << scalar_observable_to_string(so).c_str() << "\"" << std::endl;
         }
         // then output the data
         std::pair<double, double> value_time;
         for (int i = 0; i < so.value_time.size(); ++i) {
             value_time = so.value_time.at(i);
-            writeout << std::left << std::setw(indent) << value_time.second;
-            writeout << std::left << std::setw(indent) << value_time.first << std::endl;
+            writeout << value_time.second << delim;
+            writeout << value_time.first << std::endl;
         }
     }
     else {
