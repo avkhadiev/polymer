@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include "../include/parsing.h"
 #include "../include/state.h"
 #include "../include/molecule.h"
 State initialize_state(std::vector<Molecule> molecules, double t) {
@@ -143,7 +144,7 @@ void write_state_to_file(State s, std::string outdir, std::string fname, bool ve
     std::string fout;
     // stores path to output directoy
     // TODO get this from a config file that contains macros
-    fout = outdir + fname + ".cfg";
+    fout = outdir + parse_string(fname) + ".cfg";
     std::ofstream writeout;
     // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.

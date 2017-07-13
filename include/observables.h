@@ -7,20 +7,42 @@
 #include <utility>      /* std::pair, std::make_pair */
 #include <vector>
 #include "vector.h"
-typedef struct scalar_observable_t {
+struct scalar_observable_t {
     std::vector<std::pair<double, double> > value_time;
     double accumulator;
     std::string name;
+    std::string axis_name;
     std::string units;
-} ScalarObservable;
-typedef struct vector_observable_t {
+    scalar_observable_t& operator=(const scalar_observable_t& so)
+    {
+        value_time = so.value_time;
+        accumulator = so.accumulator;
+        name = so.name;
+        axis_name = so.axis_name;
+        units = so.units;
+        return *this;
+    }
+};
+typedef struct scalar_observable_t ScalarObservable;
+struct vector_observable_t {
     std::vector<std::pair<Vector, double> > value_time;
     Vector accumulator;
     std::string name;
+    std::string axis_name;
     std::string units;
-} VectorObservable;
+    vector_observable_t& operator=(const vector_observable_t& vo)
+    {
+        value_time = vo.value_time;
+        accumulator = vo.accumulator;
+        name = vo.name;
+        axis_name = vo.axis_name;
+        units = vo.units;
+        return *this;
+    }
+};
+typedef struct vector_observable_t VectorObservable;
 /**
-* Given the observable, return a string with "Name, Units"
+* Given the observable, return a string with "Axis name, Units"
 */
 std::string scalar_observable_to_string(ScalarObservable so);
 std::string vector_observable_to_string(VectorObservable vo);
@@ -30,8 +52,12 @@ std::string vector_observable_to_string(VectorObservable vo);
 * Given the name and the units of an observable, initialize the necessary
 * struct
 */
-ScalarObservable declare_scalar_observable(std::string name, std::string units);
-VectorObservable declare_vector_observable(std::string name, std::string units);
+ScalarObservable declare_scalar_observable(std::string name,
+    std::string units = "",
+    std::string axis_name = "");
+VectorObservable declare_vector_observable(std::string name,
+    std::string units = "",
+    std::string axis_name = "");
 /**
 * Given the observable, the output directory and the name of the simulation,
 * output the observable into outdir/sim_name_observable_name.dat.

@@ -31,7 +31,7 @@ int main(int argc, char **argv){
     Molecule m[nm];
     std::vector<Molecule> molecules;
     /**
-    /* SET UP
+    * SET UP
     */
     t = 3.0;
     // initialize atoms

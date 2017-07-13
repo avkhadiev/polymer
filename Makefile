@@ -80,27 +80,6 @@ install/fast: preinstall/fast
 	/Applications/CMake.app/Contents/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/Applications/CMake.app/Contents/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -111,6 +90,16 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
 
 # Special rule for the target install/local
 install/local: preinstall
@@ -123,6 +112,17 @@ install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
 	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/Applications/CMake.app/Contents/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -157,6 +157,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named initialize_triatomic
+
+# Build rule for target.
+initialize_triatomic: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 initialize_triatomic
+.PHONY : initialize_triatomic
+
+# fast build rule for target.
+initialize_triatomic/fast:
+	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/build
+.PHONY : initialize_triatomic/fast
+
+#=============================================================================
+# Target rules for targets named observable_container_test
+
+# Build rule for target.
+observable_container_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 observable_container_test
+.PHONY : observable_container_test
+
+# fast build rule for target.
+observable_container_test/fast:
+	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/build
+.PHONY : observable_container_test/fast
+
+#=============================================================================
 # Target rules for targets named observables_test
 
 # Build rule for target.
@@ -183,17 +209,69 @@ ljpotential_test/fast:
 .PHONY : ljpotential_test/fast
 
 #=============================================================================
-# Target rules for targets named bond
+# Target rules for targets named state_test
 
 # Build rule for target.
-bond: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bond
-.PHONY : bond
+state_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 state_test
+.PHONY : state_test
 
 # fast build rule for target.
-bond/fast:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/build
-.PHONY : bond/fast
+state_test/fast:
+	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/build
+.PHONY : state_test/fast
+
+#=============================================================================
+# Target rules for targets named observable_containers
+
+# Build rule for target.
+observable_containers: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 observable_containers
+.PHONY : observable_containers
+
+# fast build rule for target.
+observable_containers/fast:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/build
+.PHONY : observable_containers/fast
+
+#=============================================================================
+# Target rules for targets named bond_test
+
+# Build rule for target.
+bond_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bond_test
+.PHONY : bond_test
+
+# fast build rule for target.
+bond_test/fast:
+	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/build
+.PHONY : bond_test/fast
+
+#=============================================================================
+# Target rules for targets named parsing
+
+# Build rule for target.
+parsing: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 parsing
+.PHONY : parsing
+
+# fast build rule for target.
+parsing/fast:
+	$(MAKE) -f CMakeFiles/parsing.dir/build.make CMakeFiles/parsing.dir/build
+.PHONY : parsing/fast
+
+#=============================================================================
+# Target rules for targets named parsing_test
+
+# Build rule for target.
+parsing_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 parsing_test
+.PHONY : parsing_test
+
+# fast build rule for target.
+parsing_test/fast:
+	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/build
+.PHONY : parsing_test/fast
 
 #=============================================================================
 # Target rules for targets named molecule_test
@@ -235,17 +313,17 @@ vector_test/fast:
 .PHONY : vector_test/fast
 
 #=============================================================================
-# Target rules for targets named bond_test
+# Target rules for targets named state
 
 # Build rule for target.
-bond_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bond_test
-.PHONY : bond_test
+state: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 state
+.PHONY : state
 
 # fast build rule for target.
-bond_test/fast:
-	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/build
-.PHONY : bond_test/fast
+state/fast:
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/build
+.PHONY : state/fast
 
 #=============================================================================
 # Target rules for targets named vector
@@ -259,71 +337,6 @@ vector: cmake_check_build_system
 vector/fast:
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/build
 .PHONY : vector/fast
-
-#=============================================================================
-# Target rules for targets named atom
-
-# Build rule for target.
-atom: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 atom
-.PHONY : atom
-
-# fast build rule for target.
-atom/fast:
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/build
-.PHONY : atom/fast
-
-#=============================================================================
-# Target rules for targets named initialize_triatomic
-
-# Build rule for target.
-initialize_triatomic: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 initialize_triatomic
-.PHONY : initialize_triatomic
-
-# fast build rule for target.
-initialize_triatomic/fast:
-	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/build
-.PHONY : initialize_triatomic/fast
-
-#=============================================================================
-# Target rules for targets named ljpotential
-
-# Build rule for target.
-ljpotential: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ljpotential
-.PHONY : ljpotential
-
-# fast build rule for target.
-ljpotential/fast:
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/build
-.PHONY : ljpotential/fast
-
-#=============================================================================
-# Target rules for targets named state_test
-
-# Build rule for target.
-state_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 state_test
-.PHONY : state_test
-
-# fast build rule for target.
-state_test/fast:
-	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/build
-.PHONY : state_test/fast
-
-#=============================================================================
-# Target rules for targets named molecule
-
-# Build rule for target.
-molecule: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 molecule
-.PHONY : molecule
-
-# fast build rule for target.
-molecule/fast:
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/build
-.PHONY : molecule/fast
 
 #=============================================================================
 # Target rules for targets named gmock
@@ -383,10 +396,7 @@ src/atom.o: src/atom.cpp.o
 
 # target to build an object file
 src/atom.cpp.o:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.o
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.o
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.o
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/atom.cpp.o
 .PHONY : src/atom.cpp.o
 
 src/atom.i: src/atom.cpp.i
@@ -395,10 +405,7 @@ src/atom.i: src/atom.cpp.i
 
 # target to preprocess a source file
 src/atom.cpp.i:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.i
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.i
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.i
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/atom.cpp.i
 .PHONY : src/atom.cpp.i
 
 src/atom.s: src/atom.cpp.s
@@ -407,10 +414,7 @@ src/atom.s: src/atom.cpp.s
 
 # target to generate assembly for a file
 src/atom.cpp.s:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/atom.cpp.s
-	$(MAKE) -f CMakeFiles/atom_test.dir/build.make CMakeFiles/atom_test.dir/src/atom.cpp.s
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/atom.cpp.s
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/atom.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/atom.cpp.s
 .PHONY : src/atom.cpp.s
 
 src/atom_test.o: src/atom_test.cpp.o
@@ -446,9 +450,7 @@ src/bond.o: src/bond.cpp.o
 
 # target to build an object file
 src/bond.cpp.o:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.o
-	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.o
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/bond.cpp.o
 .PHONY : src/bond.cpp.o
 
 src/bond.i: src/bond.cpp.i
@@ -457,9 +459,7 @@ src/bond.i: src/bond.cpp.i
 
 # target to preprocess a source file
 src/bond.cpp.i:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.i
-	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.i
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/bond.cpp.i
 .PHONY : src/bond.cpp.i
 
 src/bond.s: src/bond.cpp.s
@@ -468,9 +468,7 @@ src/bond.s: src/bond.cpp.s
 
 # target to generate assembly for a file
 src/bond.cpp.s:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/bond.cpp.s
-	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/src/bond.cpp.s
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/bond.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/bond.cpp.s
 .PHONY : src/bond.cpp.s
 
 src/bond_test.o: src/bond_test.cpp.o
@@ -534,7 +532,6 @@ src/ljpotential.o: src/ljpotential.cpp.o
 # target to build an object file
 src/ljpotential.cpp.o:
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.o
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/ljpotential.cpp.o
 .PHONY : src/ljpotential.cpp.o
 
 src/ljpotential.i: src/ljpotential.cpp.i
@@ -544,7 +541,6 @@ src/ljpotential.i: src/ljpotential.cpp.i
 # target to preprocess a source file
 src/ljpotential.cpp.i:
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.i
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/ljpotential.cpp.i
 .PHONY : src/ljpotential.cpp.i
 
 src/ljpotential.s: src/ljpotential.cpp.s
@@ -554,7 +550,6 @@ src/ljpotential.s: src/ljpotential.cpp.s
 # target to generate assembly for a file
 src/ljpotential.cpp.s:
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.s
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/ljpotential.cpp.s
 .PHONY : src/ljpotential.cpp.s
 
 src/ljpotential_test.o: src/ljpotential_test.cpp.o
@@ -590,8 +585,7 @@ src/molecule.o: src/molecule.cpp.o
 
 # target to build an object file
 src/molecule.cpp.o:
-	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.o
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/molecule.cpp.o
 .PHONY : src/molecule.cpp.o
 
 src/molecule.i: src/molecule.cpp.i
@@ -600,8 +594,7 @@ src/molecule.i: src/molecule.cpp.i
 
 # target to preprocess a source file
 src/molecule.cpp.i:
-	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.i
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/molecule.cpp.i
 .PHONY : src/molecule.cpp.i
 
 src/molecule.s: src/molecule.cpp.s
@@ -610,8 +603,7 @@ src/molecule.s: src/molecule.cpp.s
 
 # target to generate assembly for a file
 src/molecule.cpp.s:
-	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule.cpp.s
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/molecule.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/molecule.cpp.s
 .PHONY : src/molecule.cpp.s
 
 src/molecule_test.o: src/molecule_test.cpp.o
@@ -641,13 +633,67 @@ src/molecule_test.cpp.s:
 	$(MAKE) -f CMakeFiles/molecule_test.dir/build.make CMakeFiles/molecule_test.dir/src/molecule_test.cpp.s
 .PHONY : src/molecule_test.cpp.s
 
+src/observable_container.o: src/observable_container.cpp.o
+
+.PHONY : src/observable_container.o
+
+# target to build an object file
+src/observable_container.cpp.o:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observable_container.cpp.o
+.PHONY : src/observable_container.cpp.o
+
+src/observable_container.i: src/observable_container.cpp.i
+
+.PHONY : src/observable_container.i
+
+# target to preprocess a source file
+src/observable_container.cpp.i:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observable_container.cpp.i
+.PHONY : src/observable_container.cpp.i
+
+src/observable_container.s: src/observable_container.cpp.s
+
+.PHONY : src/observable_container.s
+
+# target to generate assembly for a file
+src/observable_container.cpp.s:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observable_container.cpp.s
+.PHONY : src/observable_container.cpp.s
+
+src/observable_container_test.o: src/observable_container_test.cpp.o
+
+.PHONY : src/observable_container_test.o
+
+# target to build an object file
+src/observable_container_test.cpp.o:
+	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable_container_test.cpp.o
+.PHONY : src/observable_container_test.cpp.o
+
+src/observable_container_test.i: src/observable_container_test.cpp.i
+
+.PHONY : src/observable_container_test.i
+
+# target to preprocess a source file
+src/observable_container_test.cpp.i:
+	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable_container_test.cpp.i
+.PHONY : src/observable_container_test.cpp.i
+
+src/observable_container_test.s: src/observable_container_test.cpp.s
+
+.PHONY : src/observable_container_test.s
+
+# target to generate assembly for a file
+src/observable_container_test.cpp.s:
+	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable_container_test.cpp.s
+.PHONY : src/observable_container_test.cpp.s
+
 src/observables.o: src/observables.cpp.o
 
 .PHONY : src/observables.o
 
 # target to build an object file
 src/observables.cpp.o:
-	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.o
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observables.cpp.o
 .PHONY : src/observables.cpp.o
 
 src/observables.i: src/observables.cpp.i
@@ -656,7 +702,7 @@ src/observables.i: src/observables.cpp.i
 
 # target to preprocess a source file
 src/observables.cpp.i:
-	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.i
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observables.cpp.i
 .PHONY : src/observables.cpp.i
 
 src/observables.s: src/observables.cpp.s
@@ -665,7 +711,7 @@ src/observables.s: src/observables.cpp.s
 
 # target to generate assembly for a file
 src/observables.cpp.s:
-	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables.cpp.s
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/observables.cpp.s
 .PHONY : src/observables.cpp.s
 
 src/observables_test.o: src/observables_test.cpp.o
@@ -695,14 +741,73 @@ src/observables_test.cpp.s:
 	$(MAKE) -f CMakeFiles/observables_test.dir/build.make CMakeFiles/observables_test.dir/src/observables_test.cpp.s
 .PHONY : src/observables_test.cpp.s
 
+src/parsing.o: src/parsing.cpp.o
+
+.PHONY : src/parsing.o
+
+# target to build an object file
+src/parsing.cpp.o:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/parsing.cpp.o
+	$(MAKE) -f CMakeFiles/parsing.dir/build.make CMakeFiles/parsing.dir/src/parsing.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.o
+.PHONY : src/parsing.cpp.o
+
+src/parsing.i: src/parsing.cpp.i
+
+.PHONY : src/parsing.i
+
+# target to preprocess a source file
+src/parsing.cpp.i:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/parsing.cpp.i
+	$(MAKE) -f CMakeFiles/parsing.dir/build.make CMakeFiles/parsing.dir/src/parsing.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.i
+.PHONY : src/parsing.cpp.i
+
+src/parsing.s: src/parsing.cpp.s
+
+.PHONY : src/parsing.s
+
+# target to generate assembly for a file
+src/parsing.cpp.s:
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/parsing.cpp.s
+	$(MAKE) -f CMakeFiles/parsing.dir/build.make CMakeFiles/parsing.dir/src/parsing.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.s
+.PHONY : src/parsing.cpp.s
+
+src/parsing_test.o: src/parsing_test.cpp.o
+
+.PHONY : src/parsing_test.o
+
+# target to build an object file
+src/parsing_test.cpp.o:
+	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing_test.cpp.o
+.PHONY : src/parsing_test.cpp.o
+
+src/parsing_test.i: src/parsing_test.cpp.i
+
+.PHONY : src/parsing_test.i
+
+# target to preprocess a source file
+src/parsing_test.cpp.i:
+	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing_test.cpp.i
+.PHONY : src/parsing_test.cpp.i
+
+src/parsing_test.s: src/parsing_test.cpp.s
+
+.PHONY : src/parsing_test.s
+
+# target to generate assembly for a file
+src/parsing_test.cpp.s:
+	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing_test.cpp.s
+.PHONY : src/parsing_test.cpp.s
+
 src/state.o: src/state.cpp.o
 
 .PHONY : src/state.o
 
 # target to build an object file
 src/state.cpp.o:
-	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.o
-	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/state.cpp.o
 .PHONY : src/state.cpp.o
 
 src/state.i: src/state.cpp.i
@@ -711,8 +816,7 @@ src/state.i: src/state.cpp.i
 
 # target to preprocess a source file
 src/state.cpp.i:
-	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.i
-	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/state.cpp.i
 .PHONY : src/state.cpp.i
 
 src/state.s: src/state.cpp.s
@@ -721,8 +825,7 @@ src/state.s: src/state.cpp.s
 
 # target to generate assembly for a file
 src/state.cpp.s:
-	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/src/state.cpp.s
-	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/state.cpp.s
 .PHONY : src/state.cpp.s
 
 src/state_test.o: src/state_test.cpp.o
@@ -758,12 +861,9 @@ src/vector.o: src/vector.cpp.o
 
 # target to build an object file
 src/vector.cpp.o:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.o
 .PHONY : src/vector.cpp.o
 
 src/vector.i: src/vector.cpp.i
@@ -772,12 +872,9 @@ src/vector.i: src/vector.cpp.i
 
 # target to preprocess a source file
 src/vector.cpp.i:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.i
 .PHONY : src/vector.cpp.i
 
 src/vector.s: src/vector.cpp.s
@@ -786,12 +883,9 @@ src/vector.s: src/vector.cpp.s
 
 # target to generate assembly for a file
 src/vector.cpp.s:
-	$(MAKE) -f CMakeFiles/bond.dir/build.make CMakeFiles/bond.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/observable_containers.dir/build.make CMakeFiles/observable_containers.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/vector.dir/build.make CMakeFiles/vector.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/ljpotential.dir/build.make CMakeFiles/ljpotential.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/molecule.dir/build.make CMakeFiles/molecule.dir/src/vector.cpp.s
 .PHONY : src/vector.cpp.s
 
 src/vector_test.o: src/vector_test.cpp.o
@@ -829,23 +923,24 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install"
+	@echo "... rebuild_cache"
+	@echo "... initialize_triatomic"
 	@echo "... list_install_components"
+	@echo "... observable_container_test"
 	@echo "... observables_test"
 	@echo "... ljpotential_test"
-	@echo "... bond"
+	@echo "... install/local"
+	@echo "... state_test"
+	@echo "... observable_containers"
+	@echo "... bond_test"
+	@echo "... parsing"
+	@echo "... parsing_test"
 	@echo "... molecule_test"
 	@echo "... edit_cache"
 	@echo "... atom_test"
 	@echo "... vector_test"
-	@echo "... bond_test"
+	@echo "... state"
 	@echo "... vector"
-	@echo "... atom"
-	@echo "... rebuild_cache"
-	@echo "... initialize_triatomic"
-	@echo "... ljpotential"
-	@echo "... install/local"
-	@echo "... state_test"
-	@echo "... molecule"
 	@echo "... gmock"
 	@echo "... gmock_main"
 	@echo "... gtest_main"
@@ -877,12 +972,24 @@ help:
 	@echo "... src/molecule_test.o"
 	@echo "... src/molecule_test.i"
 	@echo "... src/molecule_test.s"
+	@echo "... src/observable_container.o"
+	@echo "... src/observable_container.i"
+	@echo "... src/observable_container.s"
+	@echo "... src/observable_container_test.o"
+	@echo "... src/observable_container_test.i"
+	@echo "... src/observable_container_test.s"
 	@echo "... src/observables.o"
 	@echo "... src/observables.i"
 	@echo "... src/observables.s"
 	@echo "... src/observables_test.o"
 	@echo "... src/observables_test.i"
 	@echo "... src/observables_test.s"
+	@echo "... src/parsing.o"
+	@echo "... src/parsing.i"
+	@echo "... src/parsing.s"
+	@echo "... src/parsing_test.o"
+	@echo "... src/parsing_test.i"
+	@echo "... src/parsing_test.s"
 	@echo "... src/state.o"
 	@echo "... src/state.i"
 	@echo "... src/state.s"

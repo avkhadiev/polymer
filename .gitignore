@@ -8,6 +8,9 @@ CMakeFiles/*
 CMakeCache.txt
 cmake_install.cmake
 
+# Ignore the makefile
+Makefile
+
 # Ignore google-test folders
 googletest*/*
 

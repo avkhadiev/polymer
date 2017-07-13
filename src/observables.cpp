@@ -7,20 +7,21 @@
 #include <fstream>
 #include <iomanip>      /* std::setw */
 #include <string>
+#include <../include/parsing.h>
 #include "../include/vector.h"
 #include "../include/observables.h"
 std::string scalar_observable_to_string(ScalarObservable so) {
     std::string so_str;
-    std::string so_name = so.name;
+    std::string so_axis_name = so.axis_name;
     std::string so_units = so.units;
-    so_str = so.name + ", " + so.units;
+    so_str = so_axis_name + ", " + so.units;
     return so_str;
 }
 std::string vector_observable_to_string(VectorObservable vo) {
     std::string vo_str;
-    std::string vo_name = vo.name;
+    std::string vo_axis_name = vo.axis_name;
     std::string vo_units = vo.units;
-    vo_str = vo.name + ", " + vo.units;
+    vo_str = vo_axis_name + ", " + vo.units;
     return vo_str;
 }
 ::std::ostream& operator<<(::std::ostream& os, const ScalarObservable& so) {
@@ -33,19 +34,31 @@ std::string vector_observable_to_string(VectorObservable vo) {
 * Given the name and the units of an observable, initialize the necessary
 * struct; the value_time vector of value, time pairs will be empty;
 */
-ScalarObservable declare_scalar_observable(std::string name, std::string units) {
+ScalarObservable declare_scalar_observable(std::string name,
+    std::string units,
+    std::string axis_name) {
     std::vector<std::pair<double, double> > empty_vector;
+    if (axis_name == "") {
+        axis_name = name;
+    }
     ScalarObservable so = {.value_time = empty_vector,
         .accumulator = 0.0,
         .name = name,
+        .axis_name = axis_name,
         .units = units};
     return so;
 }
-VectorObservable declare_vector_observable(std::string name, std::string units) {
+VectorObservable declare_vector_observable(std::string name,
+    std::string units,
+    std::string axis_name) {
     std::vector<std::pair<Vector, double> > empty_vector;
+    if (axis_name == "") {
+        axis_name = name;
+    }
     VectorObservable vo = {.value_time = empty_vector,
         .accumulator = vector(0.0, 0.0, 0.0),
         .name = name,
+        .axis_name = axis_name,
         .units = units};
     return vo;
 }
@@ -63,7 +76,11 @@ void write_vector_observable_to_file(VectorObservable& vo,
     int indent = 15;
     // stores path to output file
     std::string fout;
-    fout = outdir + sim_name + "_" + vo.name + ".dat";
+    fout = outdir
+        + parse_string(sim_name)
+        + "_"
+        + parse_string(vo.name)
+        + ".dat";
     std::ofstream writeout;
     // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.
@@ -126,7 +143,11 @@ void write_scalar_observable_to_file(ScalarObservable& so,
     int indent = 15;
     // stores path to output file
     std::string fout;
-    fout = outdir + sim_name + "_" + so.name + ".dat";
+    fout = outdir
+        + parse_string(sim_name)
+        + "_"
+        + parse_string(so.name)
+        + ".dat";
     std::ofstream writeout;
     // open writeout for output operations and
     // set the stream's position indicator to the end of the stream before each output operation.
