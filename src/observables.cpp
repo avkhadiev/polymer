@@ -62,6 +62,12 @@ VectorObservable declare_vector_observable(std::string name,
         .units = units};
     return vo;
 }
+void clear_observable_records(ScalarObservable *so){
+    so->value_time.clear();
+};
+void clear_observable_records(VectorObservable *vo){
+    vo->value_time.clear();
+};
 void write_vector_observable_to_file(VectorObservable& vo,
     std::string outdir, std::string sim_name, bool overwrite){
     // add header files?
@@ -102,11 +108,13 @@ void write_vector_observable_to_file(VectorObservable& vo,
         // if file could be opened...
         // first write the header file if necessary
         if (add_header) {
-            std::string s = vector_observable_to_string(vo);
-            writeout << "\"time\"" << delim;
-            writeout << "\"" << s.c_str() << " (x)\"" << delim;
-            writeout << "\"" << s.c_str() << " (y)\"" <<  delim;
-            writeout << "\"" << s.c_str() << " (z)\"" <<std::endl;
+            std::string s = parse_string(vo.name);
+            writeout << "time" << delim;
+            writeout << s.c_str() << "_x" << delim;
+            writeout << s.c_str() << "_y" << delim;
+            writeout << s.c_str() << "_z" << delim;
+            writeout << "axis_name" << delim;
+            writeout << "units" << std::endl;
         }
         // then output the data
         std::pair<Vector, double> value_time;
@@ -115,7 +123,9 @@ void write_vector_observable_to_file(VectorObservable& vo,
             writeout << value_time.second << delim;
             writeout << value_time.first.x << delim;
             writeout << value_time.first.y << delim;
-            writeout << value_time.first.z << std::endl;
+            writeout << value_time.first.z << delim;
+            writeout << vo.axis_name << delim;
+            writeout << vo.units << std::endl;
         }
     }
     else {
@@ -169,15 +179,19 @@ void write_scalar_observable_to_file(ScalarObservable& so,
         // first write the header file if necessary
         if (add_header) {
             // FIRST LINE
-            writeout << "\"time\"" << delim;
-            writeout << "\"" << scalar_observable_to_string(so).c_str() << "\"" << std::endl;
+            writeout << "time" << delim;
+            writeout << parse_string(so.name) << delim;
+            writeout << "axis_name" << delim;
+            writeout << "units" << std::endl;
         }
         // then output the data
         std::pair<double, double> value_time;
         for (int i = 0; i < so.value_time.size(); ++i) {
             value_time = so.value_time.at(i);
             writeout << value_time.second << delim;
-            writeout << value_time.first << std::endl;
+            writeout << value_time.first << delim;
+            writeout << so.axis_name << delim;
+            writeout << so.units << std::endl;
         }
     }
     else {

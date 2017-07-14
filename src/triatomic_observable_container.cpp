@@ -6,7 +6,7 @@
 #include "../include/observables.h"
 #include "../include/triatomic_observable_container.h"
 
-TriatomicObservableContainer::TriatomicObservableContainer() :
+TriatomicObservableContainer::TriatomicObservableContainer()
 {
 }
 TriatomicObservableContainer::~TriatomicObservableContainer() {

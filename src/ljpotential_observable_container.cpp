@@ -17,18 +17,13 @@ LJPotentialObservableContainer::LJPotentialObservableContainer()
     _pair_fstrength = declare_scalar_observable("Force Strength",
         "\\epsilon \\sigma^{-1}",
         "f_{ij}");
+    _distance = declare_scalar_observable("Distance",
+        "\\sigma",
+        "r_{ij}");
     add_scalar_observable(&_pair_potential);
     add_scalar_observable(&_pair_virial);
     add_scalar_observable(&_pair_fstrength);
+    add_scalar_observable(&_distance);
 };
 LJPotentialObservableContainer::~LJPotentialObservableContainer(){
 };
-ScalarObservable const *LJPotentialObservableContainer::get_pair_potential() const {
-    return &_pair_potential;
-}
-ScalarObservable const *LJPotentialObservableContainer::get_pair_virial() const {
-    return &_pair_virial;
-}
-ScalarObservable const *LJPotentialObservableContainer::get_pair_fstrength() const {
-    return &_pair_fstrength;
-}

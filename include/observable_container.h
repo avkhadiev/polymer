@@ -29,6 +29,7 @@
         virtual ScalarObservable *get_scalar_observable(std::string name);
         // returns a pointer to vector observable given its name
         virtual VectorObservable *get_vector_observable(std::string name);
+
         // returns a pointer to scalar observable accumulator given its name
         virtual double *get_scalar_observable_accumulator(std::string name);
         // returns a pointer to vector observable accumulator given its name
@@ -39,6 +40,13 @@
         virtual void zero_vector_observable_accumulator(std::string name);
         // zeros accumulators of all observables
         virtual void zero_accumulators(std::vector<std::string> names = {});
+        // clears all records of the scalar observable with the given name
+        virtual void clear_scalar_observable_records(std::string name);
+        // clears all records of the vector observable with the given name
+        virtual void clear_vector_observable_records(std::string name);
+        // clears all recods of observables with names in the given vector of
+        // names
+        virtual void clear_observables_records(std::vector<std::string> names={});
         // pushes the given pair (value, time) to a vector of observed values
         // for a scalar observable of the given name
         virtual void update_scalar_observable(std::string name, std::pair<double, double> value_time);

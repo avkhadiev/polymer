@@ -122,6 +122,44 @@ void ObservableContainer::zero_accumulators(std::vector<std::string> names) {
         }
     }
 }
+void ObservableContainer::clear_scalar_observable_records(std::string name){
+    ScalarObservable *so;
+    try
+    {
+        so = get_scalar_observable(name);
+        clear_observable_records(so);
+    }
+    catch (std::invalid_argument& e)
+    {
+        throw;
+    }
+}
+void ObservableContainer::clear_vector_observable_records(std::string name){
+    VectorObservable *vo;
+    try
+    {
+        vo = get_vector_observable(name);
+        clear_observable_records(vo);
+    }
+    catch (std::invalid_argument& e)
+    {
+        throw;
+    }
+}
+void ObservableContainer::clear_observables_records(std::vector<std::string> names){
+    if (names.empty()){
+        names = _observable_names;
+    }
+    for (std::string& name : names){
+        if (_scalar_observables.find(name) != _scalar_observables.end()){
+            clear_scalar_observable_records(name);
+        }
+        // update a vector observable if such a name exists
+        if (_vector_observables.find(name) != _vector_observables.end()){
+            clear_vector_observable_records(name);
+        }
+    }
+}
 void ObservableContainer::update_scalar_observable(std::string name, std::pair<double, double> value_time) {
     try
     {

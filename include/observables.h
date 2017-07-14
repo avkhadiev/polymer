@@ -59,6 +59,14 @@ VectorObservable declare_vector_observable(std::string name,
     std::string units = "",
     std::string axis_name = "");
 /**
+* Clear the value_time vector in scalar observable
+*/
+void clear_observable_records(ScalarObservable *so);
+/**
+* Clear the value_time vector in vector observable
+*/
+void clear_observable_records(VectorObservable *vo);
+/**
 * Given the observable, the output directory and the name of the simulation,
 * output the observable into outdir/sim_name_observable_name.dat.
 * if overwrite = false:

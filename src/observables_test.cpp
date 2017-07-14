@@ -75,6 +75,20 @@ TEST_F(ObservableTest, StringOutput) {
     EXPECT_EQ(vo_string, vector_observable_to_string(vo));
 }
 
+TEST_F(ObservableTest, ClearTest){
+    // add stuff to the observable value_time vector
+    so.value_time.push_back(std::make_pair(2.0, 2.0));
+    vo.value_time.push_back(std::make_pair(vector(2.0, 2.0, 2.0), 2.0));
+    ASSERT_EQ(false, so.value_time.empty());
+    ASSERT_EQ(false, vo.value_time.empty());
+    // clear value_time vectors in observables
+    clear_observable_records(&so);
+    clear_observable_records(&vo);
+    // check whether the records are emptied
+    ASSERT_EQ(true, so.value_time.empty());
+    ASSERT_EQ(true, vo.value_time.empty());
+}
+
 TEST_F(ObservableTest, IOTest) {
     so.value_time = value_time_scalar;
     vo.value_time = value_time_vector;

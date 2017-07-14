@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include "../include/parsing.h"
 #include "../include/ljpotential.h"
 #include "../include/vector.h"
 LJPotential::LJPotential() :
@@ -93,9 +94,11 @@ std::string LJPotential::get_str() const {
 }
 void LJPotential::writeout_parameters_to_file(std::string outdir,
     std::string sim_name) {
+    // delimeter for csv file
+    std::string delim = ",";
     // stores path to output file
     std::string fout;
-    fout = outdir + sim_name + "_potential.cfg";
+    fout = outdir + parse_string(sim_name) + "_potential.csv";
     std::ofstream writeout;
     // open writeout for output operations and s
     // try to open in truncate mode
@@ -104,7 +107,12 @@ void LJPotential::writeout_parameters_to_file(std::string outdir,
     if (writeout.is_open()) {
         // if file could be opened...
         // writeout potential's string representation
-        writeout << get_str().c_str();
+        // writeout the header
+        writeout << "\\epsilon" << delim;
+        writeout << "\\sigma" << std::endl;
+        // writeout the parameters
+        writeout << get_epsilon() << delim;
+        writeout << get_sigma() << std::endl;
     }
     else {
         // if file could not be opened

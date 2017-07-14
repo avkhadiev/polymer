@@ -13,11 +13,8 @@
         ScalarObservable _pair_potential;
         ScalarObservable _pair_virial;
         ScalarObservable _pair_fstrength;
+        ScalarObservable _distance;
     public:
-        // getters
-        const ScalarObservable *get_pair_potential() const;
-        const ScalarObservable *get_pair_virial() const;
-        const ScalarObservable *get_pair_fstrength() const;
         // a constructor and a destructor
         LJPotentialObservableContainer();
         ~LJPotentialObservableContainer();

@@ -157,6 +157,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named study_ljpotential
+
+# Build rule for target.
+study_ljpotential: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 study_ljpotential
+.PHONY : study_ljpotential
+
+# fast build rule for target.
+study_ljpotential/fast:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/build
+.PHONY : study_ljpotential/fast
+
+#=============================================================================
 # Target rules for targets named initialize_triatomic
 
 # Build rule for target.
@@ -531,6 +544,7 @@ src/ljpotential.o: src/ljpotential.cpp.o
 
 # target to build an object file
 src/ljpotential.cpp.o:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential.cpp.o
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.o
 .PHONY : src/ljpotential.cpp.o
 
@@ -540,6 +554,7 @@ src/ljpotential.i: src/ljpotential.cpp.i
 
 # target to preprocess a source file
 src/ljpotential.cpp.i:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential.cpp.i
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.i
 .PHONY : src/ljpotential.cpp.i
 
@@ -549,8 +564,36 @@ src/ljpotential.s: src/ljpotential.cpp.s
 
 # target to generate assembly for a file
 src/ljpotential.cpp.s:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential.cpp.s
 	$(MAKE) -f CMakeFiles/ljpotential_test.dir/build.make CMakeFiles/ljpotential_test.dir/src/ljpotential.cpp.s
 .PHONY : src/ljpotential.cpp.s
+
+src/ljpotential_observable_container.o: src/ljpotential_observable_container.cpp.o
+
+.PHONY : src/ljpotential_observable_container.o
+
+# target to build an object file
+src/ljpotential_observable_container.cpp.o:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential_observable_container.cpp.o
+.PHONY : src/ljpotential_observable_container.cpp.o
+
+src/ljpotential_observable_container.i: src/ljpotential_observable_container.cpp.i
+
+.PHONY : src/ljpotential_observable_container.i
+
+# target to preprocess a source file
+src/ljpotential_observable_container.cpp.i:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential_observable_container.cpp.i
+.PHONY : src/ljpotential_observable_container.cpp.i
+
+src/ljpotential_observable_container.s: src/ljpotential_observable_container.cpp.s
+
+.PHONY : src/ljpotential_observable_container.s
+
+# target to generate assembly for a file
+src/ljpotential_observable_container.cpp.s:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/ljpotential_observable_container.cpp.s
+.PHONY : src/ljpotential_observable_container.cpp.s
 
 src/ljpotential_test.o: src/ljpotential_test.cpp.o
 
@@ -855,6 +898,33 @@ src/state_test.cpp.s:
 	$(MAKE) -f CMakeFiles/state_test.dir/build.make CMakeFiles/state_test.dir/src/state_test.cpp.s
 .PHONY : src/state_test.cpp.s
 
+src/study_ljpotential.o: src/study_ljpotential.cpp.o
+
+.PHONY : src/study_ljpotential.o
+
+# target to build an object file
+src/study_ljpotential.cpp.o:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/study_ljpotential.cpp.o
+.PHONY : src/study_ljpotential.cpp.o
+
+src/study_ljpotential.i: src/study_ljpotential.cpp.i
+
+.PHONY : src/study_ljpotential.i
+
+# target to preprocess a source file
+src/study_ljpotential.cpp.i:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/study_ljpotential.cpp.i
+.PHONY : src/study_ljpotential.cpp.i
+
+src/study_ljpotential.s: src/study_ljpotential.cpp.s
+
+.PHONY : src/study_ljpotential.s
+
+# target to generate assembly for a file
+src/study_ljpotential.cpp.s:
+	$(MAKE) -f CMakeFiles/study_ljpotential.dir/build.make CMakeFiles/study_ljpotential.dir/src/study_ljpotential.cpp.s
+.PHONY : src/study_ljpotential.cpp.s
+
 src/vector.o: src/vector.cpp.o
 
 .PHONY : src/vector.o
@@ -923,6 +993,7 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install"
+	@echo "... study_ljpotential"
 	@echo "... rebuild_cache"
 	@echo "... initialize_triatomic"
 	@echo "... list_install_components"
@@ -963,6 +1034,9 @@ help:
 	@echo "... src/ljpotential.o"
 	@echo "... src/ljpotential.i"
 	@echo "... src/ljpotential.s"
+	@echo "... src/ljpotential_observable_container.o"
+	@echo "... src/ljpotential_observable_container.i"
+	@echo "... src/ljpotential_observable_container.s"
 	@echo "... src/ljpotential_test.o"
 	@echo "... src/ljpotential_test.i"
 	@echo "... src/ljpotential_test.s"
@@ -996,6 +1070,9 @@ help:
 	@echo "... src/state_test.o"
 	@echo "... src/state_test.i"
 	@echo "... src/state_test.s"
+	@echo "... src/study_ljpotential.o"
+	@echo "... src/study_ljpotential.i"
+	@echo "... src/study_ljpotential.s"
 	@echo "... src/vector.o"
 	@echo "... src/vector.i"
 	@echo "... src/vector.s"
