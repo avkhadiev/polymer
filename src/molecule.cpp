@@ -104,14 +104,19 @@ bool is_time_consistent(Molecule molecule, double time) {
         // if time was not optional and is not equal to one of the time values
         double some_time_record = molecule.atoms.back().position.second;
         if (time != -1 && time != some_time_record){
-                consistent = false;
+            fprintf(stderr, "atoms time records do not match the required time (%.3f)\n", time);
+            consistent = false;
         }
         // otherwise set the time argument as not optional and equal to the
         // time record
         else {
             time = some_time_record;
-            for(Atom& atom : molecule.atoms) {
-                consistent = consistent && is_time_consistent(atom, time);
+            for(int i = 0; i < molecule.na; ++i) {
+                consistent = consistent && is_time_consistent(molecule.atoms.at(i), time);
+                if (!consistent) {
+                    fprintf(stderr, "atom %d is not time-consistent\n", i);
+                    break;
+                }
             }
         }
     }

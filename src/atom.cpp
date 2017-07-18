@@ -23,15 +23,30 @@ Atom initialize_atom(double mass, Vector r, Vector v, double t){
 bool is_time_consistent(Atom atom, double time) {
     double position_time = atom.position.second;
     double velocity_time = atom.velocity.second;
-    bool consistent = false;
-    if (position_time == velocity_time) {
-        if (time == -1) {
-            consistent = true;
+    bool consistent = true;
+    if (time == -1){
+        if (position_time != velocity_time) {
+            consistent = false;
+            fprintf(stderr, "velocity time (%f) and position time (%f) do not match\n", velocity_time, position_time);
         }
-        else {
-            if (time == position_time){
-                consistent = true;
-            }
+    }
+    else{
+        if ((position_time != velocity_time)
+            || (position_time != time)
+            || (velocity_time != time)) {
+            consistent = false;
+            fprintf(stderr,
+                "The following three do not match: velocity time (%.20f),  position time (%.20f), and required time (%.20f)\n",
+                velocity_time, position_time, time);
+            fprintf(stderr, "%s: %d\n",
+                "position_time != velocity_time",
+                (position_time != velocity_time));
+            fprintf(stderr, "%s: %d\n",
+                "position_time != time",
+                (position_time != time));
+            fprintf(stderr, "%s: %d\n",
+                "velocity_time != time",
+                (velocity_time != time));
         }
     }
     return consistent;

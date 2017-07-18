@@ -9,11 +9,10 @@
 #include "simulation.h"
 #include "molecule.h"
 #include "observable_container.h"
-#include "integrator.h"
+#include "verlet_integrator.h"
 class RattleIntegrator :
-    public Integrator {
+    public VerletIntegrator {
 private:
-    ObservableContainer &_observables;
     typedef struct parameters_t {
         double tol;
         double rvtol;
@@ -31,12 +30,10 @@ public:
     double get_tol();
     double get_rvtol();
     double get_tiny();
-    ObservableContainer &get_observables();
     // setters
     void set_tol(double tol);
     void set_rvtol(double rvtol);
     void set_tiny(double tiny);
-    void set_observables(ObservableContainer &observables);
     virtual void move(double timestep,
         LJPotential &potential,
         State& state,
@@ -44,8 +41,8 @@ public:
     // constructors and a destructor
     RattleIntegrator();
     RattleIntegrator(double tol, double rvtol, double tiny = pow(10, -7.0));
-    RattleIntegrator(ObservableContainer &observables);
-    RattleIntegrator(ObservableContainer &observables,
+    RattleIntegrator(ObservableContainer *observables);
+    RattleIntegrator(ObservableContainer *observables,
         double tol,
         double rvtol,
         double tiny = pow(10, -7.0));

@@ -15,19 +15,17 @@ const int observations_before_writeout = 100;
 
 // distances in units of sigma
 const double distance_over_sigma_min = 0.01;
-const double distance_over_sigma_max = 5.0;
+const double distance_over_sigma_max = 2.0;
 const double distance_over_sigma_step = 0.01;
 
-const std::string pair_potential_str = "Pair Potential";
-const std::string pair_virial_str = "Pair Virial";
-const std::string pair_fstrength_str = "Force Strength";
+const std::string pair_potential_str = "Potential";
+const std::string pair_virial_str = "Virial";
+const std::string pair_fstrength_str = "Force";
 const std::string distance_str = "Distance";
 
 void make_observation(double rij,
     LJPotential *potential,
     LJPotentialObservableContainer *container) {
-    // calculate all the prefactors for observables
-    potential->set_calculate_prefactors(true);
     // get observable accumulators
     double *distance
         = container->get_scalar_observable_accumulator(distance_str);
@@ -56,40 +54,29 @@ void make_observation(double rij,
 // takes in arguments: epsilon & sigma of the potential to study
 int main(int argc, char **argv){
     std::string fname;
-    if (argc < 3 || argc > 4){
+    if (argc > 2){
         fprintf(stderr,
             "%s\n",
-            "Usage: ./study_ljpotential <epsilon> <sigma> optional <outdir>");
+            "Usage: ./study_ljpotential optional <outdir>");
     }
     else {
         // declare the title of the study
-        std::string study_name = "ljpot_e_" + std::string(argv[1])
-            + "_s_" + std::string(argv[2]);
-        // retrieve potential parameters
-        double epsilon = atof(argv[1]);
-        double sigma = atof(argv[2]);
+        std::string study_name = "ljpot";
         // save output directory
         std::string outdir;
-        if (argc == 4){
-            outdir = std::string(argv[3]);
+        if (argc == 2){
+            outdir = std::string(argv[1]);
         }
         else {
             outdir = default_outdir;
         }
-        // create potential with indicated parameters
-        // always calculate  prefactors (proportional to epsilon) for all
-        // observables
-        bool calculate_prefactors = true;
-        LJPotential ljpot = LJPotential(epsilon, sigma, calculate_prefactors);
+        LJPotential ljpot = LJPotential();
         // create the observable container to store data
         LJPotentialObservableContainer container
             = LJPotentialObservableContainer();
-        // writeout potential parameters in a csv file
-        ljpot.writeout_parameters_to_file(outdir, study_name);
-        // convert rij coordinates using the given value of sigma
-        double dist_min = distance_over_sigma_min * sigma;
-        double dist_max = distance_over_sigma_max * sigma;
-        double dist_step = distance_over_sigma_step * sigma;
+        double dist_min = distance_over_sigma_min;
+        double dist_max = distance_over_sigma_max;
+        double dist_step = distance_over_sigma_step;
         // for a range of distances, calculate and store the observables
         // number of observations stored in container
         int nobservations = 0;

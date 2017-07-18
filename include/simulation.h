@@ -9,47 +9,48 @@
 #include "state.h"
 #include "observable_container.h"
 #include "ljpotential.h"
+#include "force_updater.h"
 #include "integrator.h"
 class Simulation {
-    private:
+    protected:
         std::string _name;
-        LJPotential& _potential;
         Integrator& _integrator;
         ObservableContainer& _observables;
-        State &_state;
-        typedef struct indicators_t {
-            int step;
-        } _Indicators;
-        typedef struct parameters_t {
-            double timestep;
-            double measurestep;
-        } _Parameters;
+        State _state;
+        double _timestep;
+        double _measurestep;
+        int _cycle;
     public:
-        // Getters
+        // getters
         std::string get_name();
-        LJPotential& get_potential();
-        Integrator& get_integrator();
-        ObservableContainer& get_observables();
-        State& get_state();
+        const LJPotential& get_potential() const;
+        const Integrator& get_integrator() const;
+        ObservableContainer& get_observables() const;
+        const State& get_state() const;
+        int get_cycle();
         double get_time();
-        double get_step();
         double get_timestep();
         double get_measurestep();
-        // Setters
+        // setters
         void set_name(std::string name);
         void set_potential(LJPotential &potential);
         void set_integrator(Integrator &integrator);
         void set_observables(ObservableContainer &observables);
         void set_time(double time);
-        void set_step(int step);
         void set_timestep(double timestep);
         void set_measurestep(double measurestep);
+        // writeout
+        // writes out observables to oudir/sim_name_<observable_name>.dat
+        // if the vector of names is empty, outputs all observables.
+        virtual void writeout_observables_to_file(std::vector<std::string> names,
+            std::string outdir,
+            bool overwrite = false);
+        // main member functions
+        virtual void evolve(int ncycles);
         // constructors and a destructor
-        Simulation();
-        Simulation(LJPotential& potential,
-            ObservableContainer &observables,
-            double timestep,
-            double measurestep);
+        Simulation(std::string name,
+            Integrator& integrator,
+            ObservableContainer &observables);
         ~Simulation();
 };
 #endif

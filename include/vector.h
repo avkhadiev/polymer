@@ -42,6 +42,20 @@ struct vector_t {
     {
         return (x != v.x || y != v.y || z != v.z);
     }
+    vector_t& operator+=(const vector_t& v)
+    {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+    vector_t& operator-=(const vector_t& v)
+    {
+        x -= v.x;
+        y -= v.y;
+        z -= v.z;
+        return *this;
+    }
 };
 typedef struct vector_t Vector;
 // Constructors of vectors

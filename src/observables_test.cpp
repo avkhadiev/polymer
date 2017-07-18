@@ -1,13 +1,14 @@
 // 2017 Artur Avkhadiev
 /*! \file observable_test.cpp
 */
-#include <map>
-#include <utility>      /* std::pair, std::make_pair */
 #include <vector>
 #include <string>
+#include <map>
 #include <gtest/gtest.h>
+#include "../include/state.h"
+#include "../include/parsing.h"
 #include "../include/vector.h"
-#include "../include/observables.h"
+#include "../include/observable_container.h"
 
 class ObservableTest : public ::testing::Test {
  protected:

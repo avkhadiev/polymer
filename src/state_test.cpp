@@ -3,12 +3,13 @@
 */
 #include <string>
 #include <stdexcept>
-#include <gtest/gtest.h>
 #include "../include/vector.h"
 #include "../include/atom.h"
 #include "../include/bond.h"
 #include "../include/molecule.h"
 #include "../include/state.h"
+
+#include <gtest/gtest.h>
 
 class StateTest : public ::testing::Test {
  protected:

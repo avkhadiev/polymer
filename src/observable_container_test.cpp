@@ -73,7 +73,6 @@ TEST_F(ObservableContainerTest, ScalarManipulation){
     EXPECT_EQ(false, ms->value_time.empty());
     EXPECT_EQ(*s_acc, ms->value_time.at(0).first);
     EXPECT_EQ(t, ms->value_time.at(0).second);
-
 }
 
 TEST_F(ObservableContainerTest, VectorManipulation){

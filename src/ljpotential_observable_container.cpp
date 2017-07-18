@@ -8,13 +8,13 @@
 #include "../include/ljpotential_observable_container.h"
 LJPotentialObservableContainer::LJPotentialObservableContainer()
 {
-    _pair_potential = declare_scalar_observable("Pair Potential",
+    _pair_potential = declare_scalar_observable("Potential",
         "\\epsilon",
         "v_{ij}");
-    _pair_virial = declare_scalar_observable("Pair Virial",
+    _pair_virial = declare_scalar_observable("Virial",
         "\\epsilon",
         "w_{ij}");
-    _pair_fstrength = declare_scalar_observable("Force Strength",
+    _pair_fstrength = declare_scalar_observable("Force",
         "\\epsilon \\sigma^{-1}",
         "f_{ij}");
     _distance = declare_scalar_observable("Distance",

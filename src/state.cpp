@@ -66,8 +66,12 @@ void check_state(State state) {
 }
 bool is_time_consistent(State state){
     bool consistent = true;
-    for (Molecule& molecule : state.molecules) {
-        consistent = consistent && is_time_consistent(molecule, state.time);
+    for (int i = 0; i <  state.nm; ++i) {
+        consistent = consistent && is_time_consistent(state.molecules.at(i), state.time);
+        if (!consistent) {
+            fprintf(stderr, "molecule %d is not time-consistent\n", i);
+            break;
+        }
     }
     return consistent;
 }
