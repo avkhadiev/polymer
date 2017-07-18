@@ -51,8 +51,8 @@ void VerletIntegrator::_move_verlet_half_step(double timestep, State& state) {
                 // will not add halfstep to velocity time; will add full step
                 // later --- this is to avoid floating pointing arithmetic
                 // issues.
-                // r(t + dt) = r(t) + v(t + 0.5 dt)
-                atom->position.first += atom->velocity.first;
+                // r(t + dt) = r(t) + dt * v(t + 0.5 dt)
+                atom->position.first += multiply(atom->velocity.first, timestep);
                 atom->position.second += timestep;
             }
         }

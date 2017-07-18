@@ -1,4 +1,3 @@
-
 #pb.figure( self.figures )
 #pb.plot(self.sampleTArray / self.T , self.tempArray / self.tempMax,
 #        linestyle = '-', marker = 'o', color = 'r')

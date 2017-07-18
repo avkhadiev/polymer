@@ -17,10 +17,10 @@
 #include "../include/integrator.h"
 #include "../include/verlet_integrator.h"
 #include "../include/lj_verlet_test.h"
-int ncycles = 1000;
+int ncycles = 100000;
 // in LJ units
-double timestep = 0.01;
-double measurestep = 0.1;
+double timestep = pow(10, -5.0);
+double measurestep = pow(10, -4.0);
 // default output directory
 const std::string default_outdir = "/Users/Arthur/stratt/polymer/test/";
 // number of observations to store in memory before writeout
@@ -157,6 +157,9 @@ void LJVerletTestSimulation::evolve(int ncycles){
                     state_to_string(_state, verbose_state).c_str());
                 throw;
             }
+            // record all accumulators
+            _observables.update_observables_through_accumulators({}, _state.time);
+            // writeout if necessary
             nobservations += 1;
             if (nobservations > observations_before_writeout) {
                 writeout_observables_to_file({},
