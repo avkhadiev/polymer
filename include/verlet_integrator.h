@@ -17,16 +17,30 @@ protected:
     // boolean has_observable_container indicates whether a pointer to the
     // observable container is valid
     ForceUpdater _force_updater;
+    double _timestep;
+    double _halfstep;
+    void _set_timestep(double timestep);
     // pointers to accumulators of observables
-    bool _is_kinetic_energy_set;
+    bool _is_kinetic_energy_acc_set;
     double *_kinetic_energy_acc;
-    void _move_verlet_half_step(double timestep, State& state);
-    void _move_verlet_full_step(double timestep,
-        State& state,
-        bool calculate_observables);
+    /**
+    * The following two helper functions take in the molecule by value:
+    * One feeds in the value of the molecule at time t, and receives the value
+    * of the molecule at time t + dt. To do so by value rather than by reference
+    * is important because integrator classes that deriver from Verlet may
+    * require both Verlet output of molecule at (t + dt) and the initial value
+    * at t. For example, RATTLE needs both r_{AB}(t) and r^{0}(t+dt)_{AB},
+    * where the latter is the (unconstrained) value of the bond vector at t+dt.
+    */
+    Molecule _move_verlet_half_step(Molecule molecule);
+    Molecule _move_verlet_full_step(Molecule molecule, bool calculate_observables);
+    virtual void _zero_accumulators();
+    virtual void _correct_accumulators();
 public:
+    virtual double *get_kinetic_energy_acc();
     virtual ForceUpdater& get_force_updater();
     virtual void set_force_updater(ForceUpdater force_updater);
+    virtual void set_kinetic_energy_acc(double *kinetic_energy_acc);
     virtual void move(double timestep,
         State& state,
         bool calculate_observables = false);

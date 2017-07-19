@@ -28,10 +28,12 @@ const int observations_before_writeout = 100;
 // observable names
 const std::string kinetic_energy_str = "Kinetic Energy";
 const std::string potential_energy_str = "Potential Energy";
+const std::string energy_str = "Energy";
 const std::string neg_virial_str = "Virial";
 // observable axes labels
-const std::string kinetic_energy_axis_str = "T";
+const std::string kinetic_energy_axis_str = "K";
 const std::string potential_energy_axis_str = "V_{LJ}";
+const std::string energy_axis_str = "E";
 const std::string neg_virial_axis_str = "-W_{LJ}";
 // observable units
 const std::string units_energy = "\\epsilon";
@@ -44,35 +46,32 @@ LJVerletTestContainer::LJVerletTestContainer()
     _potential_energy = declare_scalar_observable(potential_energy_str,
         units_energy,
         potential_energy_axis_str);
+    _energy = declare_scalar_observable(energy_str,
+        units_energy,
+        energy_axis_str);
     _neg_virial = declare_scalar_observable(neg_virial_str,
         units_energy,
         neg_virial_axis_str);
     add_scalar_observable(&_kinetic_energy);
     add_scalar_observable(&_potential_energy);
+    add_scalar_observable(&_energy);
     add_scalar_observable(&_neg_virial);
 };
 LJVerletTestContainer::~LJVerletTestContainer(){
 };
-// define state of the simulation
+// mass unit is 1 atomic mass (all atoms are identical)
 double atomic_mass = 1.0;
 // simulation class
 LJVerletTestSimulation::LJVerletTestSimulation(std::string name,
     std::string outdir,
     Integrator &integrator,
     ObservableContainer &observables) :
-    Simulation(name, integrator, observables),
-    _outdir (outdir)
+    Simulation(name, outdir, integrator, observables, observations_before_writeout)
 {
     _timestep = timestep;
     _measurestep = measurestep;
 }
 LJVerletTestSimulation::~LJVerletTestSimulation(){
-}
-std::string LJVerletTestSimulation::get_outdir(){
-    return _outdir;
-}
-void LJVerletTestSimulation::set_outdir(std::string outdir){
-    _outdir = outdir;
 }
 void LJVerletTestSimulation::initialize_state(double initial_distance){
     // one atom is centered at (0, 0, 0), another one is a given distance away
@@ -98,89 +97,12 @@ void LJVerletTestSimulation::initialize_state(double initial_distance){
     _integrator.get_force_updater().update_forces(_state,
         calculate_observables);
 }
-void LJVerletTestSimulation::evolve(int ncycles){
-    // make sure steps are not 0
-    if (_timestep == 0){
-        std::string err_msg = "evolve: timestep is equal to 0";
-        throw std::invalid_argument(err_msg);
-    }
-    if (_measurestep == 0){
-        std::string err_msg = "evolve: measurestep is equal to 0";
-        throw std::invalid_argument(err_msg);
-    }
-    // find how many timesteps are in the measure step (when to write out)
-    int writeoutcycle = int((measurestep / timestep) + 0.5);
-    printf("%s %d\n", "writeout cycle is", writeoutcycle);
-    //div(_measurestep, timestep).quot;
-    // create the observable container
-    // number of observations stored in container
-    int nobservations = 0;
-    bool overwrite_observables = true;
-    bool overwrite_state = true;
-    bool verbose_state = true;
-    // iterate through the cycles, evolving the system and writing out
-    // the observables
-    bool calculate_observables;
-    for(int icycle = 0; icycle < ncycles; ++icycle){
-        if (icycle % writeoutcycle != 0){
-            // integrate without computing observables
-            calculate_observables = false;
-            try
-            {
-                _integrator.move(_timestep, _state, calculate_observables);
-            }
-            catch (std::invalid_argument &e)
-            {
-                fprintf(stderr, "%s\n", e.what());
-                fprintf(stderr, "%s\n",
-                    state_to_string(_state, verbose_state).c_str());
-                throw;
-            }
-        }
-        else {
-            // integrate with computing observables
-            calculate_observables = true;
-            write_state_to_file(_state, _outdir,
-                _name,
-                verbose_state,
-                overwrite_state);
-            // only overwrite state output file for the first time
-            overwrite_state = false;
-            try
-            {
-                _integrator.move(_timestep, _state, calculate_observables);
-            }
-            catch (std::invalid_argument &e)
-            {
-                fprintf(stderr, "%s\n", e.what());
-                fprintf(stderr, "%s\n",
-                    state_to_string(_state, verbose_state).c_str());
-                throw;
-            }
-            // record all accumulators
-            _observables.update_observables_through_accumulators({}, _state.time);
-            // writeout if necessary
-            nobservations += 1;
-            if (nobservations > observations_before_writeout) {
-                writeout_observables_to_file({},
-                    _outdir,
-                    overwrite_observables);
-                // do not overwrite after the first time
-                overwrite_observables = false;
-                // reset the counter
-                nobservations = 0;
-                // empty observable_container
-                _observables.clear_observables_records();
-            }
-        }
-    }
-    // writeout the remaining observations
-    writeout_observables_to_file({},
-        _outdir,
-        overwrite_observables);
-    fprintf(stdout, "%s %s\n",
-        "wrote out csv data to",
-        _outdir.c_str());
+void LJVerletTestSimulation::calculate_remaining_observables(){
+    // update accumulator as a sum of potential and kinetic energies
+    double k = *(_observables.get_scalar_observable_accumulator(kinetic_energy_str));
+    double v = *(_observables.get_scalar_observable_accumulator(potential_energy_str));
+    double *e = _observables.get_scalar_observable_accumulator(energy_str);
+    *e = k + v;
 }
 // takes in arguments: initial separation of the atom
 int main(int argc, char **argv){

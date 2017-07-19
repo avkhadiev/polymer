@@ -23,8 +23,10 @@ protected:
     ObservableContainer test_container;
     LJPotential potential;
     std::string sim_name;
+    std::string outdir;
     double timestep;
     double measurestep;
+    int observations_before_writeout;
     virtual void SetUp() {
         // set up observable container
         mock_scalar = declare_scalar_observable("Mock Scalar",
@@ -39,8 +41,10 @@ protected:
         // set up the potential
         potential = LJPotential();
         sim_name = "test_sim";
+        outdir =  "/Users/Arthur/stratt/polymer/test/";
         timestep = 3.0;
-        measurestep = 2.0;
+        measurestep = timestep;
+        observations_before_writeout = 0;
     }
     // virtual void TearDown() {}
 };
@@ -52,8 +56,10 @@ TEST_F(SimulationTest, Initialization){
     Integrator& integrator = verlet_integrator;
     ObservableContainer& container = test_container;
     Simulation test_sim = Simulation(sim_name,
+        outdir,
         integrator,
-        container);
+        container,
+        observations_before_writeout);
     test_sim.set_timestep(timestep);
     test_sim.set_measurestep(measurestep);
     // test basic getters

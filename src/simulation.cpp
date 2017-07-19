@@ -12,11 +12,15 @@
 #include "../include/verlet_integrator.h"
 #include "../include/simulation.h"
 Simulation::Simulation(std::string name,
+    std::string outdir,
     Integrator& integrator,
-    ObservableContainer &observables) :
+    ObservableContainer &observables,
+    int observations_before_writeout) :
     _name (name),
     _integrator (integrator),
-    _observables (observables)
+    _observables (observables),
+    _outdir (outdir),
+    _observations_before_writeout (observations_before_writeout)
 {
     // default state contains no atoms or molecules
     std::vector<Molecule> default_molecules = {};
@@ -28,6 +32,9 @@ Simulation::Simulation(std::string name,
 };
 Simulation::~Simulation(){};
 // Getters
+std::string Simulation::get_outdir(){
+    return _outdir;
+}
 std::string Simulation::get_name(){
     return _name;
 }
@@ -56,6 +63,9 @@ double Simulation::get_measurestep() {
     return _measurestep;
 }
 // Setters
+void Simulation::set_outdir(std::string outdir){
+    _outdir = outdir;
+}
 void Simulation::set_name(std::string name){
     _name = name;
 };
@@ -84,4 +94,89 @@ void Simulation::writeout_observables_to_file(std::vector<std::string> names, st
         outdir, _name, overwrite);
 }
 void Simulation::evolve(int ncycles){
+    // make sure steps are not 0
+    if (_timestep == 0){
+        std::string err_msg = "evolve: timestep is equal to 0";
+        throw std::invalid_argument(err_msg);
+    }
+    if (_measurestep == 0){
+        std::string err_msg = "evolve: measurestep is equal to 0";
+        throw std::invalid_argument(err_msg);
+    }
+    // find how many timesteps are in the measure step (when to write out)
+    int writeoutcycle = int((_measurestep / _timestep) + 0.5);
+    printf("%s %d\n", "writeout cycle is", writeoutcycle);
+    int nobservations = 0;
+    bool overwrite_observables = true;
+    bool overwrite_state = true;
+    bool verbose_state = true;
+    // iterate through the cycles, evolving the system and writing out
+    // the observables
+    bool calculate_observables;
+    for(int icycle = 0; icycle < ncycles; ++icycle){
+        if (icycle % writeoutcycle != 0){
+            // integrate without computing observables
+            calculate_observables = false;
+            try
+            {
+                _integrator.move(_timestep, _state, calculate_observables);
+            }
+            catch (std::invalid_argument &e)
+            {
+                fprintf(stderr, "%s\n", e.what());
+                fprintf(stderr, "%s\n",
+                    state_to_string(_state, verbose_state).c_str());
+                throw;
+            }
+        }
+        else {
+            // integrate with computing observables
+            calculate_observables = true;
+            write_state_to_file(_state, _outdir,
+                _name,
+                verbose_state,
+                overwrite_state);
+            // only overwrite state output file for the first time
+            overwrite_state = false;
+            try
+            {
+                _integrator.move(_timestep, _state, calculate_observables);
+            }
+            catch (std::invalid_argument &e)
+            {
+                fprintf(stderr, "%s\n", e.what());
+                fprintf(stderr, "%s\n",
+                    state_to_string(_state, verbose_state).c_str());
+                throw;
+            }
+            // update accumulators of other observables that were not computed
+            // in the force loop / integration step
+            calculate_remaining_observables();
+            // record all accumulators
+            _observables.update_observables_through_accumulators({}, _state.time);
+            // writeout if necessary
+            nobservations += 1;
+            if (nobservations > _observations_before_writeout) {
+                writeout_observables_to_file({},
+                    _outdir,
+                    overwrite_observables);
+                // do not overwrite after the first time
+                overwrite_observables = false;
+                // reset the counter
+                nobservations = 0;
+                // empty observable_container
+                _observables.clear_observables_records();
+            }
+        }
+        _cycle += 1;
+    }
+    // writeout the remaining observations
+    writeout_observables_to_file({},
+        _outdir,
+        overwrite_observables);
+    fprintf(stdout, "%s %s\n",
+        "wrote out csv data to",
+        _outdir.c_str());
+}
+void Simulation::calculate_remaining_observables(){
 }
