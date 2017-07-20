@@ -19,7 +19,7 @@ protected:
     ForceUpdater _force_updater;
     double _timestep;
     double _halfstep;
-    void _set_timestep(double timestep);
+    virtual void _set_timestep(double timestep);
     // pointers to accumulators of observables
     bool _is_kinetic_energy_acc_set;
     double *_kinetic_energy_acc;

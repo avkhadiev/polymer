@@ -20,6 +20,9 @@ private:
     double _tol2;                               /**> _tol * 2 */
     double _rvtol2;                             /**> _rvtol * 2 */
 protected:
+    double _inv_timestep;
+    // stores inv_timestep in addition to half step and full step
+    virtual void _set_timestep(double timestep);
     // pointers to accumulators of observables
     // RATTLE gets its own kinetic energy accumulator, because now that
     // corrections have to be performed on velocities after Verlet full step,
@@ -30,17 +33,20 @@ protected:
     double *_kinetic_energy_acc;
     bool _is_neg_constraint_virial_acc_set;
     double *_neg_constraint_virial_acc;
-    // checks whether | r_{i+1}_{AB}(t + dt) - d_{AB} |^2 < 2 * tol * d^2_{AB}
-    bool _is_constraint_within_tol(Bond* bond, Molecule& molecule);
-    // checks whether | r_{AB}(t + dt) * v_{AB} |^2 < 2 * rvtol * d^2_{AB}
-    bool _is_constraint_derivative_within_rvtol(Bond* bond, Molecule& molecule);
+    // checks whether | r^{i}_{AB}(t + dt) - d_{AB} |^2 < 2 * tol * d^2_{AB}
+    bool _is_constraint_within_tol(double dabsq, double difference_of_squares);
+    // checks whether r_{AB}(t) * r^{i}_{AB}(t+dt) > tiny * d_{AB}
+    // to avoid division by 0
+    bool _is_angle_okay(double dabsq, double rr_dot);
+    // checks whether | r_{AB}(t+dt) * v_{AB}(t+dt) |^2 < 2 * rvtol * d^2_{AB}
+    bool _is_constraint_derivative_within_rvtol(double dabsq, double rv_dot);
     // before calling,
     //      call unconstrained verlet: r(t) -> r^0(t + dt), v(t) -> v^0(t + dt)
     //      and save the output molecule as molecule_current_step
     // Then: for each constrained bond r_{AB}, iterative correction:
     //      1. r^i_{AB}(t + dt) -> r^{i+1}_{AB}(t + dt),
     //         v^i_{AB}(t+0.5dt) -> v^{i+1}_{AB}(t+0.5dt), until for all bonds
-    //          | r_{i+1}_{AB}(t + dt) - d_{AB} |^2 < 2 * tol * d^2_{AB},
+    //          | r_{i}_{AB}(t + dt) - d_{AB} |^2 < 2 * tol * d^2_{AB},
     //              where d_{AB} = r_{AB}(t) is the constrained bond length,
     //              a factor 2 in front of tol is from Taylor expansion
     //      2. When all bonds are satisfied to within given tolerance, save
@@ -48,7 +54,7 @@ protected:
     //          r_{AB}(t + dt) = r^m_{AB}(t + dt),
     //          v_{AB}(t + 0.5dt) = v^m_{AB}(t + 0.5dt)
     Molecule _move_correct_half_step(Molecule molecule_last_step,
-        Molecule molecule_half_step_unconstrained);
+        Molecule molecule_half_step_to_correct);
     // before calling,
     //      call unconstrained verlet: v(t + 0.5dt) -> v^0(t + dt),
     //      and save the output molecule as molecule_full_step
@@ -60,8 +66,7 @@ protected:
     //      2. When all bonds are satisfied to within given tolerance, save
     //          the corrected versions of velocity
     //          v_{AB}(t + dt) = v^m_{AB}(t + dt),
-    Molecule _move_correct_full_step(Molecule molecule_half_step,
-        Molecule molecule_full_step_unconstrained,
+    Molecule _move_correct_full_step(Molecule molecule_full_step_to_correct,
         bool calculate_observables);
     virtual void _zero_accumulators();
     virtual void _correct_accumulators();
