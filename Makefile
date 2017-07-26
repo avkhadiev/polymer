@@ -103,16 +103,6 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -123,6 +113,16 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -155,6 +155,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named lj_rattle_test
+
+# Build rule for target.
+lj_rattle_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lj_rattle_test
+.PHONY : lj_rattle_test
+
+# fast build rule for target.
+lj_rattle_test/fast:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/build
+.PHONY : lj_rattle_test/fast
 
 #=============================================================================
 # Target rules for targets named state
@@ -207,19 +220,6 @@ initialize_triatomic: cmake_check_build_system
 initialize_triatomic/fast:
 	$(MAKE) -f CMakeFiles/initialize_triatomic.dir/build.make CMakeFiles/initialize_triatomic.dir/build
 .PHONY : initialize_triatomic/fast
-
-#=============================================================================
-# Target rules for targets named bond_test
-
-# Build rule for target.
-bond_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bond_test
-.PHONY : bond_test
-
-# fast build rule for target.
-bond_test/fast:
-	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/build
-.PHONY : bond_test/fast
 
 #=============================================================================
 # Target rules for targets named ljpotential_test
@@ -376,6 +376,19 @@ integrators: cmake_check_build_system
 integrators/fast:
 	$(MAKE) -f CMakeFiles/integrators.dir/build.make CMakeFiles/integrators.dir/build
 .PHONY : integrators/fast
+
+#=============================================================================
+# Target rules for targets named bond_test
+
+# Build rule for target.
+bond_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bond_test
+.PHONY : bond_test
+
+# fast build rule for target.
+bond_test/fast:
+	$(MAKE) -f CMakeFiles/bond_test.dir/build.make CMakeFiles/bond_test.dir/build
+.PHONY : bond_test/fast
 
 #=============================================================================
 # Target rules for targets named basics
@@ -674,6 +687,33 @@ src/integrator.cpp.s:
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/integrator.cpp.s
 	$(MAKE) -f CMakeFiles/integrators.dir/build.make CMakeFiles/integrators.dir/src/integrator.cpp.s
 .PHONY : src/integrator.cpp.s
+
+src/lj_rattle_test.o: src/lj_rattle_test.cpp.o
+
+.PHONY : src/lj_rattle_test.o
+
+# target to build an object file
+src/lj_rattle_test.cpp.o:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/lj_rattle_test.cpp.o
+.PHONY : src/lj_rattle_test.cpp.o
+
+src/lj_rattle_test.i: src/lj_rattle_test.cpp.i
+
+.PHONY : src/lj_rattle_test.i
+
+# target to preprocess a source file
+src/lj_rattle_test.cpp.i:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/lj_rattle_test.cpp.i
+.PHONY : src/lj_rattle_test.cpp.i
+
+src/lj_rattle_test.s: src/lj_rattle_test.cpp.s
+
+.PHONY : src/lj_rattle_test.s
+
+# target to generate assembly for a file
+src/lj_rattle_test.cpp.s:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/lj_rattle_test.cpp.s
+.PHONY : src/lj_rattle_test.cpp.s
 
 src/lj_verlet_test.o: src/lj_verlet_test.cpp.o
 
@@ -1077,6 +1117,7 @@ src/simulation.o: src/simulation.cpp.o
 
 # target to build an object file
 src/simulation.cpp.o:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/simulation.cpp.o
 	$(MAKE) -f CMakeFiles/simulation_test.dir/build.make CMakeFiles/simulation_test.dir/src/simulation.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simulation.cpp.o
 	$(MAKE) -f CMakeFiles/lj_verlet_test.dir/build.make CMakeFiles/lj_verlet_test.dir/src/simulation.cpp.o
@@ -1088,6 +1129,7 @@ src/simulation.i: src/simulation.cpp.i
 
 # target to preprocess a source file
 src/simulation.cpp.i:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/simulation.cpp.i
 	$(MAKE) -f CMakeFiles/simulation_test.dir/build.make CMakeFiles/simulation_test.dir/src/simulation.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simulation.cpp.i
 	$(MAKE) -f CMakeFiles/lj_verlet_test.dir/build.make CMakeFiles/lj_verlet_test.dir/src/simulation.cpp.i
@@ -1099,6 +1141,7 @@ src/simulation.s: src/simulation.cpp.s
 
 # target to generate assembly for a file
 src/simulation.cpp.s:
+	$(MAKE) -f CMakeFiles/lj_rattle_test.dir/build.make CMakeFiles/lj_rattle_test.dir/src/simulation.cpp.s
 	$(MAKE) -f CMakeFiles/simulation_test.dir/build.make CMakeFiles/simulation_test.dir/src/simulation.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simulation.cpp.s
 	$(MAKE) -f CMakeFiles/lj_verlet_test.dir/build.make CMakeFiles/lj_verlet_test.dir/src/simulation.cpp.s
@@ -1325,14 +1368,13 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install"
+	@echo "... lj_rattle_test"
 	@echo "... state"
 	@echo "... simulation_test"
 	@echo "... install/local"
 	@echo "... study_ljpotential"
 	@echo "... rebuild_cache"
 	@echo "... initialize_triatomic"
-	@echo "... bond_test"
-	@echo "... list_install_components"
 	@echo "... ljpotential_test"
 	@echo "... observable_container_test"
 	@echo "... observables_test"
@@ -1346,6 +1388,8 @@ help:
 	@echo "... vector_test"
 	@echo "... observable_containers"
 	@echo "... integrators"
+	@echo "... list_install_components"
+	@echo "... bond_test"
 	@echo "... basics"
 	@echo "... lj_verlet_test"
 	@echo "... vector"
@@ -1374,6 +1418,9 @@ help:
 	@echo "... src/integrator.o"
 	@echo "... src/integrator.i"
 	@echo "... src/integrator.s"
+	@echo "... src/lj_rattle_test.o"
+	@echo "... src/lj_rattle_test.i"
+	@echo "... src/lj_rattle_test.s"
 	@echo "... src/lj_verlet_test.o"
 	@echo "... src/lj_verlet_test.i"
 	@echo "... src/lj_verlet_test.s"

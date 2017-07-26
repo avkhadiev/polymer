@@ -199,6 +199,11 @@ Molecule RattleIntegrator::_move_correct_half_step(Molecule molecule_last_step,
     _moved = _moving;
     std::fill(_moving.begin(), _moving.end(), false);
     }
+    if (iter >= _maxiter){
+        fprintf(stderr, "%s (%d)\n",
+            "RATTLE MOVE A: maximum number of iterations reached. Stopping correction",
+            _maxiter);
+    }
     return molecule_half_step_to_correct;
 }
 Molecule RattleIntegrator::_move_correct_full_step(Molecule molecule_full_step_to_correct,
@@ -281,6 +286,11 @@ Molecule RattleIntegrator::_move_correct_full_step(Molecule molecule_full_step_t
                 *_kinetic_energy_acc += k_increase;
             }
         }
+    }
+    if (iter >= _maxiter){
+        fprintf(stderr, "%s (%d)\n",
+            "RATTLE MOVE B: maximum number of iterations reached. Stopping correction.",
+            _maxiter);
     }
     return molecule_full_step_to_correct;
 }
