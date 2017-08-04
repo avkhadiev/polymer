@@ -5,6 +5,7 @@
 #define POLYMER_FORCE_UPDATER_H
 #include "ljpotential.h"
 #include "state.h"
+#include "simple_state.h"
 // Is only meant to be called inside the function update_forces
 
 class ForceUpdater {
@@ -20,8 +21,13 @@ private:
     // decreases atom_j->force.first by fij.
     // Does not change the force time records (atom->force.second) of the atoms.
     void _update_forces_in_atomic_pair(Atom *atom_i, Atom *atom_j, bool calculate_observables);
+    void _update_forces_in_atomic_pair(simple::Atom &atom_i,
+        simple::Atom &atom_j,
+        bool calculate_observables);
     void _update_forces_intramolecular(State& state, bool calculate_observables);
+    void _update_forces_intramolecular(simple::AtomState& state, bool calculate_observables);
     void _update_forces_intermolecular(State& state, bool calculate_observables);
+    void _update_forces_intermolecular(simple::AtomState& state, bool calculate_observables);
 public:
     // getters
     const LJPotential& get_potential() const;
@@ -31,8 +37,10 @@ public:
     void set_potential(LJPotential& potential);
     void set_potential_energy_acc(double *potential_energy_acc);
     void set_neg_virial_acc(double *neg_virial_acc);
-    // main function
+    // main functions
     void update_forces(State& state, bool calculate_observables = false);
+    void update_forces(simple::AtomState &state,
+        bool calculate_observables = false);
     ForceUpdater(LJPotential potential,
         double *potential_energy_acc = NULL,
         double *_neg_virial_acc = NULL);

@@ -8,6 +8,7 @@
 #include "ljpotential.h"
 #include "simulation.h"
 #include "molecule.h"
+#include "simple_polymer.h"
 #include "force_updater.h"
 #include "observable_container.h"
 #include "integrator.h"
@@ -32,6 +33,9 @@ protected:
     * at t. For example, RATTLE needs both r_{AB}(t) and r^{0}(t+dt)_{AB},
     * where the latter is the (unconstrained) value of the bond vector at t+dt.
     */
+    simple::AtomPolymer _move_verlet_half_step(simple::AtomPolymer molecule);
+    simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule,
+        bool calculate_observables);
     Molecule _move_verlet_half_step(Molecule molecule);
     Molecule _move_verlet_full_step(Molecule molecule, bool calculate_observables);
     virtual void _zero_accumulators();
@@ -43,6 +47,9 @@ public:
     virtual void set_kinetic_energy_acc(double *kinetic_energy_acc);
     virtual void move(double timestep,
         State& state,
+        bool calculate_observables = false);
+    virtual void move(double timestep,
+        simple::AtomState& state,
         bool calculate_observables = false);
     // constructors and a destructor
     VerletIntegrator(ForceUpdater force_updater,
