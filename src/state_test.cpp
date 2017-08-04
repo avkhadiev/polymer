@@ -88,7 +88,7 @@ class StateTest : public ::testing::Test {
 TEST_F(StateTest, CheckState) {
     ASSERT_NO_THROW(initialize_state(molecules, t));
     State s = initialize_state(molecules, t);
-    s.molecules.pop_back();
+    s.molecules.back();
     // number of molecules is not equal to the one declared
     EXPECT_THROW(check_state(s), std::invalid_argument);
 }

@@ -1,6 +1,6 @@
 // 2017 Artur Avkhadiev
 /*! \file vector.cpp
-    \brief Contains implementations of functions on a Vector struct.
+\brief Contains implementations of functions on a Vector struct.
 
     Functions add, subtract, multiply and divide take in 2 arguments and output
     a vector. They are overaloaded to take in either 2 vectors or a vector and

@@ -27,12 +27,13 @@ struct vector_t {
         z=v.z;
         return *this;
     }
-    vector_t& operator-()
+    vector_t operator-() const
     {
-        x = -x;
-        y = -y;
-        z = -z;
-        return *this;
+        vector_t v;
+        v.x = -x;
+        v.y = -y;
+        v.z = -z;
+        return v;
     }
     bool operator==(const vector_t& v) const
     {
