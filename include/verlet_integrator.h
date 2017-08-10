@@ -8,6 +8,7 @@
 #include "ljpotential.h"
 #include "simulation.h"
 #include "molecule.h"
+#include "simple_atom.h"
 #include "simple_polymer.h"
 #include "force_updater.h"
 #include "observable_container.h"

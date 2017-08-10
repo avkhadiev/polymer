@@ -88,10 +88,9 @@ void Simulation::set_timestep(double timestep){
 void Simulation::set_measurestep(double measurestep){
     _measurestep = measurestep;
 };
-void Simulation::writeout_observables_to_file(std::vector<std::string> names, std::string outdir, bool overwrite)
+void Simulation::writeout_observables_to_file(std::string outdir, bool overwrite)
 {
-    _observables.writeout_observables_to_file(names,
-        outdir, _name, overwrite);
+    _observables.writeout(outdir, _name, overwrite);
 }
 void Simulation::evolve(int ncycles){
     // make sure steps are not 0
@@ -153,27 +152,23 @@ void Simulation::evolve(int ncycles){
             // in the force loop / integration step
             calculate_remaining_observables();
             // record all accumulators
-            _observables.update_observables_through_accumulators({}, _state.time);
+            _observables.update(_state.time);
             // writeout if necessary
             nobservations += 1;
             if (nobservations > _observations_before_writeout) {
-                writeout_observables_to_file({},
-                    _outdir,
-                    overwrite_observables);
+                writeout_observables_to_file(_outdir, overwrite_observables);
                 // do not overwrite after the first time
                 overwrite_observables = false;
                 // reset the counter
                 nobservations = 0;
                 // empty observable_container
-                _observables.clear_observables_records();
+                _observables.clear();
             }
         }
         _cycle += 1;
     }
     // writeout the remaining observations
-    writeout_observables_to_file({},
-        _outdir,
-        overwrite_observables);
+    writeout_observables_to_file(_outdir, overwrite_observables);
     fprintf(stdout, "%s %s\n",
         "wrote out csv data to",
         _outdir.c_str());

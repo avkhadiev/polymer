@@ -61,11 +61,11 @@ VectorObservable declare_vector_observable(std::string name,
 /**
 * Clear the value_time vector in scalar observable
 */
-void clear_observable_records(ScalarObservable *so);
+void clear_observable_records(ScalarObservable& so);
 /**
 * Clear the value_time vector in vector observable
 */
-void clear_observable_records(VectorObservable *vo);
+void clear_observable_records(VectorObservable& vo);
 /**
 * Given the observable, the output directory and the name of the simulation,
 * output the observable into outdir/sim_name_observable_name.dat.

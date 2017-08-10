@@ -8,6 +8,7 @@
 #include "ljpotential.h"
 #include "simulation.h"
 #include "molecule.h"
+#include "simple_atom.h"
 #include "simple_polymer.h"
 #include "observable_container.h"
 #include "verlet_integrator.h"
@@ -20,6 +21,7 @@ private:
     double _tiny;
     double _tol2;     /**> _tol * 2 */
 protected:
+    int _nb;
     double _dabsq; /**> constant square of bond length for simple polymers */
     double _rm;   /**> constant inverse atomic mass for simple polymers */
     double _inv_timestep;

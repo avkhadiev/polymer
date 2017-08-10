@@ -1,11 +1,5 @@
 // 2017 Artur Avkhadiev
 /*! \file lj_verlet.cpp
-* simple simulation test to test the Verlet integrator and the force loop with
-* LJ potential.
-* A diatomic molecule starts with its center of mass at the origin, aligned
-* with the x-axis.
-* The simulation evolves the system and tracks the change in potential energy, kinetic energy, and the virial. It outputs corresponding CSV files to the test/
- folder
 */
 #include <iostream>
 #include <cmath>                            /* pow */
@@ -25,7 +19,7 @@ double measurestep = pow(10, -2.0);
 // default output directory
 const std::string default_outdir = "/Users/Arthur/stratt/polymer/test/";
 // number of observations to store in memory before writeout
-const int observations_before_writeout = 10000;
+const int observations_before_writeout = 1000000000;
 // integrator settings
 const double tol = pow(10, -3.0);
 const double rvtol = pow(10, -3.0);
@@ -64,11 +58,11 @@ LJRattleTestContainer::LJRattleTestContainer()
         = declare_scalar_observable(neg_constraint_virial_str,
             units_energy,
             neg_virial_axis_str);
-    add_scalar_observable(&_kinetic_energy);
-    add_scalar_observable(&_potential_energy);
-    add_scalar_observable(&_energy);
-    add_scalar_observable(&_neg_virial);
-    add_scalar_observable(&_neg_constraint_virial);
+    add_scalar(_kinetic_energy);
+    add_scalar(_potential_energy);
+    add_scalar(_energy);
+    add_scalar(_neg_virial);
+    add_scalar(_neg_constraint_virial);
 };
 LJRattleTestContainer::~LJRattleTestContainer(){
 };
@@ -92,8 +86,8 @@ void LJRattleTestSimulation::initialize_state(double bond_length){
     double half_bond = bond_length / 2.0;
     Vector pos1 = vector(half_bond, 0.0, 0.0);
     Vector pos2 = vector(-half_bond, 0.0, 0.0);
-    Vector vel1 = vector(0.0, 0.0, 0.0);
-    Vector vel2 = vector(0.0, 0.0, 0.0);
+    Vector vel1 = vector(0.0, 1.0, 0.0);
+    Vector vel2 = vector(0.0, -1.0, 0.0);
     Atom atom1 = initialize_atom(atomic_mass, pos1, vel1);
     Atom atom2 = initialize_atom(atomic_mass, pos2, vel2);
     std::vector<Atom> atoms;
@@ -113,9 +107,9 @@ void LJRattleTestSimulation::initialize_state(double bond_length){
 }
 void LJRattleTestSimulation::calculate_remaining_observables(){
     // update accumulator as a sum of potential and kinetic energies
-    double k = *(_observables.get_scalar_observable_accumulator(kinetic_energy_str));
-    double v = *(_observables.get_scalar_observable_accumulator(potential_energy_str));
-    double *e = _observables.get_scalar_observable_accumulator(energy_str);
+    double k = _observables.get_scalar(kinetic_energy_str).accumulator;
+    double v= _observables.get_scalar(potential_energy_str).accumulator;
+    double *e = &(_observables.get_scalar(energy_str).accumulator);
     *e = k + v;
 }
 // takes in arguments: initial separation of the atom
@@ -148,15 +142,14 @@ int main(int argc, char **argv){
         // potential energy and virial (they will be updated if specified)
         printf("%s\n", "setting up the force loop and integrator...");
         ForceUpdater force_updater = ForceUpdater(LJPotential(),
-            observables.get_scalar_observable_accumulator(potential_energy_str),
-            observables.get_scalar_observable_accumulator(neg_virial_str));
+            &(observables.get_scalar(potential_energy_str).accumulator),
+            &(observables.get_scalar(neg_virial_str).accumulator));
         // set up the integrator, tell it where is the accumulator for the
         // kinetic energy
         double *kinetic_energy_acc = NULL;
         double *neg_constraint_virial_acc = NULL;
         RattleIntegrator rattle = RattleIntegrator(force_updater,
             tol,
-            rvtol,
             tiny,
             maxiter,
             kinetic_energy_acc,
@@ -178,7 +171,8 @@ int main(int argc, char **argv){
         }
         catch (std::invalid_argument &e)
         {
-            fprintf(stdout, "ERROR occured. See error log.\n");
+            fprintf(stdout, "ERROR occured.\n");
+            fprintf(stdout, "%s\n", e.what());
         }
     }
 }

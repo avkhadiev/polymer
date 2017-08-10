@@ -49,6 +49,8 @@ namespace simple {
         static void set_d(double d) {_d = d;};
         Vector rcm() const {return _rcm;};
         Vector vcm() const {return _vcm;};
+        void set_rcm(Vector rcm) {_rcm = rcm;};
+        void set_vcm(Vector vcm) {_vcm = vcm;};
         /**
         * Ouptuts an std::string header
         * that constains RCM and VCM vectors of the molecule

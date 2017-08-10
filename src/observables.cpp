@@ -62,11 +62,11 @@ VectorObservable declare_vector_observable(std::string name,
         .units = units};
     return vo;
 }
-void clear_observable_records(ScalarObservable *so){
-    so->value_time.clear();
+void clear_observable_records(ScalarObservable& so){
+    so.value_time.clear();
 };
-void clear_observable_records(VectorObservable *vo){
-    vo->value_time.clear();
+void clear_observable_records(VectorObservable& vo){
+    vo.value_time.clear();
 };
 void write_vector_observable_to_file(VectorObservable& vo,
     std::string outdir, std::string sim_name, bool overwrite){
@@ -149,7 +149,7 @@ void write_scalar_observable_to_file(ScalarObservable& so,
         add_header = false;
     }
     // integer for field width
-    int indent = 15;
+    // int indent = 15;
     // stores path to output file
     std::string fout;
     fout = outdir

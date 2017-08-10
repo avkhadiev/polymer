@@ -8,6 +8,8 @@
 #include "../include/force_updater.h"
 #include "../include/simulation.h"
 #include "../include/molecule.h"
+#include "../include/simple_atom.h"
+#include "../include/simple_polymer.h"
 #include "../include/observable_container.h"
 #include "../include/integrator.h"
 #include "../include/verlet_integrator.h"

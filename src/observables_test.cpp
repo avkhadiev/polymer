@@ -83,8 +83,8 @@ TEST_F(ObservableTest, ClearTest){
     ASSERT_EQ(false, so.value_time.empty());
     ASSERT_EQ(false, vo.value_time.empty());
     // clear value_time vectors in observables
-    clear_observable_records(&so);
-    clear_observable_records(&vo);
+    clear_observable_records(so);
+    clear_observable_records(vo);
     // check whether the records are emptied
     ASSERT_EQ(true, so.value_time.empty());
     ASSERT_EQ(true, vo.value_time.empty());

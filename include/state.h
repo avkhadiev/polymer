@@ -5,6 +5,7 @@
 #define POLYMER_STATE_H
 #include <vector>
 #include <string>
+#include "parsing.h"
 #include "molecule.h"
 struct state_t {
     double time;                            /*>> current time */

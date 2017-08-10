@@ -10,6 +10,8 @@
 #include "../include/force_updater.h"
 #include "../include/simulation.h"
 #include "../include/molecule.h"
+#include "../include/simple_atom.h"
+#include "../include/simple_polymer.h"
 #include "../include/observable_container.h"
 #include "../include/integrator.h"
 #include "../include/verlet_integrator.h"
@@ -26,6 +28,7 @@ RattleIntegrator::RattleIntegrator(ForceUpdater force_updater,
     _rvtol (tol/_timestep),  /**> will be updated once the timestep is known */
     _tiny (tiny),
     _tol2 (2 * _tol),
+    _nb (simple::BasePolymer::nb()),
     _dabsq (pow(simple::BasePolymer::d(), 2.0)),
     _rm (1.0/(simple::BasePolymer::m())),
     _inv_timestep (0.0),     /**> will be set in move() by _set_timestep()*/
@@ -40,8 +43,8 @@ RattleIntegrator::RattleIntegrator(ForceUpdater force_updater,
         _is_neg_constraint_virial_acc_set = true;
         _neg_constraint_virial_acc = neg_constraint_virial_acc;
     }
-    _moving = {};
-    _moved = {};
+    _moving.resize(_nb);
+    _moved.resize(_nb);
 }
 RattleIntegrator::~RattleIntegrator(){};
 double RattleIntegrator::get_tol() const {
@@ -53,9 +56,9 @@ double RattleIntegrator::get_rvtol() const {
 double RattleIntegrator::get_tiny() const {
     return _tiny;
 }
-double RattleIntegrator::get_dabsq() const {
-    return _dabsq;
-}
+//double RattleIntegrator::get_dabsq() const {
+//    return _dabsq;
+//}
 double *RattleIntegrator::get_kinetic_energy_acc(){
     return _kinetic_energy_acc;
 }
@@ -414,11 +417,8 @@ void RattleIntegrator::_set_up_correction_bookkeeping(){
     std::fill(_moving.begin(), _moving.end(), false);
 }
 simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
-    simple::AtomPolymer molecule_last_step,
-    simple::AtomPolymer molecule_half_step_to_correct){
-    // notational shorthand
-    simple::AtomPolymer& molecule_old = molecule_last_step;
-    simple::AtomPolymer& molecule_new = molecule_half_step_to_correct;
+    simple::AtomPolymer molecule_old,
+    simple::AtomPolymer molecule_new){
     // set up "moved" and "moving" arrays
     _set_up_correction_bookkeeping();
     bool still_correcting = true;
@@ -430,7 +430,6 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
     double rma = _rm;           /**> 1/mass of atom 1 */
     double rmb = _rm;           /**> 1/mass of atom 2 */
     double dt = _timestep;
-    double rdt = _inv_timestep;
     int nb = simple::BasePolymer::nb();
     while (still_correcting && (iter < _maxiter)){
         /***********************************************************/
@@ -442,16 +441,12 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
                 continue;
             }
             else{
-                simple::Atom &atom_old1 = molecule_old.atoms.at(ib);
-                simple::Atom &atom_old2 = molecule_old.atoms.at(ib + 1);
-                simple::Atom &atom_new1 = molecule_new.atoms.at(ib);
-                simple::Atom &atom_new2 = molecule_new.atoms.at(ib + 1);
-                Vector& r_old_atom1 = atom_old1.position;
-                Vector& r_old_atom2 = atom_old2.position;
-                Vector& r_new_atom1 = atom_new1.position;
-                Vector& r_new_atom2 = atom_new2.position;
-                Vector& v_new_atom1 = atom_new1.velocity;
-                Vector& v_new_atom2 = atom_new2.velocity;
+                Vector& r_old_atom1 = molecule_old.atoms.at(ib).position;
+                Vector& r_old_atom2 = molecule_old.atoms.at(ib+1).position;
+                Vector& r_new_atom1 = molecule_new.atoms.at(ib).position;
+                Vector& r_new_atom2 = molecule_new.atoms.at(ib+1).position;
+                Vector& v_new_atom1 = molecule_new.atoms.at(ib).velocity;
+                Vector& v_new_atom2 = molecule_new.atoms.at(ib+1).velocity;
                 Vector rab_old = subtract(r_old_atom1, r_old_atom2);
                 Vector rab_new = subtract(r_new_atom1, r_new_atom2);
                 // Order of terms is important! Determines the sign of the
@@ -466,12 +461,14 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
                     // check angle between r_AB(t) and r_AB(t+dt)
                     rr_dot = dot(rab_old, rab_new);
                     if(_is_angle_okay(dabsq, rr_dot) == false){
-                        std::string err_msg = "move_correct_half_step: r_{AB}(t) and r_{AB}(t + dt) are nearly normal to each other!";
+                        std::string err_msg = "move_correct_half_step: r_{AB}(t) and r_{AB}(t + dt) are nearly normal to each other!\n";
+                        err_msg += "r_{AB}(t) = " + vector_to_string(rab_old);
+                        err_msg += "\nr_{AB(t + dt) = " + vector_to_string(rab_new);
                         throw std::invalid_argument(err_msg);
                     }
                     // COMMENCE CORRECTION
                     // calculate constraint force
-                    gab = diffsq/(2 * rdt * (rma + rmb) * rr_dot);
+                    gab = diffsq/(2 * dt * (rma + rmb) * rr_dot);
                     // correct the atomic velocities
                     Vector dva = multiply(rab_new, rma * gab);
                     Vector dvb = multiply(-rab_new, rmb * gab);
@@ -494,13 +491,11 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
             "RATTLE MOVE A: maximum number of iterations reached. Stopping correction",
             _maxiter);
     }
-    return molecule_half_step_to_correct;
+    return molecule_new;
 }
 simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
-    simple::AtomPolymer molecule_full_step_to_correct,
+    simple::AtomPolymer molecule,
     bool calculate_observables){
-    // notational shorthand
-    simple::AtomPolymer& molecule = molecule_full_step_to_correct;
     // set up "moved" and "moving" arrays
     _set_up_correction_bookkeeping();
     bool still_correcting = true;
@@ -522,12 +517,10 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
                 continue;
             }
             else{
-                simple::Atom& atom1 = molecule.atoms.at(ib);
-                simple::Atom& atom2 = molecule.atoms.at(ib + 1);
-                Vector& r_atom1 = atom1.position;
-                Vector& r_atom2 = atom2.position;
-                Vector& v_atom1 = atom1.velocity;
-                Vector& v_atom2 = atom2.velocity;
+                Vector& r_atom1 = molecule.atoms.at(ib).position;
+                Vector& r_atom2 = molecule.atoms.at(ib + 1).position;
+                Vector& v_atom1 = molecule.atoms.at(ib).velocity;
+                Vector& v_atom2 = molecule.atoms.at(ib + 1).velocity;
                 Vector rab = subtract(r_atom1, r_atom2);
                 Vector vab = subtract(v_atom1, v_atom2);
                 rv_dot = dot(rab, vab);
@@ -578,7 +571,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
             "RATTLE MOVE B: maximum number of iterations reached. Stopping correction.",
             _maxiter);
     }
-    return molecule_full_step_to_correct;
+    return molecule;
 }
 void RattleIntegrator::move(double timestep,
     simple::AtomState &state,
@@ -599,14 +592,12 @@ void RattleIntegrator::move(double timestep,
         // the integrator returns the molecule
         // with uncorrected full-step positions
         // and uncorrected half-step velocities
-        molecule_half_step_to_correct
-            = _move_verlet_half_step(molecule_last_step);
+        molecule_half_step_to_correct = _move_verlet_half_step(molecule_last_step);
         // pass both last-step molecule and molecule from verlet integrator
         // to RATTLE for iterative correction
         // molecule with corrected full-step positions and
         // corrected half-step velocities is stored in the state
-        state.polymers.at(im) = _move_correct_half_step(molecule_last_step,
-            molecule_half_step_to_correct);
+        state.polymers.at(im) = _move_correct_half_step(molecule_last_step, molecule_half_step_to_correct);
     }
     // r(t + dt) has been calculated and corrected
     // now update forces in all atoms from f(t) to f(t + dt)
@@ -622,8 +613,7 @@ void RattleIntegrator::move(double timestep,
         // pass molecule to verlet integrator, which returns the molecule
         // with uncorrected velocities at full step.
         // store returned molecule in memory
-        state.polymers.at(im) = _move_verlet_full_step(molecule, false);
-        molecule = state.polymers.at(im);
+        molecule = _move_verlet_full_step(molecule, calculate_observables);
         // pass the molecule to RATTLE to iteratively correct velocities
         // at full step. Store the returned molecule in memory.
         state.polymers.at(im) = _move_correct_full_step(molecule, calculate_observables);

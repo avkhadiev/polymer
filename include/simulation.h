@@ -46,8 +46,7 @@ class Simulation {
         // writeout
         // writes out observables to oudir/sim_name_<observable_name>.dat
         // if the vector of names is empty, outputs all observables.
-        virtual void writeout_observables_to_file(std::vector<std::string> names,
-            std::string outdir,
+        virtual void writeout_observables_to_file(std::string outdir,
             bool overwrite = false);
         // main member functions
         virtual void evolve(int ncycles);
