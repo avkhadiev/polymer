@@ -6,8 +6,6 @@
 #include <vector>
 #include <cmath>              /* pow */
 #include "ljpotential.h"
-#include "simulation.h"
-#include "molecule.h"
 #include "simple_atom.h"
 #include "simple_polymer.h"
 #include "observable_container.h"
@@ -59,9 +57,6 @@ protected:
     *          r_{AB}(t + dt) = r^m_{AB}(t + dt),
     *          v_{AB}(t + 0.5dt) = v^m_{AB}(t + 0.5dt)
     */
-    // ::state legacy version
-    Molecule _move_correct_half_step(Molecule molecule_last_step,
-        Molecule molecule_half_step_to_correct);
     // ::simple_state version
     simple::AtomPolymer _move_correct_half_step(
         simple::AtomPolymer molecule_last_step,
@@ -79,10 +74,6 @@ protected:
     *          the corrected versions of velocity
     *          v_{AB}(t + dt) = v^m_{AB}(t + dt),
     */
-    // ::state legacy version
-    Molecule _move_correct_full_step(Molecule molecule_full_step_to_correct,
-        bool calculate_observables);
-    // ::simple_state version
     simple::AtomPolymer _move_correct_full_step(
         simple::AtomPolymer molecule_full_step_to_correct,
         bool calculate_observables);
@@ -103,9 +94,6 @@ protected:
     // after verlet steps for a given molecule, resizes the moved-moving vectors
     // number of elements is equal to the number of constrained bonds
     // all bonds are marked as moved; none are marked as moving
-    // legacy version
-    void _set_up_correction_bookkeeping(Molecule& molecule);
-    // simple::state version
     void _set_up_correction_bookkeeping();
 public:
     // getters
@@ -130,15 +118,9 @@ public:
     // perform iterative correction of full-step velocities
     //      calculate constraint virial and kinetic energy if necessary
     virtual void move(double timestep,
-        State& state,
-        bool calculate_observables = false);
-    virtual void move(double timestep,
         simple::AtomState& state,
         bool calculate_observables = false);
     // constructors and a destructor
-    RattleIntegrator();
-    RattleIntegrator(double tol, double rvtol, double tiny = pow(10, -7.0));
-    RattleIntegrator(ObservableContainer *observables);
     RattleIntegrator(ForceUpdater force_updater,
         double tol,
         double tiny = pow(10, -7.0),

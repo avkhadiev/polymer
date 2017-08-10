@@ -6,8 +6,6 @@
 #include <vector>
 #include <cmath>              /* pow */
 #include "ljpotential.h"
-#include "simulation.h"
-#include "molecule.h"
 #include "simple_atom.h"
 #include "simple_polymer.h"
 #include "force_updater.h"
@@ -37,8 +35,6 @@ protected:
     simple::AtomPolymer _move_verlet_half_step(simple::AtomPolymer molecule);
     simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule,
         bool calculate_observables);
-    Molecule _move_verlet_half_step(Molecule molecule);
-    Molecule _move_verlet_full_step(Molecule molecule, bool calculate_observables);
     virtual void _zero_accumulators();
     virtual void _correct_accumulators();
 public:
@@ -46,9 +42,6 @@ public:
     virtual ForceUpdater& get_force_updater();
     virtual void set_force_updater(ForceUpdater force_updater);
     virtual void set_kinetic_energy_acc(double *kinetic_energy_acc);
-    virtual void move(double timestep,
-        State& state,
-        bool calculate_observables = false);
     virtual void move(double timestep,
         simple::AtomState& state,
         bool calculate_observables = false);

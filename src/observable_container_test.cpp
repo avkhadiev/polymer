@@ -6,7 +6,6 @@
 #include <vector>
 #include <stdexcept>
 #include <gtest/gtest.h>
-#include "../include/vector.h"
 #include "../include/observable_container.h"
 
 class ObservableContainerTest : public ::testing::Test {

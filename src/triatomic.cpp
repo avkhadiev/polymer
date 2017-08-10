@@ -13,10 +13,10 @@ namespace settings{
     std::string cndir = "/Users/Arthur/stratt/polymer/test/";
     std::string tpdir = "/Users/Arthur/stratt/polymer/test/";
     std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
-    double dt = 0.01;
+    double dt = 0.001;
     size_t icalc = 10;
     size_t iprint = 10;
-    size_t isave = 100;
+    size_t isave = 0;
     size_t idata = 0;
     size_t itape = 0;
 }
@@ -57,5 +57,5 @@ int main(int argc, char **argv){
             settings::isave,
             settings::idata,
             settings::itape);
-    sim.evolve(0.1);
+    sim.evolve(100.0);
 }

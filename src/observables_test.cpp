@@ -5,10 +5,7 @@
 #include <string>
 #include <map>
 #include <gtest/gtest.h>
-#include "../include/state.h"
-#include "../include/parsing.h"
-#include "../include/vector.h"
-#include "../include/observable_container.h"
+#include "../include/observables.h"
 
 class ObservableTest : public ::testing::Test {
  protected:

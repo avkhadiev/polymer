@@ -8,6 +8,9 @@ CMakeFiles/*
 CMakeCache.txt
 cmake_install.cmake
 
+# Ignore legacy code
+**/legacy/*
+
 # Ignore the makefile
 Makefile
 

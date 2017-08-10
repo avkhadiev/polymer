@@ -7,12 +7,6 @@
 #include <map>
 #include <sstream>
 #include <fstream>
-#include "../include/state.h"
-#include "../include/observable_container.h"
-#include "../include/ljpotential.h"
-#include "../include/force_updater.h"
-#include "../include/integrator.h"
-#include "../include/rattle_integrator.h"
 #include "../include/simple_simulation.h"
 //namespace parameters{
 //    int NM = 1;
