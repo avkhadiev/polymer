@@ -1,0 +1,57 @@
+# Ignore build, lib and test dirs
+build
+lib/*
+test/*
+
+# Ignore cmake files
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+
+# Ignore legacy code
+**/legacy/*
+
+# Ignore the makefile
+Makefile
+
+# Ignore google-test folders
+googletest*/*
+
+# Ignore any executables
+bin/*
+
+# Ignore Mac specific files
+.DS_Store
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
