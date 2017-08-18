@@ -11,8 +11,8 @@ _bond_state(),
 _atom_state(_bond_state)
 {
     // set up the state in a straigt line along the x-axis with CM at zero.
+    Vector pos = vector(0.0, 0.0, 0.0);
     for (simple::BondPolymer& polymer : _bond_state.polymers){
-        Vector pos = vector(0.0, 0.0, 0.0);
         polymer.set_rcm(pos);
         polymer.set_vcm(vector(0.0, 0.0, 0.0));
         pos = add(pos, vector(0.0, 0.0, 10.0));

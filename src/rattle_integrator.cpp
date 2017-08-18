@@ -112,7 +112,8 @@ bool RattleIntegrator::_is_constraint_derivative_within_rvtol(double dabsq,
     // the projection of bond velocity onto the bond vector should not
     // increase the bond length by more than the bondlength tolerance within
     // the given timestep
-    bool is_constraint_derivative_within_rvtol = (rv_dot < _rvtol * dabsq);
+    bool is_constraint_derivative_within_rvtol =
+        (std::abs(rv_dot) < _tol * dabsq);
     return is_constraint_derivative_within_rvtol;
 }
 void RattleIntegrator::_zero_accumulators(){
@@ -192,8 +193,8 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
                     // calculate constraint force
                     gab = diffsq/(2 * dt * (rma + rmb) * rr_dot);
                     // correct the atomic velocities
-                    Vector dva = multiply(rab_new, rma * gab);
-                    Vector dvb = multiply(-rab_new, rmb * gab);
+                    Vector dva = multiply(rab_old, rma * gab);
+                    Vector dvb = multiply(-rab_old, rmb * gab);
                     v_new_atom1 += dva;
                     v_new_atom2 += dvb;
                     // correct atomic position
@@ -224,7 +225,6 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
     int iter = 0;
     double rv_dot;              /**> r_{AB}(t) * r^{i}_{AB}(t+dt) */
     double dabsq = _dabsq;      /**> fixed bond length squared */
-    double rabsq;               /**> norm squared of r^{i}_{AB}(t+dt)*/
     double kab;                 /**> proportional to constraint force */
     double rma = _rm;           /**> 1/mass of atom 1 */
     double rmb = _rm;           /**> 1/mass of atom 2 */
@@ -254,8 +254,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
                     /**********************************************************/
                     // COMMENCE CORRECTION
                     // calculate constraint force
-                    rabsq = normsq(rab);
-                    kab = - rv_dot /(2 * (rma + rmb) * rabsq);
+                    kab = - rv_dot /((rma + rmb) * dabsq);
                     // correct the atomic velocities
                     Vector dva = multiply(rab, rma * kab);
                     Vector dvb = multiply(-rab, rmb * kab);

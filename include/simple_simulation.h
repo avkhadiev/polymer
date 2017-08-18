@@ -14,23 +14,6 @@
 #include "force_updater.h"
 #include "rattle_integrator.h"
 #include "config_handler.h"
-//namespace parameters{
-//    extern int NM;
-//    extern int NB;
-//    extern double M;
-//    extern double D;
-//}
-//namespace observables{
-//    extern ScalarObservable K;
-//    extern ScalarObservable V;
-//    extern ScalarObservable W;
-//    extern ScalarObservable WC;
-//} // namespace observables
-//namespace rattle {
-//    extern double tol;
-//    extern double tiny;
-//    extern int maxiter;
-//}
 namespace simple{
     class Simulation {
     protected:
@@ -38,6 +21,7 @@ namespace simple{
         std::string _cndir;     /**> directory of config file       */
         std::string _tpdir;     /**> directory of `tape` file       */
         std::string _dtdir;     /**> directory for observables      */
+        std::string _infile;    /**> input config file address      */
         std::string _cnfname;   /**> determined by _name            */
         std::string _tpfname;   /**> determined by _name            */
         ConfigHandler &_cfg;
@@ -63,23 +47,26 @@ namespace simple{
         /**
         * Readin utilities
         */
-        virtual void _read_config();      /**> read state + accumulators    */
-        virtual void _read_accumulators(std::ifstream& input_stream);
+        bool _is_input_given;             /**> should input config be read? */
+        void _read_config();              /**> read state + accumulators    */
         /**
         * Writeout utilities from within evolve()
         */
-        void _write_data();               /**> writeout data                */
-        void _write_tape();               /**> append state to tape file    */
-        virtual void _write_status();     /**> report status to stdout      */
-        virtual void _write_config();     /**> overwrite state + accumulators */
-        virtual std::string _write_accumulators();
+        void _write_data();             /**> writeout data                */
+        void _write_status();           /**> report status to stdout      */
+        void _write_config();           /**> overwrite state + accumulators */
+        // append state to tape file
+        void _prepare_tpstream(std::ofstream& tpstream);
+        void _write_tape(std::ofstream& tpstream);
     public:
+        bool is_input_given() {return _is_input_given;};
         void evolve(double runtime);
         // constructors and a destructor
         Simulation(std::string name,
             std::string cndir,
             std::string tpdir,
             std::string dtdir,
+            std::string infile,
             ConfigHandler& config_handler,
             Integrator& integrator,
             ObservableContainer& container,

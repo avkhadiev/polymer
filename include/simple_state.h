@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include "simple_polymer.h"
 namespace simple {
     class BaseState {
@@ -89,6 +90,8 @@ namespace simple {
         */
         virtual std::string to_string(bool verbose = true,
             bool output_header = true) const = 0;
+        std::string header_str(bool verbose = true)
+            const {return _header_str(verbose);};
         /**
         * If the file outdir/fname.cfg does not exist, creates it.
         * Otherwise, if overwrite = false, appends the state to the end of the file; if overwrite=true, overwrites the file; adds header information.

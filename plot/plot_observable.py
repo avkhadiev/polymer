@@ -9,7 +9,7 @@ parser.add_option("-c", "config",
 # TODO removes capitalization, replaces ' ' with '_' and '.' with '_'
 def parse_name(string):
     return string
-def parse_config(config_string)
+def parse_config(config_string):
     config = dict(item.split("=") for item in config_string.split(":"))
     return config
 def make_file_name(simulation, observable):

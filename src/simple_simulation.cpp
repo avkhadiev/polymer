@@ -2,54 +2,19 @@
 /*! \file simple_simulation.cpp
 */
 #include <vector>
+#include <sys/stat.h>                       /**> checks for file existence */
 #include <string>
 #include <stdexcept>
 #include <map>
 #include <sstream>
 #include <fstream>
 #include "../include/simple_simulation.h"
-//namespace parameters{
-//    int NM = 1;
-//    int NB = 1;
-//    double M = 1.0;
-//    double D = 3.0;
-//}
-//namespace obs{
-//    ScalarObservable inst_K
-//        = declare_scalar_observable("Instanteneous Kinetic Energy",
-//            "\\epsilon",
-//            "K");
-//    ScalarObservable avg_K
-//        = declare_scalar_observable("Average Kinetic Energy",
-//            "\\epsilon",
-//            "\\bar{K}");
-//    ScalarObservable inst_V
-//        = declare_scalar_observable("Instantaneous Potential Energy",
-//            "\\epsilon",
-//            "V_{LJ}");
-//    ScalarObservable avg_V
-//        = declare_scalar_observable("Average Potential Energy",
-//            "\\epsilon",
-//            "\\bar{V}_{LJ}");
-//    ScalarObservable W
-//        = declare_scalar_observable("Negative Virial",
-//            "\\epsilon",
-//            "-W_{LJ}");
-//    ScalarObservable WC
-//        = declare_scalar_observable("Negative Constraint Virial",
-//            "\\epsilon",
-//            "-W_{C}");
-//} // namespace observables
-//namespace rattle {
-//    double tol = pow(10, -3);
-//    double tiny = pow(10, -7);
-//    int maxiter = pow(10, 3);
-//}
 namespace simple{
     Simulation::Simulation(std::string name,
         std::string cndir,
         std::string tpdir,
         std::string dtdir,
+        std::string infile,
         ConfigHandler& config_handler,
         Integrator& integrator,
         ObservableContainer& container,
@@ -63,6 +28,7 @@ namespace simple{
         _cndir(cndir),
         _tpdir(tpdir),
         _dtdir(dtdir),
+        _infile(infile),
         _cnfname(_name + "_cn.txt"),
         _tpfname(_name + "_tp.txt"),
         _cfg(config_handler),
@@ -77,6 +43,19 @@ namespace simple{
         _idata(idata),
         _itape(itape)
     {
+        if (_dt == 0.0){
+            fprintf(stderr, "%s. %s: %f\n",
+                "Cannot have zero timestep",
+                "Setting default value", 0.001);
+            _dt = 0.001;
+        }
+        //*********************************************************************
+        if (_infile == ""){
+            _is_input_given = false;
+        }
+        else {
+            _is_input_given = true;
+        }
         //*********************************************************************
         fprintf(stdout, "%s\n", "Simulation is set up:");
         fprintf(stdout, "%s: %s\n", "Name", _name.c_str());
@@ -86,11 +65,17 @@ namespace simple{
         fprintf(stdout, "%s: %d\n",
             "Number of Bonds in a Molecule",
             _cfg.polymer_nb());
-        fprintf(stdout, "%s: %s/%s\n",
+        if (_is_input_given){
+            fprintf(stdout, "%s: %s\n",
+                "Input Config File",
+                _infile.c_str());
+            _read_config();                 // may change state & observables
+        }
+        fprintf(stdout, "%s: %s%s\n",
             "Config File",
             _cndir.c_str(),
             _cnfname.c_str());
-        fprintf(stdout, "%s: %s/%s\n",
+        fprintf(stdout, "%s: %s%s\n",
             "Tape File",
             _tpdir.c_str(),
             _tpfname.c_str());
@@ -100,23 +85,15 @@ namespace simple{
         fprintf(stdout, "%s: %lu steps\n", "Observable Print Interval", _idata);
         fprintf(stdout, "%s: %lu steps\n", "Config Update Interval", _isave);
         fprintf(stdout, "%s: %lu steps\n", "Tape Update Interval", _itape);
-        _write_status();
     }
     Simulation::~Simulation(){}
     void Simulation::_write_status(){
         fprintf(stdout, "%s\n", "STATUS:");
         fprintf(stdout, "%s: %f\n", "Time", _cfg.atom_state().time());
-        fprintf(stdout, "%s\n", _cfg.atom_state().to_string(true, false).c_str());
-        fprintf(stdout, "%s\n", _write_accumulators().c_str());
-    }
-    std::string Simulation::_write_accumulators(){
-        return "";
-    }
-    void Simulation::_read_accumulators(std::ifstream& input_stream){
+        fprintf(stdout, "%s", _obs.status_string().c_str());
     }
     void Simulation::_read_config(){
-        std::string fin;              /*>> stores path to input file */
-        fin = _cndir + _cnfname;      /*>> stores path to input directory */
+        std::string fin = _infile;
         std::ifstream readout;
         readout.open(fin, std::ifstream::in);
         if (!readout.is_open()) {
@@ -125,8 +102,8 @@ namespace simple{
             perror("open");
         }
         else{
-            _cfg.read_atom_state(readout);
-            _read_accumulators(readout);
+            _cfg.read_bond_state(readout);
+            _obs.read_status(readout);
         }
         readout.close();
     }
@@ -134,7 +111,7 @@ namespace simple{
         // open file in truncate mode,
         // write out state,
         // write out accumulators
-        bool verbose = true;
+        bool verbose = false;
         bool output_header = true;
         std::string fout;
         fout = _cndir + _cnfname;
@@ -144,9 +121,9 @@ namespace simple{
         // now file has to be opened
         if (writeout.is_open()) {
             std::string s_str;
-            writeout << _cfg.atom_state().to_string(verbose,
+            writeout << _cfg.bond_state().to_string(verbose,
                 output_header);
-            writeout << _write_accumulators();
+            writeout << _obs.config_string();
         }
         else {
             // if file still could not be opened
@@ -156,43 +133,60 @@ namespace simple{
         }
         writeout.close();
     }
-    void Simulation::_write_tape(){
-        bool verbose = true;
-        bool output_header = false;
-        std::string fout;
-        fout = _tpdir + _tpfname;
-        std::ofstream writeout;
-        // open writeout for output operations in append mode
-        writeout.open(fout, std::ofstream::out | std::ofstream::app);
-        if (!writeout.is_open()) {
-            // if file does not exist, open in truncate mode
-            // header is written only in the beginning of tape file
-            output_header = true;
-            writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    void Simulation::_prepare_tpstream(std::ofstream &tpstream){
+        bool verbose = false;
+        std::string fout = _tpdir + _tpfname;
+        // check for file existence
+        // if doesn't exist, create new one and output header information
+        struct stat buffer;
+        if (stat(fout.c_str(), &buffer) == 0) {
+            tpstream.open(fout, std::ofstream::out | std::ofstream::app);
+        }
+        else{
+            fprintf(stderr, "%s\n",
+                "tape file doesn't exist, creating new one.");
+            tpstream.open(fout, std::ofstream::out | std::ofstream::trunc);
+            tpstream << _cfg.atom_state().header_str(verbose) << std::endl;
         }
         // now file has to be opened
-        if (writeout.is_open()) {
-            writeout << _cfg.atom_state().to_string(verbose,
-                output_header);
-        }
-        else {
+        if (!tpstream.is_open()) {
             // if file still could not be opened
             std::string err_msg = "write_state_to_file: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), fout.c_str());
             perror("open");
         }
-        writeout.close();
+        else{
+            fprintf(stdout, "%s\n", "Tape file opened for writing.");
+        }
+    }
+    void Simulation::_write_tape(std::ofstream& tpstream){
+        bool verbose = false;
+        bool output_header = false;
+        // now file has to be opened
+        if (tpstream.is_open()) {
+            tpstream << _cfg.bond_state().to_string(verbose,
+                output_header);
+        }
+        else {
+            perror("open");
+        }
     }
     void Simulation::_write_data(){
         bool overwrite = false;
-        _obs.writeout(_tpdir, _name, overwrite);
-        // flush all records to save memory and not output them next time
-        _obs.clear();
+        _obs.write_data(_tpdir, _name, overwrite);
     }
     void Simulation::_calculate(){
         _calcstep += 1;
+        _obs.update(_cfg.atom_state(), _calcstep);
     }
     void Simulation::evolve(double runtime){
+        // write out initial state data as necessary
+        std::ofstream tpstream;
+        if (_itape != 0) _prepare_tpstream(tpstream);
+        if (_icalc != 0) _calculate();
+        if (_idata != 0) _obs.write_data(_tpdir, _name, true);
+        if (_isave != 0) _write_config();
+        if (_iprint != 0) _write_status();
         size_t nsteps = _step + (size_t)(runtime / _dt);
         size_t icalc = _icalc;
         size_t iprint = _iprint;
@@ -206,11 +200,8 @@ namespace simple{
         if (isave == 0) isave = nsteps + 1;
         if (idata == 0) idata = nsteps + 1;
         if (itape == 0) itape = nsteps + 1;
-        if (idata < icalc) idata = icalc;
         // can't output data more often that new data is calculated
-        // shouldn't print to tape less often that configuration is output
         if (idata < icalc) idata = icalc;
-        if (isave < itape) isave = itape;
         bool calc;
         while(_step < nsteps){
             _step = _step + 1;
@@ -218,12 +209,17 @@ namespace simple{
             _int.move(_dt, _cfg.atom_state(), calc);
             if (calc) _calculate();
             if (_step % iprint == 0) _write_status();
-            if (_step % itape == 0) _write_tape();
+            if (_step % itape == 0) _write_tape(tpstream);
             if (_step % idata == 0) _write_data();
             if (_step % isave == 0) _write_config();
-            if (_step % itape == 0) _write_tape();
         }
-        _write_config();
-        _write_data();
+        // write to tape if this state has not been already written
+        // and tape interval is non-zero
+        if (_step % itape != 0 && itape != nsteps + 1){
+            _write_tape(tpstream);
+            tpstream.close();
+            fprintf(stdout, "%s\n", "Tape file closed.");
+        }
+        if (idata != nsteps + 1) _write_data();
     }
 } // namespace simple
