@@ -8,52 +8,48 @@
 #include "../include/ljpotential.h"
 #include "../include/simple_state.h"
 ForceUpdater::ForceUpdater(LJPotential potential,
-    double *potential_energy_acc,
-    double *neg_virial_acc) :
-    _potential (potential),
-    _is_potential_energy_set (false),
-    _is_neg_virial_acc_set (false) {
-    // if non-null pointers to accumulators are given, they will be used to
-    // calculate the respective observables
-    if(potential_energy_acc != NULL){
-        _is_potential_energy_set = true;
-        _potential_energy_acc = potential_energy_acc;
+    Observable *pe,
+    Observable *w) :
+    _potential (potential){
+    _pe.ptr = pe;
+    _w.ptr = w;
+    if(_pe.ptr == NULL){
+        _pe.is_set = false;
     }
-    if(neg_virial_acc != NULL){
-        _is_neg_virial_acc_set = true;
-        _neg_virial_acc = neg_virial_acc;
+    else{
+        _pe.is_set = true;
+    }
+    if(_w.ptr == NULL){
+        _w.is_set = false;
+    }
+    else{
+        _w.is_set = true;
     }
 }
 ForceUpdater::~ForceUpdater(){}
 const LJPotential& ForceUpdater::get_potential() const {
     return _potential;
 }
-bool ForceUpdater::is_potential_energy_acc_set() const {
-    return _is_potential_energy_set;
-}
-bool ForceUpdater::is_neg_virial_acc_set() const {
-    return _is_potential_energy_set;
-}
 void ForceUpdater::set_potential(LJPotential& potential){
     _potential = potential;
 }
-void ForceUpdater::set_potential_energy_acc(double *potential_energy_acc){
-    if (potential_energy_acc != NULL){
-        _is_potential_energy_set = true;
+void ForceUpdater::set_pe(Observable *ptr){
+    if (ptr != NULL){
+        _pe.is_set = true;
     }
     else {
-        _is_potential_energy_set = false;
+        _pe.is_set = false;
     }
-    _potential_energy_acc = potential_energy_acc;
+    _pe.ptr = ptr;
 }
-void ForceUpdater::set_neg_virial_acc(double *neg_virial_acc){
-    if (neg_virial_acc != NULL){
-        _is_neg_virial_acc_set = true;
+void ForceUpdater::set_w(Observable *ptr){
+    if (ptr != NULL){
+        _w.is_set = true;
     }
     else {
-        _is_neg_virial_acc_set = false;
+        _w.is_set = false;
     }
-    _neg_virial_acc = neg_virial_acc;
+    _w.ptr = ptr;
 }
 void ForceUpdater::_update_forces_in_atomic_pair(simple::Atom &atom_i,
     simple::Atom &atom_j,
@@ -75,13 +71,13 @@ void ForceUpdater::_update_forces_in_atomic_pair(simple::Atom &atom_i,
             // if observables need to be calculated and respective pointers are set,
             // zero the accumulators
             if(calculate_observables){
-                if(_is_potential_energy_set){
+                if(_pe.is_set){
                     double vij = _potential.calculate_pair_potential(inv_rijsq);
-                    *_potential_energy_acc += vij;
+                    _pe.ptr->update( _pe.ptr->value() + vij );
                 }
-                if(_is_neg_virial_acc_set){
+                if(_w.is_set){
                     double wij = _potential.calculate_neg_pair_virial(inv_rijsq);
-                    *_neg_virial_acc += wij;
+                    _w.ptr->update( _w.ptr->value() + wij );
                 }
             }
         }
@@ -130,21 +126,15 @@ void ForceUpdater::update_forces(simple::AtomState &state, bool calculate_observ
         // if observables need to be calculated and respective pointers are set,
         // zero the accumulators
         if(calculate_observables){
-            if(_is_potential_energy_set){
-                *_potential_energy_acc = 0.0;
-            }
-            if(_is_neg_virial_acc_set){
-                *_neg_virial_acc = 0.0;
-            }
+            if(_pe.is_set) _pe.ptr->zero();
+            if(_w.is_set) _w.ptr->zero();
         }
         // update all inter- and intra- molecular interactions
         _update_forces_intermolecular(state, calculate_observables);
         _update_forces_intramolecular(state, calculate_observables);
         // divide the negative of the sum of pair virials by 3
         // (see definition of virial in Allen & Tildesley)
-        if(calculate_observables){
-            if(_is_neg_virial_acc_set){
-                *_neg_virial_acc = *_neg_virial_acc / 3.0;
-            }
+        if(calculate_observables && _w.is_set) {
+            _w.ptr->update( _w.ptr->value() / 3.0 );
         }
 }

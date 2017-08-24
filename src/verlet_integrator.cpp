@@ -6,22 +6,21 @@
 #include <cmath>              /* pow */
 #include "../include/verlet_integrator.h"
 VerletIntegrator::VerletIntegrator(ForceUpdater force_updater,
-    double *kinetic_energy_acc) :
+    Observable *ke) :
     _force_updater (force_updater),
     _timestep (0.001),
-    _halfstep (_timestep * 0.5),
-    _is_kinetic_energy_acc_set (false) {
-    if(kinetic_energy_acc != NULL){
-        _is_kinetic_energy_acc_set = true;
-        _kinetic_energy_acc = kinetic_energy_acc;
+    _halfstep (_timestep * 0.5) {
+    _ke.ptr = ke;
+    if(_ke.ptr == NULL){
+        _ke.is_set = false;
+    }
+    else{
+        _ke.is_set = true;
     }
 }
 VerletIntegrator::~VerletIntegrator(){};
 ForceUpdater& VerletIntegrator::get_force_updater() {
     return _force_updater;
-}
-double *VerletIntegrator::get_kinetic_energy_acc(){
-    return _kinetic_energy_acc;
 }
 void VerletIntegrator::_set_timestep(double timestep){
     _timestep = timestep;
@@ -30,24 +29,17 @@ void VerletIntegrator::_set_timestep(double timestep){
 void VerletIntegrator::set_force_updater(ForceUpdater force_updater) {
     _force_updater = force_updater;
 }
-void VerletIntegrator::set_kinetic_energy_acc(double *kinetic_energy_acc){
-    if (kinetic_energy_acc != NULL){
-        _is_kinetic_energy_acc_set = true;
+void VerletIntegrator::set_ke(Observable *ptr){
+    if (ptr != NULL){
+        _ke.is_set = true;
     }
     else {
-        _is_kinetic_energy_acc_set = false;
+        _ke.is_set = false;
     }
-    _kinetic_energy_acc = kinetic_energy_acc;
+    _ke.ptr = ptr;
 }
 void VerletIntegrator::_zero_accumulators(){
-    if(_is_kinetic_energy_acc_set){
-        *_kinetic_energy_acc = 0.0;
-    }
-}
-void VerletIntegrator::_correct_accumulators(){
-    if(_is_kinetic_energy_acc_set){
-        *_kinetic_energy_acc = *_kinetic_energy_acc / 2.0;
-    }
+    if(_ke.is_set) _ke.ptr->zero();
 }
 simple::AtomPolymer VerletIntegrator::_move_verlet_half_step(simple::AtomPolymer molecule) {
     int na = molecule.nb() + 1;
@@ -76,9 +68,8 @@ simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer
         atom.velocity += multiply(acceleration, _halfstep);
         // update kinetic energy accumulator if necessary and possible
         if(calculate_observables){
-            if(_is_kinetic_energy_acc_set){
-                double k_increase = m * normsq(atom.velocity);
-                *_kinetic_energy_acc += k_increase;
+            if(_ke.is_set){
+                _ke.ptr->update(atom);
             }
         }
     }
@@ -87,9 +78,7 @@ simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer
 void VerletIntegrator::move(double timestep, simple::AtomState& state,
     bool calculate_observables){
         // if necessary, zero the counters of accumulators
-        if(calculate_observables){
-            _zero_accumulators();
-        }
+        if(calculate_observables) _zero_accumulators();
         simple::AtomPolymer polymer;
         // set the time step and perform integration
         _set_timestep(timestep);
@@ -120,7 +109,4 @@ void VerletIntegrator::move(double timestep, simple::AtomState& state,
         // now velocity, positions, and forces of all atoms have to be at t + dt
         state.advance_time(timestep);
         // multiply the accumulators by whatever factors necessary
-        if(calculate_observables){
-            _correct_accumulators();
-        }
 }

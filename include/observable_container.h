@@ -28,7 +28,7 @@ private:
     std::vector<container::Unit> _status_variables;
 public:
     // I/O
-    std::string config_string();           
+    std::string config_string();
     std::string status_string();
     void print_status(std::ofstream& output);
     void read_status(std::ifstream& input);

@@ -1,5 +1,11 @@
 // 2017 Artur Avkhadiev
 /*! \file run_simulation.cpp
+* Usage: run_simulation
+*    <name> <infile>
+*    <optional nbonds bond/sigma>
+*    <optional runtime/tau dt/tau rattle_tol>
+*    <optional icalc iprint isave idata itape>
+*    <optional cndir dtdir tpdir>
 */
 #include<string>
 #include<vector>
@@ -7,57 +13,97 @@
 #include "../include/diatomic_observables.h"
 #include "../include/dynamic_observables.h"
 namespace parameters{
-    int NM = 1;
-    int NB = 1;
-    double M = 1.0;
-    double D = 4.0;
+    int NM = 1;                         /**> single-molecule simulation */
+    // default parameters
+    // may be changed via command line
+    int NB = 2;                         /**> is a triatomic             */
+    double M = 1.0;                     /**> specifies unit of mass     */
+    double D = 4.0;                     /**> (-.-)--(-.-)--(-.-)--(-.-) */
 }
 namespace settings{
-    std::string sim_name = "test";
-    std::string cndir = "/Users/Arthur/stratt/polymer/test/";
-    std::string tpdir = "/Users/Arthur/stratt/polymer/test/";
-    std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
+    // mandatory arguments, suggested values
+    std::string sim_name = "bond" + std::to_string(parameters::NB);
     std::string infile = "/Users/Arthur/stratt/polymer/test/readin_cn.txt";
-    double runtime;
+    std::string infile_default = "default";
+    // optional arguments, default values
+    std::string cndir = "/Users/Arthur/stratt/polymer/test/";
+    std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
+    std::string tpdir = "/Users/Arthur/stratt/polymer/test/";
+    double runtime = 4.0;
     double dt = 0.001;
-    size_t icalc = 10;
-    size_t iprint = 10;
-    size_t isave = 100;
-    size_t idata = 100;
-    size_t itape = 10;
+    // intervals, in number of time steps
+    size_t icalc = 10;                  /**> observable update      */
+    size_t iprint = 10;                 /**> status printout        */
+    size_t isave = 100;                 /**> configuration update   */
+    size_t idata = 100;                 /**> observable writeout    */
+    size_t itape = 10;                  /**> tapefile update        */
 }
 namespace rattle{
-    double tol = pow(10, -7);
+    double tol = pow(settings::dt, 2.0);
     double tiny = pow(10, -7);
     int maxiter = pow(10, 7);
 }
 namespace observables{
-    // declare observables
-    std::vector<container::Unit> vec
-        = {};
+    void setup(ConfigHandler& cfg){
+    }
+    std::vector<container::Unit> vec = {};
 }
 namespace messages{
-    std::string usage = "Usage: run_simulation <name> <runtime/tau> <tol>.";
-    std::string defaults = "default bond length = "
-        + std::to_string(parameters::D)
-        + ", default nbonds = "
-        + std::to_string(parameters::NB);
+    std::string usage = "Usage: run_simulation <name> <infile>  <optional nbonds bond/sigma> <optional runtime/tau dt/tau rattle_tol> <optional icalc iprint isave idata itape> <optional cndir dtdir tpdir>";
+    std::string defaults =
+        "Defaults:\nnbonds " + std::to_string(parameters::NB) + "\n"
+        + "bond/sigma " + std::to_string(parameters::D) + "\n"
+        + "runtime/tau " + std::to_string(settings::runtime) + "\n"
+        + "dt " + std::to_string(settings::dt) + "\n"
+        + "tol " + std::to_string(rattle::tol) + "\n"
+        + "icalc " + std::to_string(settings::icalc) + "\n"
+        + "iprint " + std::to_string(settings::iprint) + "\n"
+        + "isave " + std::to_string(settings::isave) + "\n"
+        + "idata " + std::to_string(settings::idata) + "\n"
+        + "itape " + std::to_string(settings::itape) + "\n"
+        + "cndir " + settings::cndir + "\n"
+        + "dtdir " + settings::dtdir + "\n"
+        + "tpdir " + settings::tpdir;
+    std::string infile = "If infile =='" + settings::infile_default + "', the state will be initialized with the default initialization method and requires arguments <nbonds> and <bond/sigma>; otherwise, the infile should specify a path to the configuration file, and arguments <nbonds> and <bond/sigma> will be ignored";
 }
-int main(int argc, char **argv){
-    if (argc < 3){
-        fprintf(stderr, "%s\n", messages::usage.c_str());
-        fprintf(stderr, "%s\n", messages::defaults.c_str());
+
+bool read_arguments(int argc, char **argv){
+    bool success = true;
+    switch (argc) {
+        case 16: settings::tpdir = argv[15];
+        case 15: settings::dtdir = argv[14];
+        case 14: settings::cndir = argv[13];
+        case 13: settings::itape = atoi(argv[12]);
+        case 12: settings::idata = atoi(argv[11]);
+        case 11: settings::isave = atoi(argv[10]);
+        case 10: settings::iprint = atoi(argv[9]);
+        case 9: settings::icalc = atoi(argv[8]);
+        case 8: rattle::tol = atof(argv[7]);
+        case 7: settings::dt = atof(argv[6]);
+        case 6: settings::runtime = atof(argv[5]);
+        case 5: parameters::D = atof(argv[4]);
+        case 4: parameters::NB = atoi(argv[3]);
+        case 3:
+            settings::infile = argv[2];
+            settings::sim_name = argv[1];
+            break;
+        default:
+            fprintf(stderr, "%s\n", messages::usage.c_str());
+            fprintf(stderr, "%s\n", messages::defaults.c_str());
+            fprintf(stderr, "%s\n", messages::infile.c_str());
+            success = false;
     }
+    return success;
+}
+
+int main(int argc, char **argv){
+    int res = 0;
+
+    if (!read_arguments(argc, argv)) res = 1;
     else {
-        settings::sim_name = argv[1];
-        settings::runtime = atof(argv[2]);      /**>  run time */
-        rattle::tol = atof(argv[3]);            /**> tolerance */
-        // include parameters in name
-        //settings::sim_name
-        //    += "_T_" + std::to_string(settings::runtime)
-        //    + "_D_" + std::to_string(parameters::D)
-        //    + "_NB_" + std::to_string(parameters::NB);
-        //settings::sim_name = parse_string(settings::sim_name);
+        if (settings::infile == settings::infile_default){
+            settings::infile = "";
+        }
         // state setup
         simple::BaseState::set_nm(parameters::NM);
         simple::BasePolymer::set_nb(parameters::NB);
@@ -71,8 +117,11 @@ int main(int argc, char **argv){
         // integrator setup
         ForceUpdater force_loop = ForceUpdater(LJPotential());
         VerletIntegrator verlet = VerletIntegrator(force_loop);
-        RattleIntegrator rattle = RattleIntegrator(force_loop,
-            rattle::tol, rattle::tiny, rattle::maxiter);
+        RattleIntegrator rattle
+            = RattleIntegrator(force_loop,
+                rattle::tol,
+                rattle::tiny,
+                rattle::maxiter);
         Integrator& integrator = rattle;
         // simulation setup
         simple::Simulation sim
@@ -90,6 +139,19 @@ int main(int argc, char **argv){
                 settings::isave,
                 settings::idata,
                 settings::itape);
+        if (!sim.is_input_given()){
+        /**
+        * The state is now set up.
+        * If it was NOT set up from input file,
+        *  observables may need the initial-state information. For example,
+        *  the orientation of the angular momentum vector initially needs
+        *  to be given to the LProj observable.
+        * If it was set up from the input file, this information need not
+        *  be re-written.
+        */
+            observables::setup(config);
+        }
         sim.evolve(settings::runtime);
     }
+    return res;
 }

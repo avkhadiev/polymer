@@ -102,7 +102,15 @@ namespace simple{
             perror("open");
         }
         else{
+            // get state
             _cfg.read_bond_state(readout);
+            // get steps
+            std::string line;
+            getline(readout, line);
+            sscanf(line.c_str(), "%zu", &_step);
+            getline(readout, line);
+            sscanf(line.c_str(), "%zu", &_calcstep);
+            // get observables
             _obs.read_status(readout);
         }
         readout.close();
@@ -121,8 +129,9 @@ namespace simple{
         // now file has to be opened
         if (writeout.is_open()) {
             std::string s_str;
-            writeout << _cfg.bond_state().to_string(verbose,
-                output_header);
+            writeout << _cfg.bond_state().to_string(verbose, output_header);
+            writeout << _step << std::endl;
+            writeout << _calcstep << std::endl;
             writeout << _obs.config_string();
         }
         else {
@@ -176,16 +185,13 @@ namespace simple{
         _obs.write_data(_tpdir, _name, overwrite);
     }
     void Simulation::_calculate(){
-        _calcstep += 1;
+        // calc step has to be updated manually
         _obs.update(_cfg.atom_state(), _calcstep);
     }
     void Simulation::evolve(double runtime){
         // write out initial state data as necessary
         std::ofstream tpstream;
         if (_itape != 0) _prepare_tpstream(tpstream);
-        if (_icalc != 0) _calculate();
-        if (_idata != 0) _obs.write_data(_tpdir, _name, true);
-        if (_isave != 0) _write_config();
         if (_iprint != 0) _write_status();
         size_t nsteps = _step + (size_t)(runtime / _dt);
         size_t icalc = _icalc;
@@ -207,7 +213,10 @@ namespace simple{
             _step = _step + 1;
             _step % icalc == 0? calc = true : calc = false;
             _int.move(_dt, _cfg.atom_state(), calc);
-            if (calc) _calculate();
+            if (calc) {
+                ++_calcstep;
+                _calculate();
+            }
             if (_step % iprint == 0) _write_status();
             if (_step % itape == 0) _write_tape(tpstream);
             if (_step % idata == 0) _write_data();

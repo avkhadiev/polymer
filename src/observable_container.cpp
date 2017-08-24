@@ -47,8 +47,15 @@ void ObservableContainer::write_data(std::string datadir,
 void ObservableContainer::update(const simple::AtomState& state, size_t calcstep){
     for (const container::Unit& unit: _observables){
         if (unit.eval_time == container::EvalTime::sim_loop){
-            unit.obs.zero();
-            unit.average ? unit.obs.update(calcstep) : unit.obs.update(state);
+            if (unit.average) {
+                // average observables are not zeroed -- accumulators should not
+                // be reset.
+                unit.obs.calc_avg(calcstep);
+            }
+            else {
+                unit.obs.zero();
+                unit.obs.update(state);
+            }
         }
         if (unit.timelog) unit.obs.add_record(state.time());
     }

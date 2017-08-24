@@ -21,7 +21,7 @@ public:
     std::string units() const {return _units;};
     std::string axis_name() const {return _axis_name;};
     double value() const {return _value;};
-    std::string print_value() const;
+    virtual std::string print_value() const;
     virtual std::string to_string() const
         {return name() + " " + print_value();};
     void prepare_ofstream(std::string datadir,
@@ -36,6 +36,7 @@ public:
     virtual void add_record(double time){};
     void update(double value) {_value = value;};
     virtual void update(std::string obs_string);  //*> update from to_string */
+    virtual void calc_avg(size_t calcsteps){}     //*> update average        */
     virtual void update(const simple::Atom& atom){};
     virtual void update(const simple::Bond& bond){};
     virtual void update(const simple::AtomPolymer& polymer){};
@@ -51,15 +52,16 @@ public:
 };
 class AvgObservable :
     public virtual Observable{
-private:
+protected:
     Observable& _inst_obs;       /**> corresponding instantaneous observable */
     double _acc;
-protected:
     virtual void zero() {Observable::zero(); _acc = 0.0;};
 public:
     double acc() const {return _acc;};
+    virtual std::string print_value() const;
+    virtual void update(std::string obs_string);  //*> update from to_string */
     using Observable::update;
-    virtual void update(size_t ncalcsteps){
+    void calc_avg(size_t ncalcsteps){
         _acc += _inst_obs.value();
         update(acc()/((double)ncalcsteps));
     }

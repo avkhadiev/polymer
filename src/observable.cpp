@@ -103,8 +103,24 @@ AvgObservable::AvgObservable(Observable& inst_obs, double acc,
     Observable(name, fname, units, axis_name),
     _inst_obs(inst_obs),
     _acc(acc){}
+void AvgObservable::update(std::string obs_string){
+    std::istringstream ss(obs_string.c_str());
+    std::istream_iterator<std::string> begin(ss);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> words(begin, end);
+    _acc = atof(words.at( words.size() - 2 ).c_str());
+    Observable::update(atof(words.back().c_str()));
+}
+std::string AvgObservable::print_value() const {
+    std::ostringstream out;
+    out.precision(dbl::max_digits10);
+    out << _acc;
+    out << " ";
+    out << value();
+    return out.str();
+};
 /**
-* Class AvgObservable with Virtual Inheritance of Observable
+* Class TimeLogObservable with Virtual Inheritance of Observable
 */
 TimeLogObservable::TimeLogObservable(std::string name, std::string fname,
     std::string units, std::string axis_name) :

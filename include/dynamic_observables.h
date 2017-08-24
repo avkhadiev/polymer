@@ -6,6 +6,71 @@
 #include "observable.h"
 namespace dynamic{
     /**
+    * calculates potential energy of the polymer
+    * ForceLoop knows how to work with this observable, no update functions
+    */
+    class V :
+        public TimeLogObservable {
+    public:
+        V();
+        ~V(){};
+    };
+    /**
+    * calculates average potential energy of the polymer
+    * ForceLoop knows how to work with this observable, no update functions
+    */
+    class AvgV :
+        public TimeLogObservable,
+        public AvgObservable {
+    public:
+        AvgV(V& ve, double acc = 0.0);
+        ~AvgV(){};
+    };
+    /**
+    * calculates virial of the polymer
+    * ForceLoop knows how to work with this observable, no update functions
+    */
+    class NegW :
+        public TimeLogObservable {
+    public:
+        NegW();
+        ~NegW(){};
+    };
+    /**
+    * calculates average virial of the polymer
+    * ForceLoop knows how to work with this observable, no update functions
+    */
+    class AvgNegW :
+        public TimeLogObservable,
+        public AvgObservable {
+    public:
+        AvgNegW(NegW& w, double acc = 0.0);
+        ~AvgNegW(){};
+    };
+    /**
+    * calculates negative constraint virial of the polymer
+    * RATTLE knows how to work with this observable, no update functions
+    * necessary
+    */
+    class NegWC :
+        public TimeLogObservable {
+    public:
+        NegWC();
+        ~NegWC(){};
+    };
+    /**
+    * calculates average negative constraint virial of the polymer
+    * RATTLE knows how to work with this observable, no update functions
+    * necessary
+    */
+    class AvgNegWC :
+        public TimeLogObservable,
+        public AvgObservable {
+    public:
+        AvgNegWC(NegWC& wc, double acc = 0.0);
+        ~AvgNegWC(){};
+    };
+    /**
     * calculates kinetic energy of the polymer
     * value = internal kinetic energy (motion wrt R_CM)
     */
@@ -20,6 +85,17 @@ namespace dynamic{
         double K(const simple::AtomState& state);
         IntKE(double m);
         ~IntKE(){};
+    };
+    /**
+    * calculates average internal kinetic energy of the polymer
+    * value = average internal kinetic energy (motion wrt R_CM)
+    */
+    class AvgIntKE :
+        public TimeLogObservable,
+        public AvgObservable {
+    public:
+        AvgIntKE(IntKE& ke, double acc = 0.0);
+        ~AvgIntKE(){};
     };
     /**
     * calculates angular momentum of the polymer

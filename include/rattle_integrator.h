@@ -15,13 +15,12 @@ class RattleIntegrator :
 private:
     int _maxiter;
     double _tol;
-    double _rvtol;
     double _tiny;
-    double _tol2;     /**> _tol * 2 */
+    double _tol2;             /**> _tol * 2 */
 protected:
     int _nb;
-    double _dabsq; /**> constant square of bond length for simple polymers */
-    double _rm;   /**> constant inverse atomic mass for simple polymers */
+    double _dabsq;  /**> constant square of bond length for simple polymers */
+    double _rm;     /**> constant inverse atomic mass for simple polymers   */
     double _inv_timestep;
     // stores inv_timestep in addition to half step and full step
     virtual void _set_timestep(double timestep);
@@ -29,18 +28,13 @@ protected:
     // RATTLE gets its own kinetic energy accumulator, because now that
     // corrections have to be performed on velocities after Verlet full step,
     // it doesn't make sense to calculate kinetic energy from (unconstrained)
-    // velocities. Thus these two data members shadow (hide) the ones in the
-    // base class
-    bool _is_kinetic_energy_acc_set;
-    double *_kinetic_energy_acc;
-    bool _is_neg_constraint_virial_acc_set;
-    double *_neg_constraint_virial_acc;
-    // checks whether | r^{i}_{AB}(t + dt) - d_{AB} |^2 < 2 * tol * d^2_{AB}
+    // velocities.  These data members shadows the one in the base class
+    struct obs_t {
+        bool is_set;
+        Observable *ptr;
+    } _ke, _wc;             /**> kinetic energy & negative constraint virial */
     bool _is_constraint_within_tol(double dabsq, double difference_of_squares);
-    // checks whether r_{AB}(t) * r^{i}_{AB}(t+dt) > tiny * d_{AB}
-    // to avoid division by 0
     bool _is_angle_okay(double dabsq, double rr_dot);
-    // checks whether | r_{AB}(t+dt) * v_{AB}(t+dt) |^2 < 2 * rvtol * d^2_{AB}
     bool _is_constraint_derivative_within_rvtol(double dabsq, double rv_dot);
     /**
     *   before calling,
@@ -100,13 +94,11 @@ public:
     double get_tol() const;
     double get_rvtol() const;
     double get_tiny() const;
-    virtual double *get_kinetic_energy_acc();
-    double *get_neg_constraint_virial_acc();
     // setters
     void set_tol(double tol);
     void set_tiny(double tiny);
-    virtual void set_kinetic_energy_acc(double *kinetic_energy_acc);
-    void set_neg_constraint_virial_acc(double *neg_constraint_virial_acc);
+    virtual void set_ke(Observable *ptr);
+    void set_wc(Observable *ptr);
     // main function
     // check for consistency of the state
     // zero observable accumulators, if necessary
@@ -125,8 +117,8 @@ public:
         double tol,
         double tiny = pow(10, -7.0),
         int maxiter = pow(10, 3),
-        double *kinetic_energy_acc = NULL,
-        double *neg_constraint_virial_acc = NULL);
+        Observable *ke = NULL,
+        Observable *wc = NULL);
     ~RattleIntegrator();
 };
 #endif

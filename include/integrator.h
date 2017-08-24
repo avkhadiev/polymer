@@ -7,7 +7,6 @@
 #include "ljpotential.h"
 #include "simple_state.h"
 #include "force_updater.h"
-#include "observable_container.h"
 class Integrator {
 public:
     virtual ForceUpdater& get_force_updater() = 0;

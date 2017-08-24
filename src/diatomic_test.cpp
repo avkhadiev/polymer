@@ -41,8 +41,15 @@ namespace observables{
     diatomic::BondPosProj bpp = diatomic::BondPosProj();
     diatomic::BondVelProj bvp = diatomic::BondVelProj();
     dynamic::IntKE ik = dynamic::IntKE(parameters::M);
+    dynamic::AvgIntKE avg_ik = dynamic::AvgIntKE(ik);
     dynamic::LNorm ln = dynamic::LNorm(parameters::M);
     dynamic::LProj lp = dynamic::LProj(parameters::M);
+    dynamic::V v = dynamic::V();
+    dynamic::AvgV avg_v = dynamic::AvgV(v);
+    dynamic::NegW w = dynamic::NegW();
+    dynamic::AvgNegW avg_w = dynamic::AvgNegW(w);
+    dynamic::NegWC wc = dynamic::NegWC();
+    dynamic::AvgNegWC avg_wc = dynamic::AvgNegWC(wc);
     void setup(DiatomicConfigHandler& cfg){
         double m = parameters::M;
         Vector paxis = cfg.ini_bp_axis();
@@ -72,6 +79,9 @@ namespace observables{
         .eval_time = container::EvalTime::sim_loop};
     container::Unit ik_unit = {.obs = ik,
         .status = true, .timelog = true, .average = false,
+        .eval_time = container::EvalTime::integrator};
+    container::Unit avg_ik_unit = {.obs = avg_ik,
+        .status = true, .timelog = true, .average = true,
         .eval_time = container::EvalTime::sim_loop};
     container::Unit ln_unit = {.obs = ln,
         .status = true, .timelog = true, .average = false,
@@ -79,9 +89,30 @@ namespace observables{
     container::Unit lp_unit = {.obs = lp,
         .status = true, .timelog = true, .average = false,
         .eval_time = container::EvalTime::sim_loop};
+    container::Unit v_unit = {.obs = v,
+        .status = true, .timelog = true, .average = false,
+        .eval_time = container::EvalTime::force_loop};
+    container::Unit avg_v_unit = {.obs = avg_v,
+        .status = true, .timelog = true, .average = true,
+        .eval_time = container::EvalTime::sim_loop};
+    container::Unit w_unit = {.obs = w,
+        .status = true, .timelog = true, .average = false,
+        .eval_time = container::EvalTime::sim_loop};
+    container::Unit avg_w_unit = {.obs = avg_w,
+        .status = true, .timelog = true, .average = true,
+        .eval_time = container::EvalTime::sim_loop};
+    container::Unit wc_unit = {.obs = wc,
+        .status = true, .timelog = true, .average = false,
+        .eval_time = container::EvalTime::force_loop};
+    container::Unit avg_wc_unit = {.obs = avg_wc,
+        .status = true, .timelog = true, .average = true,
+        .eval_time = container::EvalTime::sim_loop};
     /************************************************************************/
     std::vector<container::Unit> vec
-        = {bpl_unit, bvl_unit, bpp_unit, bvp_unit, ik_unit, ln_unit, lp_unit};
+        = {bpl_unit, bvl_unit, bpp_unit, bvp_unit,
+        ik_unit, avg_ik_unit, v_unit, avg_v_unit,
+        w_unit, avg_w_unit, wc_unit, avg_wc_unit,
+        ln_unit, lp_unit};
 }
 namespace messages{
     std::string usage
@@ -124,10 +155,12 @@ int main(int argc, char **argv){
         ObservableContainer container = ObservableContainer(observables::vec);
         ObservableContainer& obs = container;
         // integrator setup
-        ForceUpdater force_loop = ForceUpdater(LJPotential());
+        ForceUpdater force_loop
+            = ForceUpdater(LJPotential(), &observables::v, &observables::w);
         VerletIntegrator verlet = VerletIntegrator(force_loop);
         RattleIntegrator rattle = RattleIntegrator(force_loop,
-            rattle::tol, rattle::tiny, rattle::maxiter);
+            rattle::tol, rattle::tiny, rattle::maxiter,
+            &observables::ik, &observables::wc);
         Integrator& integrator = rattle;
         // simulation setup
         simple::Simulation sim

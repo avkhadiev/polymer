@@ -9,7 +9,7 @@
 #include "simple_atom.h"
 #include "simple_polymer.h"
 #include "force_updater.h"
-#include "observable_container.h"
+#include "observable.h"
 #include "integrator.h"
 class VerletIntegrator :
     public Integrator {
@@ -21,8 +21,10 @@ protected:
     double _halfstep;
     virtual void _set_timestep(double timestep);
     // pointers to accumulators of observables
-    bool _is_kinetic_energy_acc_set;
-    double *_kinetic_energy_acc;
+    struct obs_t {
+        bool is_set;
+        Observable *ptr;
+    } _ke;                                          /**> kinetic energy*/
     /**
     * The following two helper functions take in the molecule by value:
     * One feeds in the value of the molecule at time t, and receives the value
@@ -36,18 +38,16 @@ protected:
     simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule,
         bool calculate_observables);
     virtual void _zero_accumulators();
-    virtual void _correct_accumulators();
 public:
-    virtual double *get_kinetic_energy_acc();
     virtual ForceUpdater& get_force_updater();
     virtual void set_force_updater(ForceUpdater force_updater);
-    virtual void set_kinetic_energy_acc(double *kinetic_energy_acc);
+    virtual void set_ke(Observable *ptr);
     virtual void move(double timestep,
         simple::AtomState& state,
         bool calculate_observables = false);
     // constructors and a destructor
     VerletIntegrator(ForceUpdater force_updater,
-        double* kinetic_energy_acc = NULL);
+        Observable* ke = NULL);
     virtual ~VerletIntegrator();
 };
 #endif

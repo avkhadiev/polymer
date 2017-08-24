@@ -3,10 +3,51 @@
 */
 #include "../include/dynamic_observables.h"
 namespace dynamic{
+    /**************************************************************************
+    * LJ Potential Energy
+    **************************************************************************/
+    V::V() :
+        Observable("LJ Potential", "vlj", "\\varepsilon", ""),
+        TimeLogObservable(){}
+    /**************************************************************************
+    * Average LJ Potential Energy
+    **************************************************************************/
+    AvgV::AvgV(V& ve, double acc ) :
+        Observable("Average LJ Potential", "avgvlj", "\\varepsilon", ""),
+        TimeLogObservable(),
+        AvgObservable(ve, acc){}
+    /**************************************************************************
+    * Negative Virial
+    **************************************************************************/
+    NegW::NegW() :
+        Observable("Negative Virial", "-W", "\\varepsilon", ""),
+        TimeLogObservable(){}
+    /**************************************************************************
+    * Average Negative Virial
+    **************************************************************************/
+    AvgNegW::AvgNegW(NegW& w, double acc ) :
+        Observable("Average Negative Virial", "avgw", "\\varepsilon", ""),
+        TimeLogObservable(),
+        AvgObservable(w, acc){}
+    /**************************************************************************
+    * Negative Constraint Virial
+    **************************************************************************/
+    NegWC::NegWC() :
+        Observable("Negative Constraint Virial", "avgwc", "\\varepsilon", ""),
+        TimeLogObservable(){}
+    /**************************************************************************
+    * Average Negative Virial
+    **************************************************************************/
+    AvgNegWC::AvgNegWC(NegWC& wc, double acc) :
+        Observable("Average Negative Constraint Virial",
+            "avgwc", "\\varepsilon", ""),
+        TimeLogObservable(),
+        AvgObservable(wc, acc){}
+    /**************************************************************************
+    * Internal Kinetic Energy
+    **************************************************************************/
     IntKE::IntKE(double m) :
-        Observable("Internal Kinetic Energy", "ik",
-            "\\varepsilon",
-            ""),
+        Observable("Internal Kinetic Energy", "ik", "\\varepsilon", ""),
         TimeLogObservable(),
         _m(m){}
     void IntKE::update(const simple::Atom &atom){
@@ -28,6 +69,18 @@ namespace dynamic{
         }
         return K;
     }
+    /**************************************************************************
+    * Average Internal Kinetic Energy
+    **************************************************************************/
+    AvgIntKE::AvgIntKE(IntKE& ke, double acc) :
+        Observable("Average Internal Kinetic Energy", "avgik",
+            "\\varepsilon",
+            ""),
+        TimeLogObservable(),
+        AvgObservable(ke, acc){}
+    /**************************************************************************
+    * Angular Momentum Norm
+    **************************************************************************/
     LNorm::LNorm(double m) :
         Observable("Angular Momentum Norm", "ln",
             "m * \\sigma^2 / \\tau",
@@ -50,6 +103,9 @@ namespace dynamic{
         // assumes there is only one molecule in the state
         update(state.polymers.at(0));
     }
+    /**************************************************************************
+    * Angular Momentum Projection
+    **************************************************************************/
     LProj::LProj(double m, Vector axis) :
         Observable("Angular Momentum Projection on " + vector_to_string(axis),
             "lp", "", ""),

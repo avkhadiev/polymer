@@ -11,84 +11,71 @@ RattleIntegrator::RattleIntegrator(ForceUpdater force_updater,
     double tol,
     double tiny,
     int maxiter,
-    double *kinetic_energy_acc,
-    double *neg_constraint_virial_acc) :
+    Observable *ke,
+    Observable *wc) :
     VerletIntegrator(force_updater, NULL),
     _maxiter (maxiter),
     _tol (tol),
-    _rvtol (tol/_timestep),  /**> will be updated once the timestep is known */
     _tiny (tiny),
     _tol2 (2 * _tol),
     _nb (simple::BasePolymer::nb()),
     _dabsq (pow(simple::BasePolymer::d(), 2.0)),
     _rm (1.0/(simple::BasePolymer::m())),
-    _inv_timestep (0.0),     /**> will be set in move() by _set_timestep()*/
-    _is_kinetic_energy_acc_set (false),
-    _is_neg_constraint_virial_acc_set (false)
+    _inv_timestep (0.0)         /**> will be set in move() by _set_timestep()*/
 {
-    if(kinetic_energy_acc != NULL){
-        _is_kinetic_energy_acc_set = true;
-        _kinetic_energy_acc = kinetic_energy_acc;
-    }
-    if(neg_constraint_virial_acc != NULL){
-        _is_neg_constraint_virial_acc_set = true;
-        _neg_constraint_virial_acc = neg_constraint_virial_acc;
-    }
     _moving.resize(_nb);
     _moved.resize(_nb);
+    _ke.ptr = ke;
+    _wc.ptr = wc;
+    if(_ke.ptr == NULL){
+        _ke.is_set = false;
+    }
+    else{
+        _ke.is_set = true;
+    }
+    if(_wc.ptr == NULL){
+        _wc.is_set = false;
+    }
+    else{
+        _wc.is_set = true;
+    }
 }
 RattleIntegrator::~RattleIntegrator(){};
 double RattleIntegrator::get_tol() const {
     return _tol;
 }
-double RattleIntegrator::get_rvtol() const {
-    return _rvtol;
-}
 double RattleIntegrator::get_tiny() const {
     return _tiny;
-}
-//double RattleIntegrator::get_dabsq() const {
-//    return _dabsq;
-//}
-double *RattleIntegrator::get_kinetic_energy_acc(){
-    return _kinetic_energy_acc;
-}
-double *RattleIntegrator::get_neg_constraint_virial_acc(){
-    return _neg_constraint_virial_acc;
 }
 void RattleIntegrator::_set_timestep(double timestep){
     _timestep = timestep;
     _halfstep = timestep * 0.5;
     _inv_timestep = 1 / _timestep;
-    // update rvtol
-    _rvtol = _tol / _timestep;
 }
 void RattleIntegrator::set_tol(double tol){
     _tol = tol;
     _tol2 = _tol * 2.0;
-    // update rvtol
-    _rvtol = _tol / _timestep;
 }
 void RattleIntegrator::set_tiny(double tiny){
     _tiny = tiny;
 }
-void RattleIntegrator::set_kinetic_energy_acc(double *kinetic_energy_acc){
-    if (kinetic_energy_acc != NULL){
-        _is_kinetic_energy_acc_set = true;
+void RattleIntegrator::set_ke(Observable *ptr){
+    if (ptr != NULL){
+        _ke.is_set = true;
     }
     else {
-        _is_kinetic_energy_acc_set = false;
+        _ke.is_set = false;
     }
-    _kinetic_energy_acc = kinetic_energy_acc;
+    _ke.ptr = ptr;
 }
-void RattleIntegrator::set_neg_constraint_virial_acc(double *neg_constraint_virial_acc){
-    if (neg_constraint_virial_acc != NULL){
-        _is_neg_constraint_virial_acc_set = true;
+void RattleIntegrator::set_wc(Observable *ptr){
+    if (ptr != NULL){
+        _wc.is_set = true;
     }
     else {
-        _is_neg_constraint_virial_acc_set = false;
+        _wc.is_set = false;
     }
-    _neg_constraint_virial_acc = neg_constraint_virial_acc;
+    _wc.ptr = ptr;
 }
 bool RattleIntegrator::_is_constraint_within_tol(double dabsq,
     double difference_of_squares){
@@ -117,20 +104,16 @@ bool RattleIntegrator::_is_constraint_derivative_within_rvtol(double dabsq,
     return is_constraint_derivative_within_rvtol;
 }
 void RattleIntegrator::_zero_accumulators(){
-    if(_is_kinetic_energy_acc_set){
-        *_kinetic_energy_acc = 0.0;
+    if(_ke.is_set){
+        _ke.ptr->zero();
     }
-    if(_is_neg_constraint_virial_acc_set){
-        *_neg_constraint_virial_acc = 0.0;
+    if(_wc.is_set){
+        _wc.ptr->zero();
     }
 }
 void RattleIntegrator::_correct_accumulators(){
-    if(_is_kinetic_energy_acc_set){
-        *_kinetic_energy_acc = *_kinetic_energy_acc / 2.0;
-    }
-    if(_is_neg_constraint_virial_acc_set){
-        *_neg_constraint_virial_acc
-            = *_neg_constraint_virial_acc * 2.0 * _inv_timestep / 3.0;
+    if(_wc.is_set){
+        _wc.ptr->update( _wc.ptr->value() * 2.0 * _inv_timestep / 3.0);
     }
 }
 void RattleIntegrator::_set_up_correction_bookkeeping(){
@@ -262,10 +245,8 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
                     v_atom2 += dvb;
                     // increment negative constraint virial accumulator
                     // if neccessary.
-                    if(calculate_observables){
-                        if(_is_neg_constraint_virial_acc_set){
-                            *_neg_constraint_virial_acc += kab * dabsq;
-                        }
+                    if(calculate_observables && _wc.is_set){
+                        _wc.ptr->update(_wc.ptr->value() + kab * dabsq);
                     }
                 }
             }
@@ -276,17 +257,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
     }
     // all the corrections have been performed; calculate kinetic energy
     // update kinetic energy accumulator if necessary and possible
-    if(calculate_observables){
-        if(_is_kinetic_energy_acc_set){
-            // loop over atoms in the molecule
-            for(int ia = 0; ia < nb + 1; ++ia){
-                simple::Atom atom = molecule.atoms.at(ia);
-                double m = simple::BasePolymer::m();
-                double k_increase = m * normsq(atom.velocity);
-                *_kinetic_energy_acc += k_increase;
-            }
-        }
-    }
+    if(calculate_observables && _ke.is_set) _ke.ptr->update(molecule);
     if (iter >= _maxiter){
         fprintf(stderr, "%s (%d)\n",
             "RATTLE MOVE B: maximum number of iterations reached. Stopping correction.",
@@ -297,11 +268,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
 void RattleIntegrator::move(double timestep,
     simple::AtomState &state,
     bool calculate_observables){
-    // if necessary, zero the counters of accumulators
-    if(calculate_observables){
-        _zero_accumulators();
-    }
-    // set the time step and rv_tolerance = tolerance / timestep
+    if(calculate_observables) _zero_accumulators();
     _set_timestep(timestep);
     simple::AtomPolymer molecule_last_step;
     simple::AtomPolymer molecule_half_step_to_correct;
@@ -343,7 +310,5 @@ void RattleIntegrator::move(double timestep,
     // now velocity, positions, and forces of all atoms have to be at t + dt
     state.advance_time(timestep);
     // multiply accumulators by whatever factors necessary
-    if(calculate_observables){
-        _correct_accumulators();
-    }
+    if(calculate_observables) _correct_accumulators();
 }
