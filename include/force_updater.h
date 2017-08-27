@@ -32,6 +32,7 @@ public:
     void set_potential(LJPotential& potential);
     void set_pe(Observable *pe);
     void set_w(Observable *w);
+    void zero_observables();
     // main functions
     void update_forces(simple::AtomState &state,
         bool calculate_observables = false);

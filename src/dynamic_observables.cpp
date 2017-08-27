@@ -20,7 +20,7 @@ namespace dynamic{
     * Negative Virial
     **************************************************************************/
     NegW::NegW() :
-        Observable("Negative Virial", "-W", "\\varepsilon", ""),
+        Observable("Negative Virial", "w", "\\varepsilon", ""),
         TimeLogObservable(){}
     /**************************************************************************
     * Average Negative Virial
@@ -33,7 +33,7 @@ namespace dynamic{
     * Negative Constraint Virial
     **************************************************************************/
     NegWC::NegWC() :
-        Observable("Negative Constraint Virial", "avgwc", "\\varepsilon", ""),
+        Observable("Negative Constraint Virial", "wc", "\\varepsilon", ""),
         TimeLogObservable(){}
     /**************************************************************************
     * Average Negative Virial

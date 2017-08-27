@@ -268,7 +268,10 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
 void RattleIntegrator::move(double timestep,
     simple::AtomState &state,
     bool calculate_observables){
-    if(calculate_observables) _zero_accumulators();
+    if(calculate_observables){
+        _zero_accumulators();
+        _force_updater.zero_observables();
+    }
     _set_timestep(timestep);
     simple::AtomPolymer molecule_last_step;
     simple::AtomPolymer molecule_half_step_to_correct;

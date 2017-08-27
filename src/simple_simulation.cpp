@@ -191,7 +191,14 @@ namespace simple{
     void Simulation::evolve(double runtime){
         // write out initial state data as necessary
         std::ofstream tpstream;
-        if (_itape != 0) _prepare_tpstream(tpstream);
+        if (_itape != 0){
+            _prepare_tpstream(tpstream);
+            _write_tape(tpstream);
+        }
+        if (_idata != 0){
+            bool overwrite = true;
+            _obs.write_data(_dtdir, _name, overwrite);
+        }
         if (_iprint != 0) _write_status();
         size_t nsteps = _step + (size_t)(runtime / _dt);
         size_t icalc = _icalc;

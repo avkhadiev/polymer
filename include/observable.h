@@ -23,7 +23,7 @@ public:
     double value() const {return _value;};
     virtual std::string print_value() const;
     virtual std::string to_string() const
-        {return name() + " " + print_value();};
+        {return fname() + " " + print_value();};
     void prepare_ofstream(std::string datadir,
         std::string sim_name,
         std::ofstream& writeout,

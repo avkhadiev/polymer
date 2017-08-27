@@ -16,9 +16,9 @@ _atom_state(_bond_state)
         polymer.set_rcm(pos);
         polymer.set_vcm(vector(0.0, 0.0, 0.0));
         pos = add(pos, vector(0.0, 0.0, 10.0));
+        double vel = -1.0;
         for(simple::Bond& bond : polymer.bonds){
             // need better initialization
-            double vel = -1.0;
             bond.position = vector(1.0, 0.0, 0.0);
             bond.velocity = vector(0.0, vel, 0.0);
             vel = vel * -1.0;

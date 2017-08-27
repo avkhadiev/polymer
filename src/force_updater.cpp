@@ -51,6 +51,10 @@ void ForceUpdater::set_w(Observable *ptr){
     }
     _w.ptr = ptr;
 }
+void ForceUpdater::zero_observables(){
+    if (_pe.is_set) _pe.ptr->zero();
+    if (_w.is_set) _w.ptr->zero();
+}
 void ForceUpdater::_update_forces_in_atomic_pair(simple::Atom &atom_i,
     simple::Atom &atom_j,
     bool calculate_observables){
