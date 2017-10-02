@@ -1,5 +1,5 @@
 // 2017 Artur Avkhadiev
-/*! \file config_handler.h
+/*! \file diatomic_config_handler.h
 */
 #include "../include/diatomic_config_handler.h"
 const double PI = 3.14159265359;
@@ -43,7 +43,7 @@ void DiatomicConfigHandler::generate_bond_velocity()
     v = vector(cos(phi) * sin(theta), sin(phi) * sin(theta), cos(theta));
     // subtract projection onto bond
     Vector &r = _bond_state.polymers.at(0).bonds.at(0).position;
-    v = subtract(v, multiply(v, dot(v, r)));
+    v = subtract(v, multiply(r, dot(v, r)));
     // normalize remainder
     v = divide(v, norm(v));
 }

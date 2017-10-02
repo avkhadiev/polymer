@@ -1,5 +1,5 @@
 // 2017 Artur Avkhadiev
-/*! \file config_handler.h
+/*! \file diatomic_config_handler.h
 */
 #ifndef POLYMER_DIATOMIC_CONFIG_HANDLER_H
 #define POLYMER_DIATOMIC_CONFIG_HANDLER_H

@@ -11,6 +11,8 @@ _bond_state(),
 _atom_state(_bond_state)
 {
     // set up the state in a straigt line along the x-axis with CM at zero.
+    // this is a rather unhelpful initialization method;
+    // it will be overriden by a new configuration handler that inherits from this base class
     Vector pos = vector(0.0, 0.0, 0.0);
     for (simple::BondPolymer& polymer : _bond_state.polymers){
         polymer.set_rcm(pos);
@@ -30,14 +32,21 @@ ConfigHandler::ConfigHandler(std::string indir, std::string fname){
     std::vector<simple::BondState> states;
     read_states_from_file(indir, fname, states);
     if (states.empty()){
+        fprintf(stderr, "ConfigHandler: tape file %s in directory %s is empty. Will use a default initialization method.\n",
+            fname.c_str(),
+            indir.c_str());
         ConfigHandler();
     }
     else{
+        // use the state last written to tape file (the bottom end of the tape)
         _bond_state = states.back();
         _atom_state.update(_bond_state);
     }
 }
 ConfigHandler::~ConfigHandler(){}
+/*
+* There are two state representations. They are independent: any time you do something to one representation, another one is not changed. The next 2 methods ensure that whenever you query representation A, the handler will check if representation B corresponds to the later time and if so, update A to reflect the most recent state.
+*/
 simple::BondState& ConfigHandler::bond_state(){
     if(_atom_state.time() > _bond_state.time()){
         _bond_state.update(_atom_state);

@@ -38,7 +38,7 @@ add_library(vector_and_parsing STATIC src/vector.cpp src/parsing.cpp)
 add_library(atom_and_bond STATIC src/vector.cpp src/parsing.cpp src/simple_atom.cpp src/simple_bond.cpp)
 add_library(polymer STATIC src/vector.cpp src/parsing.cpp src/simple_atom.cpp src/simple_bond.cpp src/simple_polymer.cpp)
 add_library(state STATIC src/vector.cpp src/parsing.cpp src/simple_atom.cpp src/simple_bond.cpp src/simple_polymer.cpp src/simple_state.cpp)
-add_library(MD_simulation STATIC src/parsing.cpp src/vector.cpp  src/simple_atom.cpp src/simple_polymer.cpp src/simple_bond.cpp src/simple_state.cpp src/config_handler.cpp src/diatomic_config_handler.cpp src/simple_simulation.cpp  src/observable.cpp src/observable_container src/ljpotential.cpp  src/force_updater.cpp src/integrator.cpp src/verlet_integrator.cpp src/rattle_integrator.cpp)
+add_library(MD_simulation STATIC src/parsing.cpp src/vector.cpp  src/simple_atom.cpp src/simple_polymer.cpp src/simple_bond.cpp src/simple_state.cpp src/config_handler.cpp src/diatomic_config_handler.cpp src/natomic_config_handler.cpp src/simple_simulation.cpp  src/observable.cpp src/observable_container src/ljpotential.cpp  src/force_updater.cpp src/integrator.cpp src/verlet_integrator.cpp src/rattle_integrator.cpp)
 add_library(observables STATIC src/parsing.cpp src/vector.cpp  src/simple_atom.cpp src/simple_polymer.cpp src/simple_bond.cpp src/simple_state.cpp src/observable.cpp src/observable_container src/diatomic_observables src/dynamic_observables)
 # Build executables for testing
 add_executable(vector_test src/vector_test.cpp src/vector.cpp)

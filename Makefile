@@ -606,6 +606,33 @@ src/ljpotential.cpp.s:
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/ljpotential.cpp.s
 .PHONY : src/ljpotential.cpp.s
 
+src/natomic_config_handler.o: src/natomic_config_handler.cpp.o
+
+.PHONY : src/natomic_config_handler.o
+
+# target to build an object file
+src/natomic_config_handler.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/natomic_config_handler.cpp.o
+.PHONY : src/natomic_config_handler.cpp.o
+
+src/natomic_config_handler.i: src/natomic_config_handler.cpp.i
+
+.PHONY : src/natomic_config_handler.i
+
+# target to preprocess a source file
+src/natomic_config_handler.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/natomic_config_handler.cpp.i
+.PHONY : src/natomic_config_handler.cpp.i
+
+src/natomic_config_handler.s: src/natomic_config_handler.cpp.s
+
+.PHONY : src/natomic_config_handler.s
+
+# target to generate assembly for a file
+src/natomic_config_handler.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/natomic_config_handler.cpp.s
+.PHONY : src/natomic_config_handler.cpp.s
+
 src/observable.o: src/observable.cpp.o
 
 .PHONY : src/observable.o
@@ -1227,6 +1254,9 @@ help:
 	@echo "... src/ljpotential.o"
 	@echo "... src/ljpotential.i"
 	@echo "... src/ljpotential.s"
+	@echo "... src/natomic_config_handler.o"
+	@echo "... src/natomic_config_handler.i"
+	@echo "... src/natomic_config_handler.s"
 	@echo "... src/observable.o"
 	@echo "... src/observable.i"
 	@echo "... src/observable.s"
