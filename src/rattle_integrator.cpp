@@ -113,7 +113,9 @@ void RattleIntegrator::_zero_accumulators(){
 }
 void RattleIntegrator::_correct_accumulators(){
     if(_wc.is_set){
-        _wc.ptr->update( _wc.ptr->value() * 2.0 * _inv_timestep / 3.0);
+        // ftp://ftp.dl.ac.uk/ccp5/ALLEN_TILDESLEY/F.09
+        // here, a *negative* of the constraint virial is calculated
+        _wc.ptr->update( _wc.ptr->value() * (-2.0) * _inv_timestep / 3.0);
     }
 }
 void RattleIntegrator::_set_up_correction_bookkeeping(){

@@ -30,13 +30,13 @@ double LJPotential::calculate_pair_potential(double inv_rijsq) {
 double LJPotential::calculate_neg_pair_virial(double inv_rijsq) {
     double neg_pair_virial;
     double frac = pow(inv_rijsq, 3.0);
-    neg_pair_virial = 24.0 * (2 * pow(frac, 2.0) - frac);
+    neg_pair_virial = - 24.0 * (2 * pow(frac, 2.0) - frac);
     return neg_pair_virial;
 };
 double LJPotential::calculate_fstrength_over_r(double inv_rijsq) {
     // Allen & Tildesley Eq. 5.3
     double neg_pair_virial = calculate_neg_pair_virial(inv_rijsq);
-    double fstrength_over_r = inv_rijsq * neg_pair_virial;
+    double fstrength_over_r = -inv_rijsq * neg_pair_virial;
     return fstrength_over_r;
 };
 std::string LJPotential::get_str() const {

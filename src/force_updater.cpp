@@ -137,7 +137,7 @@ void ForceUpdater::update_forces(simple::AtomState &state, bool calculate_observ
         _update_forces_intermolecular(state, calculate_observables);
         _update_forces_intramolecular(state, calculate_observables);
         // divide the negative of the sum of pair virials by 3
-        // (see definition of virial in Allen & Tildesley)
+        // (see definition of  in Allen & Tildesley)
         if(calculate_observables && _w.is_set) {
             _w.ptr->update( _w.ptr->value() / 3.0 );
         }
