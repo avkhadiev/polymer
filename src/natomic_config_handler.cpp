@@ -2,7 +2,7 @@
 /*! \file natomic_config_handler.h
 */
 #include "../include/natomic_config_handler.h"
-const double PI = 3.14159265359;
+#include "../include/default_macros.h"
 unsigned NAtomicConfigHandler::seed(){
     typedef std::chrono::high_resolution_clock clock;
     clock::time_point tp = clock::now();
@@ -85,7 +85,7 @@ void NAtomicConfigHandler::scale_velocities(double target_kenergy){
         multiply(atom.velocity, scale_factor);
     }
 }
-NAtomicConfigHandler::NAtomicConfigHandler(double target_kenergy, bool is_planar):
+NAtomicConfigHandler::NAtomicConfigHandler(double target_energy, bool is_planar):
     ConfigHandler(),
     mode({is_planar, 0.0})
 {
@@ -100,7 +100,10 @@ NAtomicConfigHandler::NAtomicConfigHandler(double target_kenergy, bool is_planar
         generate_bond_velocity(b);
     }
     _atom_state.update(_bond_state);
-    if (target_kenergy > 0) {
-        scale_velocities(target_kenergy);
+    // calculate potential energy, substract from target energy
+    // set up a force updater and feed it the atomic state to get potential
+    double target_kinetic_energy = target_energy; // FIXME
+    if (target_kinetic_energy > 0) {
+        scale_velocities(target_kinetic_energy);
     }
 }

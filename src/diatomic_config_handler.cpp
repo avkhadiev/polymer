@@ -2,7 +2,7 @@
 /*! \file diatomic_config_handler.h
 */
 #include "../include/diatomic_config_handler.h"
-const double PI = 3.14159265359;
+#include "../include/default_macros.h"
 unsigned DiatomicConfigHandler::seed(){
     typedef std::chrono::high_resolution_clock clock;
     clock::time_point tp = clock::now();

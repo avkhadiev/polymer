@@ -7,11 +7,15 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include "default_macros.h"
+#include "simple_solvent.h"
 #include "simple_polymer.h"
 namespace simple {
     class BaseState {
     protected:
-        static int _nm;              /*>> number of polymer molecules */
+        static int _nsolvents;       /*>> number of solvent molecules  */
+        static int _nm;              /*>> number of polymer molecules  */
+        static double _density;      /**> density of solvent molecules */
         /**
         * representations of the state will have data members describing
         * positions and velocities of molecules; _time is the time that those
@@ -19,12 +23,15 @@ namespace simple {
         */
         double _time;                /*>> last update time for representation */
         /**
-        * Outputs a string (possibly multiline) with the state's molecules in
-        * the required representation
+        * Outputs a string (possibly multiline) with the state's polymer
+        * molecules in the required representation
         */
         virtual std::string _molecules_str(bool verbose = true) const = 0;
+        std::string _solvents_str(bool verbose = true) const;
         /**
         * Ouptuts a header information about the state:
+        *   number of solvent molecules,
+        *   mass of their atoms,
         *   number of polymer molecules,
         *   number of bonds in them,
         *   mass of their atoms, and
@@ -37,27 +44,32 @@ namespace simple {
         std::string _time_str(bool verbose = true) const;
         /**
         * Outputs an std::string representation of the state
-        *   Requires the molecule string prepared and passed as argument
+        *   Requires the polymers string prepared and passed as argument
         */
-        std::string _to_string_helper(std::string molecules_str,
+        std::string _to_string_helper(std::string polymers_str,
             bool verbose = true, bool output_header = true) const;
         /**
         * Writes an std::string representation of the state
-        *   Requires the molecule string prepared and passed as argument
+        *   Requires the polymers string prepared and passed as argument
         */
-        void _write_to_file_helper(std::string molecules_str,
+        void _write_to_file_helper(std::string polymers_str,
             std::string outdir,
             std::string fname,
             bool verbose = true,
             bool overwrite = true) const;
     public:
+        std::vector<Solvent> solvents;
         // getters
+        static int nsolvents() {return _nsolvents;};
+        static double solvent_mass() {return Solvent::m();};
         static int nm() {return _nm;};
         static int polymer_nb() {return BasePolymer::nb();};
         static double polymer_mass() {return BasePolymer::m();};
         static double polymer_bondlength() {return BasePolymer::d();};
         double time() const {return _time;};
         // setters
+        static void set_nsolvents(int nsolvents) {_nsolvents = nsolvents;};
+        static void set_density(double density) {_density = density;};
         static void set_nm(int nm) {_nm = nm;};
         /**
         * Base state is an abstract class, so all non-static functions are
@@ -77,7 +89,9 @@ namespace simple {
         void advance_time(double timestep) {_time += timestep;};
         /**
         * Reads the non-verbose header string of a state,
-        * saves nm, nb, m, and d
+        * saves nsolvents, solvent mass,
+        * number of polymer molecules, number of bonds in them,
+        *   their mass, and their bondlength
         */
         void static read_header(std::string non_verbose_header);
         /**
@@ -102,7 +116,8 @@ namespace simple {
             std::string fname,
             bool verbose = false,
             bool overwrite = false) = 0;
-        BaseState(double time = 0.0);
+        BaseState(double time = 0.0); // creates default vector of solvents
+        BaseState(const std::vector<Solvent>& new_solvents, double time = 0.0);
         ~BaseState();
     };
     class AtomState;
@@ -125,7 +140,9 @@ namespace simple {
         * representation
         */
         void update(const AtomState &s);
-        BondState(const std::vector<BondPolymer>& new_polymers = {},
+        BondState(double time = 0.0);   // creates default molecule vectors
+        BondState(const std::vector<BondPolymer>& new_polymers,
+            const std::vector<Solvent>& new_solvents,
             double time = 0.0);
         BondState(const AtomState &s);
         ~BondState();
@@ -149,7 +166,9 @@ namespace simple {
         * representation
         */
         void update(const BondState &s);
-        AtomState(const std::vector<AtomPolymer>& new_polymers = {},
+        AtomState(double time = 0.0);   // creates default molecule vectors
+        AtomState(const std::vector<AtomPolymer>& new_polymers,
+            const std::vector<Solvent>& new_solvents,
             double time = 0.0);
         AtomState(const BondState &s);
         ~AtomState();

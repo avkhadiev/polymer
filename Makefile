@@ -68,16 +68,6 @@ install/strip/fast: preinstall/fast
 	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -100,17 +90,15 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/Applications/CMake.app/Contents/bin/cmake -P cmake_install.cmake
-.PHONY : install
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
 
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/Applications/CMake.app/Contents/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
 
 # Special rule for the target install/local
 install/local: preinstall
@@ -123,6 +111,18 @@ install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
 	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/Applications/CMake.app/Contents/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/Applications/CMake.app/Contents/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -157,17 +157,43 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named diatomic_test
+# Target rules for targets named solvent_config_handler_test
 
 # Build rule for target.
-diatomic_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 diatomic_test
-.PHONY : diatomic_test
+solvent_config_handler_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 solvent_config_handler_test
+.PHONY : solvent_config_handler_test
 
 # fast build rule for target.
-diatomic_test/fast:
-	$(MAKE) -f CMakeFiles/diatomic_test.dir/build.make CMakeFiles/diatomic_test.dir/build
-.PHONY : diatomic_test/fast
+solvent_config_handler_test/fast:
+	$(MAKE) -f CMakeFiles/solvent_config_handler_test.dir/build.make CMakeFiles/solvent_config_handler_test.dir/build
+.PHONY : solvent_config_handler_test/fast
+
+#=============================================================================
+# Target rules for targets named simple_solvent_test
+
+# Build rule for target.
+simple_solvent_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 simple_solvent_test
+.PHONY : simple_solvent_test
+
+# fast build rule for target.
+simple_solvent_test/fast:
+	$(MAKE) -f CMakeFiles/simple_solvent_test.dir/build.make CMakeFiles/simple_solvent_test.dir/build
+.PHONY : simple_solvent_test/fast
+
+#=============================================================================
+# Target rules for targets named simple_polymer_test
+
+# Build rule for target.
+simple_polymer_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 simple_polymer_test
+.PHONY : simple_polymer_test
+
+# fast build rule for target.
+simple_polymer_test/fast:
+	$(MAKE) -f CMakeFiles/simple_polymer_test.dir/build.make CMakeFiles/simple_polymer_test.dir/build
+.PHONY : simple_polymer_test/fast
 
 #=============================================================================
 # Target rules for targets named parsing_test
@@ -196,19 +222,6 @@ simple_atom_test/fast:
 .PHONY : simple_atom_test/fast
 
 #=============================================================================
-# Target rules for targets named run_simulation
-
-# Build rule for target.
-run_simulation: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 run_simulation
-.PHONY : run_simulation
-
-# fast build rule for target.
-run_simulation/fast:
-	$(MAKE) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/build
-.PHONY : run_simulation/fast
-
-#=============================================================================
 # Target rules for targets named vector_test
 
 # Build rule for target.
@@ -222,30 +235,17 @@ vector_test/fast:
 .PHONY : vector_test/fast
 
 #=============================================================================
-# Target rules for targets named simple_polymer_test
+# Target rules for targets named vector_and_parsing
 
 # Build rule for target.
-simple_polymer_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 simple_polymer_test
-.PHONY : simple_polymer_test
+vector_and_parsing: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vector_and_parsing
+.PHONY : vector_and_parsing
 
 # fast build rule for target.
-simple_polymer_test/fast:
-	$(MAKE) -f CMakeFiles/simple_polymer_test.dir/build.make CMakeFiles/simple_polymer_test.dir/build
-.PHONY : simple_polymer_test/fast
-
-#=============================================================================
-# Target rules for targets named observables
-
-# Build rule for target.
-observables: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 observables
-.PHONY : observables
-
-# fast build rule for target.
-observables/fast:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/build
-.PHONY : observables/fast
+vector_and_parsing/fast:
+	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/build
+.PHONY : vector_and_parsing/fast
 
 #=============================================================================
 # Target rules for targets named simple_bond_test
@@ -261,17 +261,43 @@ simple_bond_test/fast:
 .PHONY : simple_bond_test/fast
 
 #=============================================================================
-# Target rules for targets named vector_and_parsing
+# Target rules for targets named settings_parser_test
 
 # Build rule for target.
-vector_and_parsing: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 vector_and_parsing
-.PHONY : vector_and_parsing
+settings_parser_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 settings_parser_test
+.PHONY : settings_parser_test
 
 # fast build rule for target.
-vector_and_parsing/fast:
-	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/build
-.PHONY : vector_and_parsing/fast
+settings_parser_test/fast:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/build
+.PHONY : settings_parser_test/fast
+
+#=============================================================================
+# Target rules for targets named MD_simulation
+
+# Build rule for target.
+MD_simulation: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 MD_simulation
+.PHONY : MD_simulation
+
+# fast build rule for target.
+MD_simulation/fast:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/build
+.PHONY : MD_simulation/fast
+
+#=============================================================================
+# Target rules for targets named observables
+
+# Build rule for target.
+observables: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 observables
+.PHONY : observables
+
+# fast build rule for target.
+observables/fast:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/build
+.PHONY : observables/fast
 
 #=============================================================================
 # Target rules for targets named simple_state_test
@@ -300,17 +326,17 @@ polymer/fast:
 .PHONY : polymer/fast
 
 #=============================================================================
-# Target rules for targets named MD_simulation
+# Target rules for targets named solvent
 
 # Build rule for target.
-MD_simulation: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 MD_simulation
-.PHONY : MD_simulation
+solvent: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 solvent
+.PHONY : solvent
 
 # fast build rule for target.
-MD_simulation/fast:
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/build
-.PHONY : MD_simulation/fast
+solvent/fast:
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/build
+.PHONY : solvent/fast
 
 #=============================================================================
 # Target rules for targets named atom_and_bond
@@ -471,33 +497,6 @@ src/diatomic_observables.cpp.s:
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/diatomic_observables.cpp.s
 .PHONY : src/diatomic_observables.cpp.s
 
-src/diatomic_test.o: src/diatomic_test.cpp.o
-
-.PHONY : src/diatomic_test.o
-
-# target to build an object file
-src/diatomic_test.cpp.o:
-	$(MAKE) -f CMakeFiles/diatomic_test.dir/build.make CMakeFiles/diatomic_test.dir/src/diatomic_test.cpp.o
-.PHONY : src/diatomic_test.cpp.o
-
-src/diatomic_test.i: src/diatomic_test.cpp.i
-
-.PHONY : src/diatomic_test.i
-
-# target to preprocess a source file
-src/diatomic_test.cpp.i:
-	$(MAKE) -f CMakeFiles/diatomic_test.dir/build.make CMakeFiles/diatomic_test.dir/src/diatomic_test.cpp.i
-.PHONY : src/diatomic_test.cpp.i
-
-src/diatomic_test.s: src/diatomic_test.cpp.s
-
-.PHONY : src/diatomic_test.s
-
-# target to generate assembly for a file
-src/diatomic_test.cpp.s:
-	$(MAKE) -f CMakeFiles/diatomic_test.dir/build.make CMakeFiles/diatomic_test.dir/src/diatomic_test.cpp.s
-.PHONY : src/diatomic_test.cpp.s
-
 src/dynamic_observables.o: src/dynamic_observables.cpp.o
 
 .PHONY : src/dynamic_observables.o
@@ -639,8 +638,8 @@ src/observable.o: src/observable.cpp.o
 
 # target to build an object file
 src/observable.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.o
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.o
 .PHONY : src/observable.cpp.o
 
 src/observable.i: src/observable.cpp.i
@@ -649,8 +648,8 @@ src/observable.i: src/observable.cpp.i
 
 # target to preprocess a source file
 src/observable.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.i
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.i
 .PHONY : src/observable.cpp.i
 
 src/observable.s: src/observable.cpp.s
@@ -659,8 +658,8 @@ src/observable.s: src/observable.cpp.s
 
 # target to generate assembly for a file
 src/observable.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.s
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.s
 .PHONY : src/observable.cpp.s
 
 src/observable_container.o: src/observable_container.cpp.o
@@ -669,8 +668,8 @@ src/observable_container.o: src/observable_container.cpp.o
 
 # target to build an object file
 src/observable_container.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable_container.cpp.o
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.o
 .PHONY : src/observable_container.cpp.o
 
 src/observable_container.i: src/observable_container.cpp.i
@@ -679,8 +678,8 @@ src/observable_container.i: src/observable_container.cpp.i
 
 # target to preprocess a source file
 src/observable_container.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable_container.cpp.i
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.i
 .PHONY : src/observable_container.cpp.i
 
 src/observable_container.s: src/observable_container.cpp.s
@@ -689,8 +688,8 @@ src/observable_container.s: src/observable_container.cpp.s
 
 # target to generate assembly for a file
 src/observable_container.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable_container.cpp.s
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable_container.cpp.s
 .PHONY : src/observable_container.cpp.s
 
 src/parsing.o: src/parsing.cpp.o
@@ -700,10 +699,11 @@ src/parsing.o: src/parsing.cpp.o
 # target to build an object file
 src/parsing.cpp.o:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/parsing.cpp.o
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.o
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.o
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.o
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.o
 .PHONY : src/parsing.cpp.o
@@ -715,10 +715,11 @@ src/parsing.i: src/parsing.cpp.i
 # target to preprocess a source file
 src/parsing.cpp.i:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/parsing.cpp.i
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.i
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.i
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.i
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.i
 .PHONY : src/parsing.cpp.i
@@ -730,10 +731,11 @@ src/parsing.s: src/parsing.cpp.s
 # target to generate assembly for a file
 src/parsing.cpp.s:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/parsing.cpp.s
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.s
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.s
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.s
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.s
 .PHONY : src/parsing.cpp.s
@@ -765,6 +767,33 @@ src/parsing_test.cpp.s:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing_test.cpp.s
 .PHONY : src/parsing_test.cpp.s
 
+src/potential.o: src/potential.cpp.o
+
+.PHONY : src/potential.o
+
+# target to build an object file
+src/potential.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/potential.cpp.o
+.PHONY : src/potential.cpp.o
+
+src/potential.i: src/potential.cpp.i
+
+.PHONY : src/potential.i
+
+# target to preprocess a source file
+src/potential.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/potential.cpp.i
+.PHONY : src/potential.cpp.i
+
+src/potential.s: src/potential.cpp.s
+
+.PHONY : src/potential.s
+
+# target to generate assembly for a file
+src/potential.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/potential.cpp.s
+.PHONY : src/potential.cpp.s
+
 src/rattle_integrator.o: src/rattle_integrator.cpp.o
 
 .PHONY : src/rattle_integrator.o
@@ -792,32 +821,62 @@ src/rattle_integrator.cpp.s:
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/rattle_integrator.cpp.s
 .PHONY : src/rattle_integrator.cpp.s
 
-src/run_simulation.o: src/run_simulation.cpp.o
+src/settings_parser.o: src/settings_parser.cpp.o
 
-.PHONY : src/run_simulation.o
+.PHONY : src/settings_parser.o
 
 # target to build an object file
-src/run_simulation.cpp.o:
-	$(MAKE) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/src/run_simulation.cpp.o
-.PHONY : src/run_simulation.cpp.o
+src/settings_parser.cpp.o:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser.cpp.o
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/settings_parser.cpp.o
+.PHONY : src/settings_parser.cpp.o
 
-src/run_simulation.i: src/run_simulation.cpp.i
+src/settings_parser.i: src/settings_parser.cpp.i
 
-.PHONY : src/run_simulation.i
+.PHONY : src/settings_parser.i
 
 # target to preprocess a source file
-src/run_simulation.cpp.i:
-	$(MAKE) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/src/run_simulation.cpp.i
-.PHONY : src/run_simulation.cpp.i
+src/settings_parser.cpp.i:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser.cpp.i
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/settings_parser.cpp.i
+.PHONY : src/settings_parser.cpp.i
 
-src/run_simulation.s: src/run_simulation.cpp.s
+src/settings_parser.s: src/settings_parser.cpp.s
 
-.PHONY : src/run_simulation.s
+.PHONY : src/settings_parser.s
 
 # target to generate assembly for a file
-src/run_simulation.cpp.s:
-	$(MAKE) -f CMakeFiles/run_simulation.dir/build.make CMakeFiles/run_simulation.dir/src/run_simulation.cpp.s
-.PHONY : src/run_simulation.cpp.s
+src/settings_parser.cpp.s:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser.cpp.s
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/settings_parser.cpp.s
+.PHONY : src/settings_parser.cpp.s
+
+src/settings_parser_test.o: src/settings_parser_test.cpp.o
+
+.PHONY : src/settings_parser_test.o
+
+# target to build an object file
+src/settings_parser_test.cpp.o:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser_test.cpp.o
+.PHONY : src/settings_parser_test.cpp.o
+
+src/settings_parser_test.i: src/settings_parser_test.cpp.i
+
+.PHONY : src/settings_parser_test.i
+
+# target to preprocess a source file
+src/settings_parser_test.cpp.i:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser_test.cpp.i
+.PHONY : src/settings_parser_test.cpp.i
+
+src/settings_parser_test.s: src/settings_parser_test.cpp.s
+
+.PHONY : src/settings_parser_test.s
+
+# target to generate assembly for a file
+src/settings_parser_test.cpp.s:
+	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser_test.cpp.s
+.PHONY : src/settings_parser_test.cpp.s
 
 src/simple_atom.o: src/simple_atom.cpp.o
 
@@ -825,9 +884,10 @@ src/simple_atom.o: src/simple_atom.cpp.o
 
 # target to build an object file
 src/simple_atom.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.o
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.o
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.o
 .PHONY : src/simple_atom.cpp.o
@@ -838,9 +898,10 @@ src/simple_atom.i: src/simple_atom.cpp.i
 
 # target to preprocess a source file
 src/simple_atom.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.i
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.i
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.i
 .PHONY : src/simple_atom.cpp.i
@@ -851,9 +912,10 @@ src/simple_atom.s: src/simple_atom.cpp.s
 
 # target to generate assembly for a file
 src/simple_atom.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.s
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.s
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.s
 .PHONY : src/simple_atom.cpp.s
@@ -891,9 +953,9 @@ src/simple_bond.o: src/simple_bond.cpp.o
 
 # target to build an object file
 src/simple_bond.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.o
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.o
 .PHONY : src/simple_bond.cpp.o
@@ -904,9 +966,9 @@ src/simple_bond.i: src/simple_bond.cpp.i
 
 # target to preprocess a source file
 src/simple_bond.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.i
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.i
 .PHONY : src/simple_bond.cpp.i
@@ -917,9 +979,9 @@ src/simple_bond.s: src/simple_bond.cpp.s
 
 # target to generate assembly for a file
 src/simple_bond.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.s
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.s
 .PHONY : src/simple_bond.cpp.s
@@ -957,9 +1019,9 @@ src/simple_polymer.o: src/simple_polymer.cpp.o
 
 # target to build an object file
 src/simple_polymer.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.o
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.o
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.o
 .PHONY : src/simple_polymer.cpp.o
 
@@ -969,9 +1031,9 @@ src/simple_polymer.i: src/simple_polymer.cpp.i
 
 # target to preprocess a source file
 src/simple_polymer.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.i
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.i
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.i
 .PHONY : src/simple_polymer.cpp.i
 
@@ -981,9 +1043,9 @@ src/simple_polymer.s: src/simple_polymer.cpp.s
 
 # target to generate assembly for a file
 src/simple_polymer.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.s
 	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.s
-	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.s
 .PHONY : src/simple_polymer.cpp.s
 
@@ -1041,14 +1103,74 @@ src/simple_simulation.cpp.s:
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_simulation.cpp.s
 .PHONY : src/simple_simulation.cpp.s
 
+src/simple_solvent.o: src/simple_solvent.cpp.o
+
+.PHONY : src/simple_solvent.o
+
+# target to build an object file
+src/simple_solvent.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.o
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.o
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.o
+.PHONY : src/simple_solvent.cpp.o
+
+src/simple_solvent.i: src/simple_solvent.cpp.i
+
+.PHONY : src/simple_solvent.i
+
+# target to preprocess a source file
+src/simple_solvent.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.i
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.i
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.i
+.PHONY : src/simple_solvent.cpp.i
+
+src/simple_solvent.s: src/simple_solvent.cpp.s
+
+.PHONY : src/simple_solvent.s
+
+# target to generate assembly for a file
+src/simple_solvent.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.s
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.s
+	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.s
+.PHONY : src/simple_solvent.cpp.s
+
+src/simple_solvent_test.o: src/simple_solvent_test.cpp.o
+
+.PHONY : src/simple_solvent_test.o
+
+# target to build an object file
+src/simple_solvent_test.cpp.o:
+	$(MAKE) -f CMakeFiles/simple_solvent_test.dir/build.make CMakeFiles/simple_solvent_test.dir/src/simple_solvent_test.cpp.o
+.PHONY : src/simple_solvent_test.cpp.o
+
+src/simple_solvent_test.i: src/simple_solvent_test.cpp.i
+
+.PHONY : src/simple_solvent_test.i
+
+# target to preprocess a source file
+src/simple_solvent_test.cpp.i:
+	$(MAKE) -f CMakeFiles/simple_solvent_test.dir/build.make CMakeFiles/simple_solvent_test.dir/src/simple_solvent_test.cpp.i
+.PHONY : src/simple_solvent_test.cpp.i
+
+src/simple_solvent_test.s: src/simple_solvent_test.cpp.s
+
+.PHONY : src/simple_solvent_test.s
+
+# target to generate assembly for a file
+src/simple_solvent_test.cpp.s:
+	$(MAKE) -f CMakeFiles/simple_solvent_test.dir/build.make CMakeFiles/simple_solvent_test.dir/src/simple_solvent_test.cpp.s
+.PHONY : src/simple_solvent_test.cpp.s
+
 src/simple_state.o: src/simple_state.cpp.o
 
 .PHONY : src/simple_state.o
 
 # target to build an object file
 src/simple_state.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.o
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.o
 .PHONY : src/simple_state.cpp.o
 
@@ -1058,8 +1180,8 @@ src/simple_state.i: src/simple_state.cpp.i
 
 # target to preprocess a source file
 src/simple_state.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.i
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.i
 .PHONY : src/simple_state.cpp.i
 
@@ -1069,8 +1191,8 @@ src/simple_state.s: src/simple_state.cpp.s
 
 # target to generate assembly for a file
 src/simple_state.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.s
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.s
 .PHONY : src/simple_state.cpp.s
 
@@ -1101,6 +1223,60 @@ src/simple_state_test.cpp.s:
 	$(MAKE) -f CMakeFiles/simple_state_test.dir/build.make CMakeFiles/simple_state_test.dir/src/simple_state_test.cpp.s
 .PHONY : src/simple_state_test.cpp.s
 
+src/solvent_config_handler.o: src/solvent_config_handler.cpp.o
+
+.PHONY : src/solvent_config_handler.o
+
+# target to build an object file
+src/solvent_config_handler.cpp.o:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/solvent_config_handler.cpp.o
+.PHONY : src/solvent_config_handler.cpp.o
+
+src/solvent_config_handler.i: src/solvent_config_handler.cpp.i
+
+.PHONY : src/solvent_config_handler.i
+
+# target to preprocess a source file
+src/solvent_config_handler.cpp.i:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/solvent_config_handler.cpp.i
+.PHONY : src/solvent_config_handler.cpp.i
+
+src/solvent_config_handler.s: src/solvent_config_handler.cpp.s
+
+.PHONY : src/solvent_config_handler.s
+
+# target to generate assembly for a file
+src/solvent_config_handler.cpp.s:
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/solvent_config_handler.cpp.s
+.PHONY : src/solvent_config_handler.cpp.s
+
+src/solvent_config_handler_test.o: src/solvent_config_handler_test.cpp.o
+
+.PHONY : src/solvent_config_handler_test.o
+
+# target to build an object file
+src/solvent_config_handler_test.cpp.o:
+	$(MAKE) -f CMakeFiles/solvent_config_handler_test.dir/build.make CMakeFiles/solvent_config_handler_test.dir/src/solvent_config_handler_test.cpp.o
+.PHONY : src/solvent_config_handler_test.cpp.o
+
+src/solvent_config_handler_test.i: src/solvent_config_handler_test.cpp.i
+
+.PHONY : src/solvent_config_handler_test.i
+
+# target to preprocess a source file
+src/solvent_config_handler_test.cpp.i:
+	$(MAKE) -f CMakeFiles/solvent_config_handler_test.dir/build.make CMakeFiles/solvent_config_handler_test.dir/src/solvent_config_handler_test.cpp.i
+.PHONY : src/solvent_config_handler_test.cpp.i
+
+src/solvent_config_handler_test.s: src/solvent_config_handler_test.cpp.s
+
+.PHONY : src/solvent_config_handler_test.s
+
+# target to generate assembly for a file
+src/solvent_config_handler_test.cpp.s:
+	$(MAKE) -f CMakeFiles/solvent_config_handler_test.dir/build.make CMakeFiles/solvent_config_handler_test.dir/src/solvent_config_handler_test.cpp.s
+.PHONY : src/solvent_config_handler_test.cpp.s
+
 src/vector.o: src/vector.cpp.o
 
 .PHONY : src/vector.o
@@ -1108,10 +1284,11 @@ src/vector.o: src/vector.cpp.o
 # target to build an object file
 src/vector.cpp.o:
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.o
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.o
 .PHONY : src/vector.cpp.o
@@ -1123,10 +1300,11 @@ src/vector.i: src/vector.cpp.i
 # target to preprocess a source file
 src/vector.cpp.i:
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.i
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.i
 .PHONY : src/vector.cpp.i
@@ -1138,10 +1316,11 @@ src/vector.s: src/vector.cpp.s
 # target to generate assembly for a file
 src/vector.cpp.s:
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/vector_and_parsing.dir/build.make CMakeFiles/vector_and_parsing.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.s
+	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.s
 .PHONY : src/vector.cpp.s
@@ -1207,23 +1386,25 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... install/strip"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... diatomic_test"
+	@echo "... solvent_config_handler_test"
+	@echo "... list_install_components"
+	@echo "... simple_solvent_test"
+	@echo "... simple_polymer_test"
 	@echo "... parsing_test"
 	@echo "... simple_atom_test"
-	@echo "... run_simulation"
 	@echo "... vector_test"
-	@echo "... simple_polymer_test"
+	@echo "... install/local"
+	@echo "... vector_and_parsing"
+	@echo "... simple_bond_test"
+	@echo "... settings_parser_test"
+	@echo "... MD_simulation"
 	@echo "... install"
 	@echo "... observables"
-	@echo "... install/local"
-	@echo "... simple_bond_test"
-	@echo "... vector_and_parsing"
 	@echo "... simple_state_test"
 	@echo "... polymer"
-	@echo "... MD_simulation"
+	@echo "... solvent"
 	@echo "... atom_and_bond"
 	@echo "... state"
 	@echo "... gmock"
@@ -1239,9 +1420,6 @@ help:
 	@echo "... src/diatomic_observables.o"
 	@echo "... src/diatomic_observables.i"
 	@echo "... src/diatomic_observables.s"
-	@echo "... src/diatomic_test.o"
-	@echo "... src/diatomic_test.i"
-	@echo "... src/diatomic_test.s"
 	@echo "... src/dynamic_observables.o"
 	@echo "... src/dynamic_observables.i"
 	@echo "... src/dynamic_observables.s"
@@ -1269,12 +1447,18 @@ help:
 	@echo "... src/parsing_test.o"
 	@echo "... src/parsing_test.i"
 	@echo "... src/parsing_test.s"
+	@echo "... src/potential.o"
+	@echo "... src/potential.i"
+	@echo "... src/potential.s"
 	@echo "... src/rattle_integrator.o"
 	@echo "... src/rattle_integrator.i"
 	@echo "... src/rattle_integrator.s"
-	@echo "... src/run_simulation.o"
-	@echo "... src/run_simulation.i"
-	@echo "... src/run_simulation.s"
+	@echo "... src/settings_parser.o"
+	@echo "... src/settings_parser.i"
+	@echo "... src/settings_parser.s"
+	@echo "... src/settings_parser_test.o"
+	@echo "... src/settings_parser_test.i"
+	@echo "... src/settings_parser_test.s"
 	@echo "... src/simple_atom.o"
 	@echo "... src/simple_atom.i"
 	@echo "... src/simple_atom.s"
@@ -1296,12 +1480,24 @@ help:
 	@echo "... src/simple_simulation.o"
 	@echo "... src/simple_simulation.i"
 	@echo "... src/simple_simulation.s"
+	@echo "... src/simple_solvent.o"
+	@echo "... src/simple_solvent.i"
+	@echo "... src/simple_solvent.s"
+	@echo "... src/simple_solvent_test.o"
+	@echo "... src/simple_solvent_test.i"
+	@echo "... src/simple_solvent_test.s"
 	@echo "... src/simple_state.o"
 	@echo "... src/simple_state.i"
 	@echo "... src/simple_state.s"
 	@echo "... src/simple_state_test.o"
 	@echo "... src/simple_state_test.i"
 	@echo "... src/simple_state_test.s"
+	@echo "... src/solvent_config_handler.o"
+	@echo "... src/solvent_config_handler.i"
+	@echo "... src/solvent_config_handler.s"
+	@echo "... src/solvent_config_handler_test.o"
+	@echo "... src/solvent_config_handler_test.i"
+	@echo "... src/solvent_config_handler_test.s"
 	@echo "... src/vector.o"
 	@echo "... src/vector.i"
 	@echo "... src/vector.s"

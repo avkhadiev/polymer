@@ -8,26 +8,7 @@
 #include "../include/config_handler.h"
 ConfigHandler::ConfigHandler() :
 _bond_state(),
-_atom_state(_bond_state)
-{
-    // set up the state in a straigt line along the x-axis with CM at zero.
-    // this is a rather unhelpful initialization method;
-    // it will be overriden by a new configuration handler that inherits from this base class
-    Vector pos = vector(0.0, 0.0, 0.0);
-    for (simple::BondPolymer& polymer : _bond_state.polymers){
-        polymer.set_rcm(pos);
-        polymer.set_vcm(vector(0.0, 0.0, 0.0));
-        pos = add(pos, vector(0.0, 0.0, 10.0));
-        double vel = -1.0;
-        for(simple::Bond& bond : polymer.bonds){
-            // need better initialization
-            bond.position = vector(1.0, 0.0, 0.0);
-            bond.velocity = vector(0.0, vel, 0.0);
-            vel = vel * -1.0;
-        }
-    }
-    _atom_state.update(_bond_state);
-}
+_atom_state(_bond_state) {}
 ConfigHandler::ConfigHandler(std::string indir, std::string fname){
     std::vector<simple::BondState> states;
     read_states_from_file(indir, fname, states);

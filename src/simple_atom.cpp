@@ -45,7 +45,7 @@ namespace simple{
                 + a_str_force_header + " " + a_str_force_value;
         }
         else {
-            // do not include headers or forces
+            // do not include headers or forces or velocites
             a_str = a_str_position_value + " " + a_str_velocity_value;
         }
         return a_str;

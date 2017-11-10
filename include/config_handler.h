@@ -25,6 +25,8 @@ public:
     void read_bond_state(std::ifstream& input_stream);
     void read_atom_state(std::ifstream& input_stream);
     static int nmolecules() {return simple::BaseState::nm();};
+    static int nsolvents() {return simple::BaseState::nsolvents();};
+    static double solvent_mass() {return simple::BaseState::solvent_mass();};
     static int polymer_nb() {return simple::BasePolymer::nb();};
     static double polymer_m() {return simple::BasePolymer::m();};
     static double polymer_d() {return simple::BasePolymer::d();};

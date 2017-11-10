@@ -16,7 +16,7 @@ class VerletIntegrator :
 protected:
     // boolean has_observable_container indicates whether a pointer to the
     // observable container is valid
-    ForceUpdater _force_updater;
+    ForceUpdater& _force_updater;
     double _timestep;
     double _halfstep;
     virtual void _set_timestep(double timestep);
@@ -25,6 +25,14 @@ protected:
         bool is_set;
         Observable *ptr;
     } _ke;                                          /**> kinetic energy*/
+    struct mirror_image_t {
+        bool is_set;
+        double box;
+    } _mirror_image;
+    // if mirror image is set, uses box to apply the mirror image convention
+    // outputs the adjusted position.
+    // uses function round() from math.h instead of ANINT (same behavior)
+    Vector _get_mirror_image(Vector r);
     /**
     * The following two helper functions take in the molecule by value:
     * One feeds in the value of the molecule at time t, and receives the value
@@ -37,17 +45,21 @@ protected:
     simple::AtomPolymer _move_verlet_half_step(simple::AtomPolymer molecule);
     simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule,
         bool calculate_observables);
+    simple::Solvent _move_verlet_half_step(simple::Solvent molecule);
+    simple::Solvent _move_verlet_full_step(simple::Solvent molecule, bool calculate_observables);
     virtual void _zero_accumulators();
 public:
     virtual ForceUpdater& get_force_updater();
-    virtual void set_force_updater(ForceUpdater force_updater);
     virtual void set_ke(Observable *ptr);
     virtual void move(double timestep,
         simple::AtomState& state,
         bool calculate_observables = false);
     // constructors and a destructor
-    VerletIntegrator(ForceUpdater force_updater,
-        Observable* ke = NULL);
+    // if *observable = NULL, that observable will not be updated
+    // if box = 0.0, no mirror image convention will be applied to solvent pos's
+    VerletIntegrator(ForceUpdater& force_updater,
+        Observable* ke = NULL,
+        double box = 0.0);
     virtual ~VerletIntegrator();
 };
 #endif

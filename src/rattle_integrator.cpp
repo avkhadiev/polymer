@@ -115,7 +115,7 @@ void RattleIntegrator::_correct_accumulators(){
     if(_wc.is_set){
         // ftp://ftp.dl.ac.uk/ccp5/ALLEN_TILDESLEY/F.09
         // here, a *negative* of the constraint virial is calculated
-        _wc.ptr->update( _wc.ptr->value() * (-2.0) * _inv_timestep / 3.0);
+        _wc.ptr->update(_wc.ptr->value() * (-2.0) * _inv_timestep);
     }
 }
 void RattleIntegrator::_set_up_correction_bookkeeping(){

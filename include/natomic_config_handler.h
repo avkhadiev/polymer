@@ -38,10 +38,10 @@ protected:
     void generate_bond_position(simple::Bond& b);
     // random normal to position, with lognormal
     void generate_bond_velocity(simple::Bond& b);
-    void scale_velocities(double target_kenergy);
+    void scale_velocities(double target_kinetic_energy);
     RNG rng;
 public:
-    NAtomicConfigHandler(double target_kenergy = 0.0, bool is_planar = false);
+    NAtomicConfigHandler(double target_energy = 0.0, bool is_planar = false);
     ~NAtomicConfigHandler(){};
 };
 #endif

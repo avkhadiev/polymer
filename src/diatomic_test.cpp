@@ -7,7 +7,6 @@
 #include "../include/diatomic_config_handler.h"
 #include "../include/diatomic_observables.h"
 #include "../include/dynamic_observables.h"
-const double PI = 3.14159265359;
 namespace parameters{
     int NM = 1;
     int NB = 1;                          /**> is a diatomic */

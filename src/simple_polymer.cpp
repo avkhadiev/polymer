@@ -6,14 +6,11 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-
 #include "../include/vector.h"
 #include "../include/simple_atom.h"
 #include "../include/simple_bond.h"
+#include "../include/default_macros.h"
 #include "../include/simple_polymer.h"
-#define DEFAULT_NB 0
-#define DEFAULT_M 1.0
-#define DEFAULT_D 3.0
 namespace simple {
     /***************************************************************************
     *                               BASE POLYMER

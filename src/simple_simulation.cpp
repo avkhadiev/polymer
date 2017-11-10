@@ -189,17 +189,6 @@ namespace simple{
         _obs.update(_cfg.atom_state(), _calcstep);
     }
     void Simulation::evolve(double runtime){
-        // write out initial state data as necessary
-        std::ofstream tpstream;
-        if (_itape != 0){
-            _prepare_tpstream(tpstream);
-            _write_tape(tpstream);
-        }
-        if (_idata != 0){
-            bool overwrite = true;
-            _obs.write_data(_dtdir, _name, overwrite);
-        }
-        if (_iprint != 0) _write_status();
         size_t nsteps = _step + (size_t)(runtime / _dt);
         size_t icalc = _icalc;
         size_t iprint = _iprint;
@@ -216,6 +205,17 @@ namespace simple{
         // can't output data more often that new data is calculated
         if (idata < icalc) idata = icalc;
         bool calc;
+        // write out initial state data as necessary
+        std::ofstream tpstream;
+        if (_itape != 0){
+            _prepare_tpstream(tpstream);
+            _write_tape(tpstream);
+        }
+        if (_idata != 0){
+            bool overwrite = true;
+            _obs.write_data(_dtdir, _name, overwrite);
+        }
+        // if (_iprint != 0) _write_status();
         while(_step < nsteps){
             _step = _step + 1;
             _step % icalc == 0? calc = true : calc = false;

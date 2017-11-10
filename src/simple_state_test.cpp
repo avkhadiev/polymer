@@ -21,6 +21,8 @@ class SimpleStateTest : public ::testing::Test {
      std::string outdir;
      std::string indir;
      // Base State Variables
+     int nsolvents;
+     double solvent_m;
      int nm;
      int nb;
      double m;
@@ -31,6 +33,7 @@ class SimpleStateTest : public ::testing::Test {
      // Atom State Variableis
      Vector atom_displacement, r0, r1, r2, v0, v1, v2;
      std::vector<simple::Atom> atoms;
+     std::vector<simple::Solvent> solvents;
      std::vector<simple::AtomPolymer> atom_polymers;
      simple::AtomState atom_state;
      // Bond State Variables
@@ -47,13 +50,22 @@ class SimpleStateTest : public ::testing::Test {
          indir = "/Users/Arthur/stratt/polymer/test/";
          /*
          * STATE:
+         *  number of solvent atoms = 2
+         *  mass of solvent atoms = 0.5
          *  number of bonds = 2
          *  mass of atoms = 1.0
          *  bond length = 3.0
+         * SOLVENT MOLECULES
+         * r1, v1 = (1, 1, 1), (1, 1, 1)
+         * r2, v2 = (2, 2, 2), (2, 2, 2)
          * TRIATOMIC MOLECULE:      (1)                     (2)
          *   RCM                    origin            origin + cm_displacement
          *   VCM                    (0.0, 0.0, 0.0)   (0.0, 0.0, 0.0)
          */
+         nsolvents = 2;
+         solvent_m = 0.5;
+         simple::BaseState::set_nsolvents(nsolvents);
+         simple::Solvent::set_m(solvent_m);
          nm = 2;
          nb = 2;
          m = 1.0;
@@ -68,6 +80,10 @@ class SimpleStateTest : public ::testing::Test {
          simple::BondPolymer::set_m(m);
          simple::BondPolymer::set_d(d);
          for(int i = 0; i < nm; ++i){
+             rcm[i] = add(zero_vector, multiply(cm_displacement, i));
+             vcm[i] = zero_vector;
+         }
+         for(int i = 0; i < nsolvents; ++i){
              rcm[i] = add(zero_vector, multiply(cm_displacement, i));
              vcm[i] = zero_vector;
          }
@@ -92,7 +108,14 @@ class SimpleStateTest : public ::testing::Test {
             atom_polymers.push_back(simple::AtomPolymer(atoms, rcm[i], vcm[i]));
             atoms.clear();
          }
-         atom_state = simple::AtomState(atom_polymers, t);
+         Vector solvent_r;
+         Vector solvent_v;
+         for(int i = 0; i < nsolvents; ++i){
+             double k = i;
+             solvent_v = solvent_r = vector(k, k, k);
+             solvents.push_back(simple::Solvent(solvent_r, solvent_v));
+         }
+         atom_state = simple::AtomState(atom_polymers, solvents, t);
          /*
          * BOND REPRESENTATION IN CM FRAME:
          *  BOND1_R = BOND2_R = (0, 1, 0)
@@ -111,7 +134,7 @@ class SimpleStateTest : public ::testing::Test {
             bond_polymers.push_back(simple::BondPolymer(bonds, rcm[i], vcm[i]));
             bonds.clear();
          }
-         bond_state = simple::BondState(bond_polymers, t);
+         bond_state = simple::BondState(bond_polymers, solvents, t);
      }
   // virtual void TearDown() {}
 };
@@ -133,7 +156,7 @@ TEST_F(SimpleStateTest, BondStateIO) {
     s_check = states.back();
     // check the what has been written vs. read
     EXPECT_EQ(s_check, s_expect);
-    //EXPECT_EQ(s_check.to_string(verbose), s_expect.to_string(verbose));
+    EXPECT_EQ(s_check.to_string(verbose), s_expect.to_string(verbose));
 }
 
 TEST_F(SimpleStateTest, AtomStateIO) {
@@ -154,7 +177,7 @@ TEST_F(SimpleStateTest, AtomStateIO) {
     s_check = states.back();
     // check the what has been written vs. read
     EXPECT_EQ(s_check, s_expect);
-    //EXPECT_EQ(s_check.to_string(verbose), s_expect.to_string(verbose));
+    EXPECT_EQ(s_check.to_string(verbose), s_expect.to_string(verbose));
 }
 
 TEST_F(SimpleStateTest, AtomStateToBondState) {

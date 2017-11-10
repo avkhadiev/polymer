@@ -1,0 +1,67 @@
+
+In [28]: plt.plot(avgwc['time'], 3.0/2 * (avgw['value'] + avgwc['value']), label = '$\mathbf{- \\frac{1}{2} \\langle \mathcal{W}_{\mathrm{LJ}} + \mathcal{W}_{\mathrm{C}} \\rangle}
+    ...: $', color = '#7570b3', linestyle = '-')
+Out[28]: [<matplotlib.lines.Line2D at 0x1233bb6d0>]
+
+In [29]: plt.plot(avgik['time'], avgik['value'], label = '$\mathbf{\\langle K_{\mathrm{int}} \\rangle}$', color = '#d95f02', linestyle = '-')
+Out[29]: [<matplotlib.lines.Line2D at 0x123380750>]
+
+In [30]: plt.legend()
+Out[30]: <matplotlib.legend.Legend at 0x1232f7850>
+
+In [31]: plt.grid()
+
+In [32]: plt.title("Virial Theorem Test")
+Out[32]: <matplotlib.text.Text at 0x12330a650>
+
+In [33]: plt.xlabel("$\mathbf{\\tau_{\mathrm{LJ}}}$", fontsize = 14)
+Out[33]: <matplotlib.text.Text at 0x122cc9390>
+
+In [34]: plt.ylabel("$\mathbf{\\varepsilon_{\mathrm{LJ}}}$", fontsize = 14)
+Out[34]: <matplotlib.text.Text at 0x1233078d0>
+
+In [35]: plt.xlim([0.0, 200.0])
+Out[35]: (0.0, 200.0)
+
+In [36]: plt.ylim([1.1, 1.4])
+Out[36]: (1.1, 1.4)
+
+In [37]: plt.figtext(0.6, 0.2, '$\mathrm{nbonds} = 2$, planar motion\n$d = 0.86\\sigma_{\mathrm{LJ}}$\n$\delta \\tau = 10^{-3},\,\\xi = 10^{-6}$', bbox = props)
+Out[37]: <matplotlib.text.Text at 0x123410dd0>
+
+In [38]: plt.show()
+
+In [39]: plt.plot(avgwc['time'], 3.0/2 * (avgw['value'] + avgwc['value']), label = '$\mathbf{- \\frac{1}{2} \\langle \mathcal{W}_{\mathrm{LJ}} + \mathcal{W}_{\mathrm{C}} \\rangle}
+    ...: $', color = '#7570b3', linestyle = '-')
+Out[39]: [<matplotlib.lines.Line2D at 0x11c1d0e10>]
+
+In [40]: plt.plot(avgik['time'], avgik['value'], label = '$\mathbf{\\langle K_{\mathrm{int}} \\rangle}$', color = '#d95f02', linestyle = '-')
+Out[40]: [<matplotlib.lines.Line2D at 0x120b8e850>]
+
+In [41]: plt.legend()
+Out[41]: <matplotlib.legend.Legend at 0x122792f90>
+
+In [42]: plt.grid()
+
+In [43]: plt.title("Virial Theorem Test")
+Out[43]: <matplotlib.text.Text at 0x11c1e0790>
+
+In [44]: plt.xlim([0.0, 200.0])
+Out[44]: (0.0, 200.0)
+
+In [45]: plt.xlim([0.0, 500.0])
+Out[45]: (0.0, 500.0)
+
+In [46]: plt.ylim([1.1, 1.4])
+Out[46]: (1.1, 1.4)
+
+In [47]: plt.xlabel("$\mathbf{\\tau_{\mathrm{LJ}}}$", fontsize = 14)
+Out[47]: <matplotlib.text.Text at 0x124253110>
+
+In [48]: plt.ylabel("$\mathbf{\\varepsilon_{\mathrm{LJ}}}$", fontsize = 14)
+Out[48]: <matplotlib.text.Text at 0x11c1c9590>
+
+In [49]: plt.figtext(0.6, 0.2, '$\mathrm{nbonds} = 2$, planar motion\n$d = 0.86\\sigma_{\mathrm{LJ}}$\n$\delta \\tau = 10^{-3},\,\\xi = 10^{-6}$', bbox = props)
+Out[49]: <matplotlib.text.Text at 0x120ba2e10>
+
+In [50]: plt.show()
