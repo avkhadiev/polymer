@@ -123,4 +123,5 @@ void SolventConfigHandler::ran_velocities(double temperature){
     }
     subtract_momentum();
     rescale_velocities(temperature);
+    _bond_state.update(_atom_state);
 }

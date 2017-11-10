@@ -148,7 +148,7 @@ void SettingsParser::read_integration(std::ifstream& stream){
 }
 void SettingsParser::read_io(std::ifstream& stream){
     std::string line;
-    std::getline(stream, line);    // header line
+    std::getline(stream, line);    // header lineg
     // simulation state, directories, data, and state configuration directories
     std::getline(stream, line);
     cndir = line;

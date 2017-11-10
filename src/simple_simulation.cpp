@@ -60,10 +60,13 @@ namespace simple{
         fprintf(stdout, "%s\n", "Simulation is set up:");
         fprintf(stdout, "%s: %s\n", "Name", _name.c_str());
         fprintf(stdout, "%s: %d\n",
-            "Number of Molecules",
+            "Number of Polymer Molecules",
             _cfg.nmolecules());
         fprintf(stdout, "%s: %d\n",
-            "Number of Bonds in a Molecule",
+            "Number of Solvent Molecules",
+            _cfg.nsolvents());
+        fprintf(stdout, "%s: %d\n",
+            "Number of Bonds in a Polymer Molecule",
             _cfg.polymer_nb());
         if (_is_input_given){
             fprintf(stdout, "%s: %s\n",

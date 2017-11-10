@@ -30,8 +30,7 @@ class LJPotential :
         //  where f = fij * rij is the force on atom i from atom j
         virtual double calculate_fstrength_over_r(double inv_rijsq);
         LJPotential();
-        LJPotential(double epsilon,
-            double sigma);
+        LJPotential(double epsilon, double sigma);
         ~LJPotential();
 };
 class AdjustedLJPotential :

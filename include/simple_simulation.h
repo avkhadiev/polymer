@@ -10,7 +10,6 @@
 #include "parsing.h"
 #include "simple_state.h"
 #include "observable_container.h"
-#include "ljpotential.h"
 #include "force_updater.h"
 #include "rattle_integrator.h"
 #include "config_handler.h"

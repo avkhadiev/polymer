@@ -1,0 +1,40 @@
+\section{2017-10-02}\label{s:20171002}
+\par Determined a scope of studies for a single polymer in vaccuum. There are two parts:
+\begin{enumerate}
+  \item Test conservation of energy and angular momentum in a scalable fashion (write an extendable script).
+  \item Study the ``non-SLERPiness'' of motion in the absence of LJ potential.
+\end{enumerate}
+\subsection{Conservation Tests}
+\par The script needs to:
+\begin{itemize}
+  \item Test planar and 3d motion
+  \item Work for arbitrary number of links and arbitrary bond length
+  \item Require a specified time step, in reduced LJ units, and tolerance for RATTLE.
+  \item Take a specified amount of kinetic energy, in reducd LJ units, as input. Bond velocities should be scaled to obtain the desired initial kinetic energy.
+\end{itemize}
+\subsection{Non-SLERPiness}
+\par This study requires a separate MD run that:
+\begin{itemize}
+  \item Turns off the LJ potential, allowing atoms to pass through each other
+  \item Defines a unit of length as $\bond$.
+  \item Defines a unit of time as $\frac{2\pi \bond}{rms(\bondvu)}$
+\end{itemize}
+\par I then want to work with the ``tape file'' that records positions of bond vectors and choose a good  time range to study the motion of any given bond vector from the initial to the final orientation within the selected time range. I want to look at the projection $\bondpu_i(\time) \sprod \nhat_i$, where  $\nhat_i = \frac{\bondpu(\ti) \vprod \bondpu(\tf)}{\vnorm{\bondpu(\ti) \vprod \bondpu(\tf)}}$. I am interested in:
+\begin{itemize}
+  \item How much is a vector pushed out of the plane defined by its initial and final orientation?
+  \item What happends when I decrease the time range?
+  \item What happens when I increase the time range?
+\end{itemize}
+\par Implemented a N-Atomic Configuration Handler that can randomly initialize a molecule in a plane in 3d. Did a check that the random orientations have the expected properties: that bond velocities are perpendicular to bond vectors, and that planar orientations are indeed planar: see figures \ref{20171002:f1} and \ref{20171002:f2}.
+\begin{figure}[h]
+  \centering
+	\includegraphics[width=\textwidth]{20171002_planar.png}
+  \caption{\label{20171002:f1}
+    Planar configuration initilized with NAtomicConfigurationHandler}
+\end{figure}
+\begin{figure}[h]
+  \centering
+	\includegraphics[width=\textwidth]{20171002_default.png}
+  \caption{\label{20171002:f2}
+    Default (random, 3d) configuration initilized with NAtomicConfigurationHandler}
+\end{figure}
