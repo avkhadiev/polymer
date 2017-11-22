@@ -18,6 +18,8 @@
 class SolventConfigHandler :
     public ConfigHandler {
 protected:
+    double _solvent_sigma;                  /**> radius of solvent molecules  */
+    double _density;                        /**> density of solvent molecules */
     int _nc;                                /**> n of lattice cells per length*/
     double _box;                            /**> determined from density */
     // RNG
@@ -42,8 +44,9 @@ public:
     /**> temperature is in units of k_B x K */
     void rescale_velocities(double temperature);
     void ran_velocities(double temperature);/**> generate random velocities */
+    virtual std::string get_info_str();
     /** number of cells takes precedence unless n is explicitly specified (non-zero) **/
-    SolventConfigHandler(double density = 0.0, int nc = 0, int n = 0.0);
+    SolventConfigHandler(double solvent_sigma, double density = 0.0, int nc = 0, int n = 0.0);
     ~SolventConfigHandler(){};
 };
 #endif

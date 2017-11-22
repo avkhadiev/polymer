@@ -87,9 +87,14 @@ simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer
 Vector VerletIntegrator::_get_mirror_image(Vector r){
     if (_mirror_image.is_set){
         double box = _mirror_image.box;
+        // Vector r_old = r;
         r.x = r.x - box * round( r.x / box );
         r.y = r.y - box * round( r.y / box );
         r.z = r.z - box * round( r.z / box );
+        // Vector r_new = r;
+        //if (r_old != r_new){
+        //    fprintf(stderr, "%s: %s to %s\n", "mirror image convention: changed from", vector_to_string(r_old).c_str(), vector_to_string(r_new).c_str());
+        //}
     }
     return r;
 }
@@ -110,6 +115,11 @@ simple::Solvent
     double m = simple::Solvent::m();
     // v(t + dt) = v(t + 0.5 dt) + 0.5 dt * a(t + dt)
     Vector acceleration = divide(molecule.f(), m);
+    //if (normsq(multiply(acceleration, _halfstep)) > normsq(molecule.v())){
+    //    fprintf(stderr, "%s: %s %s, %s %s\n", "bug?",
+    //        "v = ", vector_to_string(molecule.v()).c_str(),
+    //        "a = ", vector_to_string(molecule.v()).c_str());
+    //}
     molecule.set_v( add(molecule.v(), multiply(acceleration, _halfstep)) );
     // update kinetic energy accumulator if necessary and possible
     if(calculate_observables){

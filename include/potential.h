@@ -13,14 +13,20 @@ class Potential {
         // outdir/sim_name_potential.cfg
         virtual void writeout_parameters_to_file(std::string outdir,
             std::string sim_name) {};
+        // calculates the separation vector between
+        // atom at ri and atom at rj
+        virtual Vector rij(Vector ri, Vector rj){
+            return subtract(ri, rj);
+        };
         // calculates the pair potential energy of interaction between
-        // atom at r1 and atom at r2.
-        virtual double calculate_pair_potential(double inv_rijsq){return 0.0;};
-        // calculates the negative of the pair virial function between r1 and r2
-        virtual double calculate_neg_pair_virial(double inv_rijsq){return 0.0;};
-        // calculates fij,u
-        //  where f = fij * rij is the force on atom i from atom j
-        virtual double calculate_fstrength_over_r(double inv_rijsq) {return 0.0;};
+        // atom at ri and atom at rj
+        virtual double vij(Vector ri, Vector rj){return 0.0;};
+        // calculates the pair virial function between ri and rj
+        virtual double wij(Vector ri, Vector rj){return 0.0;};
+        // calculates force on atom i from atom j
+        virtual Vector fij(Vector ri, Vector rj){
+            return vector(0.0, 0.0, 0.0);
+        };
         Potential();
         ~Potential();
 };

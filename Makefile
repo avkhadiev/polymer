@@ -483,60 +483,6 @@ src/diatomic_config_handler.cpp.s:
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/diatomic_config_handler.cpp.s
 .PHONY : src/diatomic_config_handler.cpp.s
 
-src/diatomic_observables.o: src/diatomic_observables.cpp.o
-
-.PHONY : src/diatomic_observables.o
-
-# target to build an object file
-src/diatomic_observables.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/diatomic_observables.cpp.o
-.PHONY : src/diatomic_observables.cpp.o
-
-src/diatomic_observables.i: src/diatomic_observables.cpp.i
-
-.PHONY : src/diatomic_observables.i
-
-# target to preprocess a source file
-src/diatomic_observables.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/diatomic_observables.cpp.i
-.PHONY : src/diatomic_observables.cpp.i
-
-src/diatomic_observables.s: src/diatomic_observables.cpp.s
-
-.PHONY : src/diatomic_observables.s
-
-# target to generate assembly for a file
-src/diatomic_observables.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/diatomic_observables.cpp.s
-.PHONY : src/diatomic_observables.cpp.s
-
-src/dynamic_observables.o: src/dynamic_observables.cpp.o
-
-.PHONY : src/dynamic_observables.o
-
-# target to build an object file
-src/dynamic_observables.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/dynamic_observables.cpp.o
-.PHONY : src/dynamic_observables.cpp.o
-
-src/dynamic_observables.i: src/dynamic_observables.cpp.i
-
-.PHONY : src/dynamic_observables.i
-
-# target to preprocess a source file
-src/dynamic_observables.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/dynamic_observables.cpp.i
-.PHONY : src/dynamic_observables.cpp.i
-
-src/dynamic_observables.s: src/dynamic_observables.cpp.s
-
-.PHONY : src/dynamic_observables.s
-
-# target to generate assembly for a file
-src/dynamic_observables.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/dynamic_observables.cpp.s
-.PHONY : src/dynamic_observables.cpp.s
-
 src/force_updater.o: src/force_updater.cpp.o
 
 .PHONY : src/force_updater.o
@@ -779,6 +725,33 @@ src/parsing_test.s: src/parsing_test.cpp.s
 src/parsing_test.cpp.s:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing_test.cpp.s
 .PHONY : src/parsing_test.cpp.s
+
+src/polymer_observables.o: src/polymer_observables.cpp.o
+
+.PHONY : src/polymer_observables.o
+
+# target to build an object file
+src/polymer_observables.cpp.o:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.o
+.PHONY : src/polymer_observables.cpp.o
+
+src/polymer_observables.i: src/polymer_observables.cpp.i
+
+.PHONY : src/polymer_observables.i
+
+# target to preprocess a source file
+src/polymer_observables.cpp.i:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.i
+.PHONY : src/polymer_observables.cpp.i
+
+src/polymer_observables.s: src/polymer_observables.cpp.s
+
+.PHONY : src/polymer_observables.s
+
+# target to generate assembly for a file
+src/polymer_observables.cpp.s:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.s
+.PHONY : src/polymer_observables.cpp.s
 
 src/potential.o: src/potential.cpp.o
 
@@ -1317,6 +1290,33 @@ src/solvent_config_handler_test.cpp.s:
 	$(MAKE) -f CMakeFiles/solvent_config_handler_test.dir/build.make CMakeFiles/solvent_config_handler_test.dir/src/solvent_config_handler_test.cpp.s
 .PHONY : src/solvent_config_handler_test.cpp.s
 
+src/solvent_observables.o: src/solvent_observables.cpp.o
+
+.PHONY : src/solvent_observables.o
+
+# target to build an object file
+src/solvent_observables.cpp.o:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/solvent_observables.cpp.o
+.PHONY : src/solvent_observables.cpp.o
+
+src/solvent_observables.i: src/solvent_observables.cpp.i
+
+.PHONY : src/solvent_observables.i
+
+# target to preprocess a source file
+src/solvent_observables.cpp.i:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/solvent_observables.cpp.i
+.PHONY : src/solvent_observables.cpp.i
+
+src/solvent_observables.s: src/solvent_observables.cpp.s
+
+.PHONY : src/solvent_observables.s
+
+# target to generate assembly for a file
+src/solvent_observables.cpp.s:
+	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/solvent_observables.cpp.s
+.PHONY : src/solvent_observables.cpp.s
+
 src/vector.o: src/vector.cpp.o
 
 .PHONY : src/vector.o
@@ -1458,12 +1458,6 @@ help:
 	@echo "... src/diatomic_config_handler.o"
 	@echo "... src/diatomic_config_handler.i"
 	@echo "... src/diatomic_config_handler.s"
-	@echo "... src/diatomic_observables.o"
-	@echo "... src/diatomic_observables.i"
-	@echo "... src/diatomic_observables.s"
-	@echo "... src/dynamic_observables.o"
-	@echo "... src/dynamic_observables.i"
-	@echo "... src/dynamic_observables.s"
 	@echo "... src/force_updater.o"
 	@echo "... src/force_updater.i"
 	@echo "... src/force_updater.s"
@@ -1488,6 +1482,9 @@ help:
 	@echo "... src/parsing_test.o"
 	@echo "... src/parsing_test.i"
 	@echo "... src/parsing_test.s"
+	@echo "... src/polymer_observables.o"
+	@echo "... src/polymer_observables.i"
+	@echo "... src/polymer_observables.s"
 	@echo "... src/potential.o"
 	@echo "... src/potential.i"
 	@echo "... src/potential.s"
@@ -1542,6 +1539,9 @@ help:
 	@echo "... src/solvent_config_handler_test.o"
 	@echo "... src/solvent_config_handler_test.i"
 	@echo "... src/solvent_config_handler_test.s"
+	@echo "... src/solvent_observables.o"
+	@echo "... src/solvent_observables.i"
+	@echo "... src/solvent_observables.s"
 	@echo "... src/vector.o"
 	@echo "... src/vector.i"
 	@echo "... src/vector.s"

@@ -4,7 +4,7 @@
 #ifndef POLYMER_DIATOMIC_OBSERVABLES_H
 #define POLYMER_DIATOMIC_OBSERVABLES_H
 #include "observable.h"
-#include "dynamic_observables.h"
+#include "polymer_observables.h"
 namespace diatomic{
     /**
     * assumes the polymer is a diatomic and calculates the length of its

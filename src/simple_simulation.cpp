@@ -59,15 +59,29 @@ namespace simple{
         //*********************************************************************
         fprintf(stdout, "%s\n", "Simulation is set up:");
         fprintf(stdout, "%s: %s\n", "Name", _name.c_str());
-        fprintf(stdout, "%s: %d\n",
-            "Number of Polymer Molecules",
-            _cfg.nmolecules());
-        fprintf(stdout, "%s: %d\n",
-            "Number of Solvent Molecules",
-            _cfg.nsolvents());
-        fprintf(stdout, "%s: %d\n",
-            "Number of Bonds in a Polymer Molecule",
-            _cfg.polymer_nb());
+        fprintf(stdout, "%s\n", _cfg.get_info_str().c_str());
+        //fprintf(stdout, "%s: %d\n",
+        //    "Number of Polymer Molecules",
+        //    _cfg.nmolecules());
+        //fprintf(stdout, "%s: %d\n",
+        //    "Number of Solvent Molecules",
+        //    _cfg.nsolvents());
+        //fprintf(stdout, "%s: %d\n",
+        //    "Number of Bonds in a Polymer Molecule",
+        //    _cfg.polymer_nb());
+        ForceUpdater& fupd = integrator.get_force_updater();
+        if (_cfg.nmolecules() > 0){
+            fprintf(stdout, "%s:\n%s", "Polymer-Polymer potential",
+                fupd.get_polymer_potential()->get_str().c_str());
+        }
+        if (_cfg.nsolvents() > 0){
+            fprintf(stdout, "%s:\n%s", "Solvent-Solvent potential",
+                fupd.get_solvent_potential()->get_str().c_str());
+        }
+        if ((_cfg.nsolvents() > 0) and (_cfg.nmolecules() > 0)){
+            fprintf(stdout, "%s:\n%s", "Polymer-Solvent potential",
+                fupd.get_inter_potential()->get_str().c_str());
+        }
         if (_is_input_given){
             fprintf(stdout, "%s: %s\n",
                 "Input Config File",

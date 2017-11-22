@@ -61,31 +61,22 @@ void ForceUpdater::zero_observables(){
 }
 void ForceUpdater::_update_forces_in_atomic_pair(simple::Atom &atom_i,
     simple::Atom &atom_j, Potential* potential, bool calculate_observables){
-        Vector rij = subtract(atom_i.position, atom_j.position);
-        double rijsq = normsq(rij);
-        // if the distances between atoms is zero
-        if (rijsq == 0) {
-            std::string err_msg = "update_forces_in_atomic_pair: distance between atoms is 0.";
-            throw std::invalid_argument(err_msg);
-        }
-        else {
-            double inv_rijsq = 1/rijsq;
-            // calculate the force of atom j on atom i
-            Vector fij = multiply(rij, _polymer_potential->calculate_fstrength_over_r(inv_rijsq));
-            // update forces
-            atom_i.force += fij;
-            atom_j.force -= fij;
-            // if observables need to be calculated and respective pointers are set,
-            // zero the accumulators
-            if(calculate_observables){
-                if(_pe.is_set){
-                    double vij = _polymer_potential->calculate_pair_potential(inv_rijsq);
-                    _pe.ptr->update( _pe.ptr->value() + vij );
-                }
-                if(_w.is_set){
-                    double wij = _polymer_potential->calculate_neg_pair_virial(inv_rijsq);
-                    _w.ptr->update( _w.ptr->value() + wij );
-                }
+        Vector ri = atom_i.position;
+        Vector rj = atom_j.position;
+        Vector fij = potential->fij(ri, rj);
+        // update forces
+        atom_i.force += fij;
+        atom_j.force -= fij;
+        // if observables need to be calculated and respective pointers are set,
+        // zero the accumulators
+        if(calculate_observables){
+            if(_pe.is_set){
+                double vij = potential->vij(ri, rj);
+                _pe.ptr->update( _pe.ptr->value() + vij );
+            }
+            if(_w.is_set){
+                double wij = potential->wij(ri, rj);
+                _w.ptr->update( _w.ptr->value() + wij );
             }
         }
 }
@@ -103,19 +94,28 @@ void ForceUpdater::_update_forces_intramolecular(simple::AtomState &state, bool 
             }
         }
     }
-    // loop over all solvent molecules
-    for(int is = 0; is < state.nsolvents() - 1; ++is){
-        simple::Atom& atom_i = state.solvents.at(is).atom;
-        for(int js = 0; js < state.nsolvents(); ++js){
-            simple::Atom& atom_j = state.solvents.at(js).atom;
-            _update_forces_in_atomic_pair(atom_i, atom_j, _solvent_potential, calculate_observables);
-        }
-    }
 }
 void ForceUpdater::_update_forces_intermolecular(simple::AtomState &state,
     bool calculate_observables){
-    int na = state.polymer_nb() + 1;
     // loop over all intermolecular interactions
+    // loop over all solvent molecules
+    for(int is = 0; is < state.nsolvents() - 1; ++is){
+        simple::Atom& atom_i = state.solvents.at(is).atom;
+        for(int js = is + 1; js < state.nsolvents(); ++js){
+            simple::Atom& atom_j = state.solvents.at(js).atom;
+            try
+            {
+                _update_forces_in_atomic_pair(atom_i, atom_j, _solvent_potential, calculate_observables);
+            }
+            catch (std::invalid_argument)
+            {
+                state.write_to_file("/Users/Arthur/stratt/polymer/test/solvents/", "log", true, true);
+                fprintf(stderr, "%s\n", "wrote out crashing configuration to log");
+                throw;
+            }
+        }
+    }
+    int na = state.polymer_nb() + 1;
     for(int im = 0; im < state.nm(); ++im){
         // polymer-polymer
         for(int jm = im + 1; jm < state.nm(); ++jm){
@@ -149,7 +149,7 @@ void ForceUpdater::update_forces(simple::AtomState &state, bool calculate_observ
         }
         // for solvents
         for (int is = 0; is < state.nsolvents(); ++is){
-            state.solvents.at(is).set_f(vector(0.0, 0.0, 0.0));
+            state.solvents.at(is).atom.force = vector(0.0, 0.0, 0.0);
         }
         // if observables need to be calculated and respective pointers are set,
         // zero the accumulators

@@ -1,8 +1,8 @@
 // 2017 Artur Avkhadiev
-/*! \file dynamic_observables.cpp
+/*! \file polymer_observables.cpp
 */
-#include "../include/dynamic_observables.h"
-namespace dynamic{
+#include "../include/polymer_observables.h"
+namespace polymer{
     /**************************************************************************
     * LJ Potential Energy
     **************************************************************************/
@@ -148,4 +148,4 @@ namespace dynamic{
         }
         return L;
     }
-} // namespace dynamic
+} // namespace polymer

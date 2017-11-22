@@ -1,10 +1,10 @@
 // 2017 Artur Avkhadiev
 /*! \file dynamic_observables.h
 */
-#ifndef POLYMER_DYNAMIC_OBSERVABLES_H
-#define POLYMER_DYNAMIC_OBSERVABLES_H
+#ifndef POLYMER_POLYMER_OBSERVABLES_H
+#define POLYMER_POLYMER_OBSERVABLES_H
 #include "observable.h"
-namespace dynamic{
+namespace polymer{
     /**
     * calculates potential energy of the polymer
     * ForceLoop knows how to work with this observable, no update functions
@@ -135,5 +135,5 @@ namespace dynamic{
         LProj(double m, Vector axis = vector(0.0, 0.0, 1.0));
         ~LProj(){};
     };
-} // namespace dynamic
+} // namespace polymer
 #endif

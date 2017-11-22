@@ -41,6 +41,7 @@ public:
     virtual void update(const simple::Bond& bond){};
     virtual void update(const simple::AtomPolymer& polymer){};
     virtual void update(const simple::BondPolymer& polymer){};
+    virtual void update(const simple::Solvent& molecule){};
     virtual void update(const simple::AtomState& state){};
     virtual void update(const simple::BondState& state){};
     Observable(std::string name,

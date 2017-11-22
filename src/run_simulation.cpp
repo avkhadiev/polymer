@@ -21,9 +21,32 @@
 #include "../include/diatomic_config_handler.h"
 #include "../include/solvent_config_handler.h"
 // observables handlers
-#include "../include/diatomic_observables.h"
-#include "../include/dynamic_observables.h"
+#include "../include/polymer_observables.h"
+#include "../include/solvent_observables.h"
 namespace observables{
+    solvent::KE k = solvent::KE();
+    solvent::AvgKE avg_k = solvent::AvgKE(k);
+    solvent::V v = solvent::V();
+    solvent::AvgV avg_v = solvent::AvgV(v);
+    solvent::Momentum p = solvent::Momentum();
+    container::Unit k_unit = {.obs = k,
+            .status = true, .timelog = true, .average = false,
+            .eval_time = container::EvalTime::sim_loop};
+    container::Unit avg_k_unit = {.obs = avg_k,
+            .status = true, .timelog = true, .average = true,
+            .eval_time = container::EvalTime::sim_loop};
+    container::Unit v_unit = {.obs = v,
+           .status = true, .timelog = true, .average = false,
+           .eval_time = container::EvalTime::force_loop};
+    container::Unit avg_v_unit = {.obs = avg_v,
+           .status = true, .timelog = true, .average = true,
+           .eval_time = container::EvalTime::sim_loop};
+    container::Unit p_unit = {.obs = p,
+           .status = true, .timelog = true, .average = false,
+           .eval_time = container::EvalTime::sim_loop};
+    std::vector<container::Unit> vec = {k_unit, avg_k_unit,
+        v_unit, avg_v_unit,
+        p_unit};
 //    dynamic::IntKE ik = dynamic::IntKE(parameters::MP);
 //    dynamic::AvgIntKE avg_ik = dynamic::AvgIntKE(ik);
 //    dynamic::LNorm ln = dynamic::LNorm(parameters::MP);
@@ -64,7 +87,6 @@ namespace observables{
 //    container::Unit avg_wc_unit = {.obs = avg_wc,
 //        .status = true, .timelog = true, .average = true,
 //        .eval_time = container::EvalTime::sim_loop};
-std::vector<container::Unit> vec = {};
 //    void setup(ConfigHandler& cfg, bool zero_observables){
 //        if (zero_observables) {
 //            for (int i = 0; i < vec.size(); ++i) {
@@ -110,10 +132,6 @@ int main(int argc, char **argv){
     if (!read_arguments(argc, argv)) res = 1;
     else {
         SettingsParser settings = SettingsParser(args::config_file);
-        // potential setup
-        LJPotential pp = LJPotential(settings.epp, settings.sp);
-        AdjustedLJPotential ss = AdjustedLJPotential(settings.ess, settings.ss, settings.rc_ss);
-        AdjustedLJPotential ps = AdjustedLJPotential(settings.eps, 0.5 * (settings.ss + settings.sp), settings.rc_ps);
         // state setup
         simple::BaseState::set_nm(settings.np);
         simple::BaseState::set_nsolvents(4 * pow(settings.nc, 3.0));
@@ -122,7 +140,6 @@ int main(int argc, char **argv){
         simple::BasePolymer::set_d(settings.d);
         ObservableContainer container = ObservableContainer(observables::vec);
         ObservableContainer& obs = container;
-        // state set up: FIXME link force updater to the configuration handler
         bool is_planar;
         if (settings.polymer_planar_conformation){
             is_planar = true;
@@ -131,8 +148,13 @@ int main(int argc, char **argv){
             is_planar = false;
         }
         // prepare state configuration
-        SolventConfigHandler config = SolventConfigHandler(settings.rho_s, settings.nc);
+        SolventConfigHandler config = SolventConfigHandler(settings.ss, settings.rho_s, settings.nc);
         ConfigHandler& cfg = config;
+        // potential setup
+        LJPotential pp = LJPotential(settings.epp, settings.sp);
+        AdjustedLJPotential ss = AdjustedLJPotential(settings.ess, settings.ss, settings.rc_ss, config.box());
+        AdjustedLJPotential ps = AdjustedLJPotential(settings.eps, 0.5 * (settings.ss + settings.sp), settings.rc_ps, config.box());
+        // initialize
         if (args::is_input_given){
             fprintf(stderr, "%s\n",
             "Don't yet know how to work with when initial state configuration is given");
@@ -142,9 +164,9 @@ int main(int argc, char **argv){
             config.fcc_positions();
             config.ran_velocities(settings.temperature);
         }
-        fprintf(stdout, "%s\n%s",
-            "State initialized by the Configuration Handler:",
-            cfg.bond_state().to_string(true, true).c_str());
+        //fprintf(stdout, "%s\n%s",
+        //    "State initialized by the Configuration Handler:",
+        //    cfg.bond_state().to_string(true, true).c_str());
         //if (settings::potential != settings::potential_default){
             //if (settings::potential == settings::potential_none){
                 //force_loop.set_potential(&empty);
@@ -173,7 +195,7 @@ int main(int argc, char **argv){
                 //exit(1);
             //}
         //}
-        ForceUpdater force_loop = ForceUpdater(&pp, &ss, &ps);
+        ForceUpdater force_loop = ForceUpdater(&pp, &ss, &ps, &observables::v, NULL);
         RattleIntegrator rattle = RattleIntegrator(force_loop,
             settings.tol, settings.tiny, settings.maxiter);
         VerletIntegrator verlet

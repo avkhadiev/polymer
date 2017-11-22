@@ -54,3 +54,27 @@ void ConfigHandler::read_atom_state(std::ifstream& input_stream){
     _atom_state = simple::string_to_atom_state(input_stream);
     _bond_state.update(_atom_state);
 }
+std::string ConfigHandler::get_info_str(){
+    std::string npolymers
+        = "Number of Polymer Molecules: "
+        + std::to_string(ConfigHandler::nmolecules());
+    std::string nsolvents
+        = "Number of Solvent Molecules: " + std::to_string(ConfigHandler::nsolvents());
+    std::string polymer_info
+        = "Polymer Atom Mass: "
+        + std::to_string(ConfigHandler::polymer_m())
+        + "\n Number of Bonds in a Polymer: "
+        + std::to_string(ConfigHandler::polymer_nb())
+        + "\n Bond Reduced Unit Length: "
+        + std::to_string(ConfigHandler::polymer_d());
+    std::string solvent_info
+        = "Solvent Atom Mass: "
+        + std::to_string(ConfigHandler::solvent_m());
+    std::string info_str
+        = "Configuration Info:\n"
+        + npolymers + "\n"
+        + polymer_info + "\n"
+        + nsolvents + "\n"
+        + solvent_info;
+    return info_str;
+}

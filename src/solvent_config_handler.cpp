@@ -5,8 +5,12 @@
 #include <stdexcept>
 #include "../include/solvent_config_handler.h"
 #include "../include/default_macros.h"
-SolventConfigHandler::SolventConfigHandler(double density, int nc, int n) :
+SolventConfigHandler::SolventConfigHandler(double solvent_sigma,
+    double density,
+    int nc, int n) :
     ConfigHandler(),
+    _solvent_sigma(solvent_sigma),
+    _density (density),
     _nc (nc) {
         if (density <= 0.0) density = DEFAULT_SOLVENT_DENSITY;
         simple::BaseState::set_density(density);
@@ -100,7 +104,7 @@ double SolventConfigHandler::solvent_kinetic_energy(){
     for(const simple::Solvent& solvent : atom_state().solvents){
         K += normsq(solvent.v());
     }
-    K = solvent_mass() * K / 2.0;
+    K = solvent_m() * K / 2.0;
     return K;
 }
 double SolventConfigHandler::temperature(){
@@ -124,4 +128,20 @@ void SolventConfigHandler::ran_velocities(double temperature){
     subtract_momentum();
     rescale_velocities(temperature);
     _bond_state.update(_atom_state);
+}
+std::string SolventConfigHandler::get_info_str(){
+    std::string basic_info = ConfigHandler::get_info_str();
+    std::string additional_info;
+    std::string density
+        = "density of solvents (reduced units): "
+        + std::to_string(SolventConfigHandler::_density);
+    std::string box
+        = "box length (reduced units): "
+        + std::to_string(SolventConfigHandler::_box);
+    std::string temperature
+        = "current temperature (reduced units): "
+        + std::to_string(SolventConfigHandler::temperature());
+    additional_info = density + "\n" + box + "\n" + temperature;
+    std::string info_str = basic_info + "\n" + additional_info;
+    return info_str;
 }
