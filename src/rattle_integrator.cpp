@@ -9,11 +9,13 @@
 #include "../include/rattle_integrator.h"
 RattleIntegrator::RattleIntegrator(ForceUpdater force_updater,
     double tol,
+    Observable *ke_polymer,
+    Observable *ke_solvent,
+    Observable *wc,
+    double box,
     double tiny,
-    int maxiter,
-    Observable *ke,
-    Observable *wc) :
-    VerletIntegrator(force_updater, NULL),
+    int maxiter) :
+    VerletIntegrator(force_updater, ke_solvent, box),
     _maxiter (maxiter),
     _tol (tol),
     _tiny (tiny),
@@ -25,19 +27,13 @@ RattleIntegrator::RattleIntegrator(ForceUpdater force_updater,
 {
     _moving.resize(_nb);
     _moved.resize(_nb);
-    _ke.ptr = ke;
-    _wc.ptr = wc;
-    if(_ke.ptr == NULL){
-        _ke.is_set = false;
-    }
-    else{
-        _ke.is_set = true;
-    }
-    if(_wc.ptr == NULL){
-        _wc.is_set = false;
-    }
-    else{
-        _wc.is_set = true;
+    _setup_observable(&_ke_polymer, ke_polymer);
+    _setup_observable(&_wc, wc);
+    if (DEBUG){
+        fprintf(stdout, "%s: %d\n",
+            "RATTLE ke_polymer.is_set (0/1)", (int)_ke_polymer.is_set);
+        fprintf(stdout, "%s: %d\n",
+            "RATTLE wc.is_set (0/1)", (int)_wc.is_set);
     }
 }
 RattleIntegrator::~RattleIntegrator(){};
@@ -59,23 +55,11 @@ void RattleIntegrator::set_tol(double tol){
 void RattleIntegrator::set_tiny(double tiny){
     _tiny = tiny;
 }
-void RattleIntegrator::set_ke(Observable *ptr){
-    if (ptr != NULL){
-        _ke.is_set = true;
-    }
-    else {
-        _ke.is_set = false;
-    }
-    _ke.ptr = ptr;
+void RattleIntegrator::set_ke_polymer(Observable *ptr){
+    _setup_observable(&_ke_polymer, ptr);
 }
 void RattleIntegrator::set_wc(Observable *ptr){
-    if (ptr != NULL){
-        _wc.is_set = true;
-    }
-    else {
-        _wc.is_set = false;
-    }
-    _wc.ptr = ptr;
+    _setup_observable(&_wc, ptr);
 }
 bool RattleIntegrator::_is_constraint_within_tol(double dabsq,
     double difference_of_squares){
@@ -104,18 +88,15 @@ bool RattleIntegrator::_is_constraint_derivative_within_rvtol(double dabsq,
     return is_constraint_derivative_within_rvtol;
 }
 void RattleIntegrator::_zero_accumulators(){
-    if(_ke.is_set){
-        _ke.ptr->zero();
-    }
-    if(_wc.is_set){
-        _wc.ptr->zero();
-    }
+    VerletIntegrator::_zero_accumulators();
+    if(_ke_polymer.is_set) _ke_polymer.ptr->value = 0.0;
+    if(_wc.is_set) _wc.ptr->value = 0.0;
 }
 void RattleIntegrator::_correct_accumulators(){
     if(_wc.is_set){
         // ftp://ftp.dl.ac.uk/ccp5/ALLEN_TILDESLEY/F.09
         // here, a *negative* of the constraint virial is calculated
-        _wc.ptr->update(_wc.ptr->value() * (-2.0) * _inv_timestep);
+        _wc.ptr->value = _wc.ptr->value * 2.0 * _inv_timestep;
     }
 }
 void RattleIntegrator::_set_up_correction_bookkeeping(){
@@ -171,7 +152,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
                     if(_is_angle_okay(dabsq, rr_dot) == false){
                         std::string err_msg = "move_correct_half_step: r_{AB}(t) and r_{AB}(t + dt) are nearly normal to each other!\n";
                         err_msg += "r_{AB}(t) = " + vector_to_string(rab_old);
-                        err_msg += "\nr_{AB(t + dt) = " + vector_to_string(rab_new);
+                        err_msg += "\nr_{AB}(t + dt) = " + vector_to_string(rab_new);
                         throw std::invalid_argument(err_msg);
                     }
                     // COMMENCE CORRECTION
@@ -248,7 +229,7 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
                     // increment negative constraint virial accumulator
                     // if neccessary.
                     if(calculate_observables && _wc.is_set){
-                        _wc.ptr->update(_wc.ptr->value() + kab * dabsq);
+                        _wc.ptr->value += kab * dabsq;
                     }
                 }
             }
@@ -259,7 +240,12 @@ simple::AtomPolymer RattleIntegrator::_move_correct_full_step(
     }
     // all the corrections have been performed; calculate kinetic energy
     // update kinetic energy accumulator if necessary and possible
-    if(calculate_observables && _ke.is_set) _ke.ptr->update(molecule);
+    if(calculate_observables && _ke_polymer.is_set) {
+        double m = molecule.m();
+        for(const simple::Atom& atom : molecule.atoms){
+            _ke_polymer.ptr->value +=  m * normsq(atom.velocity) / 2;
+        }
+    }
     if (iter >= _maxiter){
         fprintf(stderr, "%s (%d)\n",
             "RATTLE MOVE B: maximum number of iterations reached. Stopping correction.",
@@ -272,12 +258,11 @@ void RattleIntegrator::move(double timestep,
     bool calculate_observables){
     if(calculate_observables){
         _zero_accumulators();
-        _force_updater.zero_observables();
     }
     _set_timestep(timestep);
     simple::AtomPolymer molecule_last_step;
     simple::AtomPolymer molecule_half_step_to_correct;
-    // loop over molecules, perform verlet half-step and correction
+    // loop over polymer molecules, perform verlet half-step and correction
     for (int im = 0; im < state.nm(); ++im){
         // molecule contains positions and velocities at last step
         molecule_last_step = state.polymers.at(im);
@@ -290,14 +275,29 @@ void RattleIntegrator::move(double timestep,
         // to RATTLE for iterative correction
         // molecule with corrected full-step positions and
         // corrected half-step velocities is stored in the state
-        state.polymers.at(im) = _move_correct_half_step(molecule_last_step, molecule_half_step_to_correct);
+        try
+        {
+            state.polymers.at(im) = _move_correct_half_step(molecule_last_step, molecule_half_step_to_correct);
+        }
+        catch (std::invalid_argument)
+        {
+            state.write_to_file("/Users/Arthur/stratt/polymer/test/", "log", true, true);
+            fprintf(stderr, "%s\n", "RATTLE: wrote out crashing configuration to log");
+            throw;
+        }
+    }
+    // loop over solvent molecules, perform verlet half-step
+    simple::Solvent solvent;
+    for (int is = 0; is < state.nsolvents(); ++is){
+        solvent = state.solvents.at(is);
+        state.solvents.at(is) = _move_verlet_half_step(solvent);
     }
     // r(t + dt) has been calculated and corrected
     // now update forces in all atoms from f(t) to f(t + dt)
     // if calculate_observables = true, accumulators of observables that
     // should be updated in the force loop will be updated in this iteration
     _force_updater.update_forces(state, calculate_observables);
-    // loop over molecules, perfrom verlet full-step and correction
+    // loop over polymer molecules, perfrom verlet full-step and correction
     for (int im = 0; im < state.nm(); ++im){
         // molecule contains corrected positions at full step,
         // corrected velocities at half step, and forces calculated at
@@ -306,14 +306,24 @@ void RattleIntegrator::move(double timestep,
         // pass molecule to verlet integrator, which returns the molecule
         // with uncorrected velocities at full step.
         // store returned molecule in memory
-        molecule = _move_verlet_full_step(molecule, calculate_observables);
+        molecule = _move_verlet_full_step(molecule);
         // pass the molecule to RATTLE to iteratively correct velocities
         // at full step. Store the returned molecule in memory.
+        // calculate observables, if necessary
         state.polymers.at(im) = _move_correct_full_step(molecule, calculate_observables);
+    }
+    // loop over solvent molecules, perform verlet full-step
+    // calculate observables, if necessary
+    for (int is = 0; is < state.nsolvents(); ++is){
+        solvent = state.solvents.at(is);
+        state.solvents.at(is) = _move_verlet_full_step(solvent,
+            calculate_observables);
     }
     // advance state time
     // now velocity, positions, and forces of all atoms have to be at t + dt
     state.advance_time(timestep);
     // multiply accumulators by whatever factors necessary
-    if(calculate_observables) _correct_accumulators();
+    if(calculate_observables) {
+        _correct_accumulators();
+    }
 }

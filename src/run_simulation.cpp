@@ -1,18 +1,13 @@
 // 2017 Artur Avkhadiev
 /*! \file run_simulation.cpp
-* Usage: run_simulation
-*    <name> <infile>
-*    <optional zero_observables>
-*    <optional nbonds bond/sigma>
-*    <optional runtime/tau dt/tau rattle_tol>
-*    <optional icalc iprint isave idata itape>
-*    <optional cndir dtdir tpdir>
+* Usage: run_simulation <name> <config_file> <optional initial_state_file>
 */
 #include<string>
 #include<vector>
-#include "../include/simple_simulation.h"
+#include "../include/default_macros.h"
 #include "../include/settings_parser.h"
 // particular potentials and integrators
+#include "../include/potential.h"
 #include "../include/ljpotential.h"
 #include "../include/verlet_integrator.h"
 #include "../include/rattle_integrator.h"
@@ -21,86 +16,11 @@
 #include "../include/diatomic_config_handler.h"
 #include "../include/solvent_config_handler.h"
 // observables handlers
+#include "../include/general_observables.h"
 #include "../include/polymer_observables.h"
-#include "../include/solvent_observables.h"
-namespace observables{
-    solvent::KE k = solvent::KE();
-    solvent::AvgKE avg_k = solvent::AvgKE(k);
-    solvent::V v = solvent::V();
-    solvent::AvgV avg_v = solvent::AvgV(v);
-    solvent::Momentum p = solvent::Momentum();
-    container::Unit k_unit = {.obs = k,
-            .status = true, .timelog = true, .average = false,
-            .eval_time = container::EvalTime::sim_loop};
-    container::Unit avg_k_unit = {.obs = avg_k,
-            .status = true, .timelog = true, .average = true,
-            .eval_time = container::EvalTime::sim_loop};
-    container::Unit v_unit = {.obs = v,
-           .status = true, .timelog = true, .average = false,
-           .eval_time = container::EvalTime::force_loop};
-    container::Unit avg_v_unit = {.obs = avg_v,
-           .status = true, .timelog = true, .average = true,
-           .eval_time = container::EvalTime::sim_loop};
-    container::Unit p_unit = {.obs = p,
-           .status = true, .timelog = true, .average = false,
-           .eval_time = container::EvalTime::sim_loop};
-    std::vector<container::Unit> vec = {k_unit, avg_k_unit,
-        v_unit, avg_v_unit,
-        p_unit};
-//    dynamic::IntKE ik = dynamic::IntKE(parameters::MP);
-//    dynamic::AvgIntKE avg_ik = dynamic::AvgIntKE(ik);
-//    dynamic::LNorm ln = dynamic::LNorm(parameters::MP);
-//    dynamic::LProj lp = dynamic::LProj(parameters::MP);
-//    dynamic::V v = dynamic::V();
-//    dynamic::AvgV avg_v = dynamic::AvgV(v);
-//    dynamic::NegW w = dynamic::NegW();
-//    dynamic::AvgNegW avg_w = dynamic::AvgNegW(w);
-//    dynamic::NegWC wc = dynamic::NegWC();
-//    dynamic::AvgNegWC avg_wc = dynamic::AvgNegWC(wc);
-//    container::Unit ik_unit = {.obs = ik,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::integrator};
-//    container::Unit avg_ik_unit = {.obs = avg_ik,
-//        .status = true, .timelog = true, .average = true,
-//        .eval_time = container::EvalTime::sim_loop};
-//    container::Unit ln_unit = {.obs = ln,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::sim_loop};
-//    container::Unit lp_unit = {.obs = lp,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::sim_loop};
-//    container::Unit v_unit = {.obs = v,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::force_loop};
-//    container::Unit avg_v_unit = {.obs = avg_v,
-//        .status = true, .timelog = true, .average = true,
-//        .eval_time = container::EvalTime::sim_loop};
-//    container::Unit w_unit = {.obs = w,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::force_loop};
-//    container::Unit avg_w_unit = {.obs = avg_w,
-//        .status = true, .timelog = true, .average = true,
-//        .eval_time = container::EvalTime::sim_loop};
-//    container::Unit wc_unit = {.obs = wc,
-//        .status = true, .timelog = true, .average = false,
-//        .eval_time = container::EvalTime::integrator};
-//    container::Unit avg_wc_unit = {.obs = avg_wc,
-//        .status = true, .timelog = true, .average = true,
-//        .eval_time = container::EvalTime::sim_loop};
-//    void setup(ConfigHandler& cfg, bool zero_observables){
-//        if (zero_observables) {
-//            for (int i = 0; i < vec.size(); ++i) {
-//                vec.at(i).obs.zero();
-//            }
-//        }
-//        double m = parameters::MP;
-//        Vector laxis = lp.L(cfg.atom_state());// outputs angular momentum vector
-//        laxis = divide(laxis, norm(laxis));
-//        ik = dynamic::IntKE(m); // ik.update(cfg.atom_state());
-//        ln = dynamic::LNorm(m); // ln.update(cfg.atom_state());
-//        lp = dynamic::LProj(m, laxis);
-//    }
-}   // namespace observables
+//#include "../include/solvent_observables.h"
+// simulation class
+#include "../include/simple_simulation.h"
 namespace args{
     std::string initial_state = "";
     std::string config_file;
@@ -138,7 +58,48 @@ int main(int argc, char **argv){
         simple::BasePolymer::set_nb(settings.nb);
         simple::BasePolymer::set_m(settings.mp);
         simple::BasePolymer::set_d(settings.d);
-        ObservableContainer container = ObservableContainer(observables::vec);
+        // make observables
+        bool calc_mean = true;
+        bool calc_err = true;
+        bool print_val = true;
+        bool remove_linear_momentum = true;
+        bool remove_angular_momentum = false;
+        observable::Time time = observable::Time();
+        polymer::KE ke_polymer = polymer::KE(calc_mean, calc_err, print_val);
+        polymer::PE pe_polymer = polymer::PE(calc_mean, calc_err, print_val);
+        polymer::Virial w_polymer = polymer::Virial(calc_mean, calc_err, print_val);
+        polymer::ConstraintVirial wc_polymer
+            = polymer::ConstraintVirial(calc_mean, calc_err, print_val);
+        polymer::KineticTemperature temp_kin_polymer
+            = polymer::KineticTemperature(
+                remove_linear_momentum, remove_angular_momentum,
+                calc_mean, calc_err, print_val);
+        polymer::LinMomComponent px
+            = polymer::LinMomComponent(vector(1.0, 0.0, 0.0),
+                !calc_mean, !calc_err, !print_val);
+        polymer::LinMomComponent py
+            = polymer::LinMomComponent(vector(0.0, 1.0, 0.0),
+                !calc_mean, !calc_err, !print_val);
+        polymer::LinMomComponent pz
+            = polymer::LinMomComponent(vector(0.0, 0.0, 1.0),
+                !calc_mean, !calc_err, !print_val);
+        polymer::AngMomComponent lx
+            = polymer::AngMomComponent(vector(1.0, 0.0, 0.0),
+                !calc_mean, !calc_err, !print_val);
+        polymer::AngMomComponent ly
+            = polymer::AngMomComponent(vector(0.0, 1.0, 0.0),
+                !calc_mean, !calc_err, !print_val);
+        polymer::AngMomComponent lz
+            = polymer::AngMomComponent(vector(0.0, 0.0, 1.0),
+                !calc_mean, !calc_err, !print_val);
+        std::vector<Observable*> observables_vec
+            = {&time,
+                &ke_polymer, &pe_polymer,
+                &temp_kin_polymer,
+                &w_polymer, &wc_polymer,
+                &px, &py, &pz,
+                &lx, &ly, &lz};
+        ObservableContainer container = ObservableContainer(observables_vec);
         ObservableContainer& obs = container;
         bool is_planar;
         if (settings.polymer_planar_conformation){
@@ -148,12 +109,15 @@ int main(int argc, char **argv){
             is_planar = false;
         }
         // prepare state configuration
-        SolventConfigHandler config = SolventConfigHandler(settings.ss, settings.rho_s, settings.nc);
-        ConfigHandler& cfg = config;
+        SolventConfigHandler solvent_config = SolventConfigHandler(settings.ss, settings.rho_s, settings.nc);
+        NAtomicConfigHandler polymer_config
+            = NAtomicConfigHandler();
+        ConfigHandler& cfg = polymer_config;
         // potential setup
-        LJPotential pp = LJPotential(settings.epp, settings.sp);
-        AdjustedLJPotential ss = AdjustedLJPotential(settings.ess, settings.ss, settings.rc_ss, config.box());
-        AdjustedLJPotential ps = AdjustedLJPotential(settings.eps, 0.5 * (settings.ss + settings.sp), settings.rc_ps, config.box());
+        LJPotential pp = LJPotential(settings.epp, settings.sp,
+            &pe_polymer, &w_polymer);
+        AdjustedLJPotential ss = AdjustedLJPotential(settings.ess, settings.ss, settings.rc_ss, solvent_config.box());
+        AdjustedLJPotential ps = AdjustedLJPotential(settings.eps, 0.5 * (settings.ss + settings.sp), settings.rc_ps, solvent_config.box());
         // initialize
         if (args::is_input_given){
             fprintf(stderr, "%s\n",
@@ -161,8 +125,8 @@ int main(int argc, char **argv){
             exit(EXIT_FAILURE);
         }
         else {
-            config.fcc_positions();
-            config.ran_velocities(settings.temperature);
+            //solvent_config.fcc_positions();
+            //solvent_config.ran_velocities(settings.temperature);
         }
         //fprintf(stdout, "%s\n%s",
         //    "State initialized by the Configuration Handler:",
@@ -195,12 +159,27 @@ int main(int argc, char **argv){
                 //exit(1);
             //}
         //}
-        ForceUpdater force_loop = ForceUpdater(&pp, &ss, &ps, &observables::v, NULL);
+        ForceUpdater force_loop = ForceUpdater(&pp, &ss, &ps);
+        cfg.set_force_updater(&force_loop);
+        if (settings.polymer_planar_conformation) {
+            polymer_config.initialize2D(
+                settings.temperature
+            );
+        }
+        else {
+            polymer_config.initialize3D(
+                settings.temperature
+            );
+        }
         RattleIntegrator rattle = RattleIntegrator(force_loop,
-            settings.tol, settings.tiny, settings.maxiter);
+            settings.tol,
+            &ke_polymer, NULL,
+            &wc_polymer,
+            solvent_config.box(),
+            settings.tiny, settings.maxiter);
         VerletIntegrator verlet
-            = VerletIntegrator(force_loop, NULL, config.box());
-        Integrator& integrator = verlet;
+            = VerletIntegrator(force_loop, NULL, solvent_config.box());
+        Integrator& integrator = rattle;
         // simulation setup
         simple::Simulation sim
             = simple::Simulation(args::sim_name,
@@ -211,11 +190,12 @@ int main(int argc, char **argv){
                 cfg,
                 integrator,
                 obs,
+                settings.should_write_data,
                 settings.dt,
                 settings.icalc,
+                settings.iblock,
                 settings.iprint,
                 settings.isave,
-                settings.idata,
                 settings.itape);
         //if (!sim.is_input_given()){
         /**
@@ -229,7 +209,11 @@ int main(int argc, char **argv){
         */
         //    observables::setup(config, settings::zero_observables);
         //}
+        // save simulation settings in a file
+        settings.write(settings.cndir, args::sim_name);
+        sim.relax(20.0);
         sim.evolve(settings.runtime);
+        sim.write_run_summary();
     }
     return res;
 }

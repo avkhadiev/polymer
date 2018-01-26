@@ -6,20 +6,24 @@
 #include <cmath>              /* pow   */
 #include <math.h>             /* round */
 #include "../include/verlet_integrator.h"
+void VerletIntegrator::_setup_observable(ObservableStruct *obs,
+    Observable* obs_ptr){
+    obs->ptr = obs_ptr;
+    if (obs->ptr == NULL){
+        obs->is_set = false;
+    }
+    else {
+        obs->is_set = true;
+    }
+}
 VerletIntegrator::VerletIntegrator(ForceUpdater& force_updater,
-    Observable *ke,
+    Observable *ke_solvent,
     double box) :
     _force_updater (force_updater),
     _timestep (0.001),
     _halfstep (_timestep * 0.5) {
-    _ke.ptr = ke;
     _mirror_image.box = box;
-    if(_ke.ptr == NULL){
-        _ke.is_set = false;
-    }
-    else{
-        _ke.is_set = true;
-    }
+    _setup_observable(&_ke_solvent, ke_solvent);
     if(box == 0.0){
         _mirror_image.is_set = false;
     }
@@ -35,17 +39,11 @@ void VerletIntegrator::_set_timestep(double timestep){
     _timestep = timestep;
     _halfstep = timestep * 0.5;
 }
-void VerletIntegrator::set_ke(Observable *ptr){
-    if (ptr != NULL){
-        _ke.is_set = true;
-    }
-    else {
-        _ke.is_set = false;
-    }
-    _ke.ptr = ptr;
+void VerletIntegrator::set_ke_solvent(Observable *ptr){
+    _setup_observable(&_ke_solvent, ptr);
 }
 void VerletIntegrator::_zero_accumulators(){
-    if(_ke.is_set) _ke.ptr->zero();
+    if(_ke_solvent.is_set) _ke_solvent.ptr->value = 0.0;
 }
 simple::AtomPolymer VerletIntegrator::_move_verlet_half_step(simple::AtomPolymer molecule) {
     int na = molecule.nb() + 1;
@@ -62,8 +60,7 @@ simple::AtomPolymer VerletIntegrator::_move_verlet_half_step(simple::AtomPolymer
     // positions at full step
     return molecule;
 }
-simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer molecule,
-    bool calculate_observables) {
+simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer molecule) {
     int na = molecule.nb() + 1;
     double m = molecule.m();
     // loop over all atoms
@@ -72,12 +69,8 @@ simple::AtomPolymer VerletIntegrator::_move_verlet_full_step(simple::AtomPolymer
         // v(t + dt) = v(t + 0.5 dt) + 0.5 dt * a(t + dt)
         Vector acceleration = divide(atom.force, m);
         atom.velocity += multiply(acceleration, _halfstep);
-        // update kinetic energy accumulator if necessary and possible
-        if(calculate_observables){
-            if(_ke.is_set){
-                _ke.ptr->update(atom);
-            }
-        }
+        // no updating kinetic energy --- for polymers, RATTLE does that
+        // with corrected velocities
     }
     return molecule;
 }
@@ -122,10 +115,8 @@ simple::Solvent
     //}
     molecule.set_v( add(molecule.v(), multiply(acceleration, _halfstep)) );
     // update kinetic energy accumulator if necessary and possible
-    if(calculate_observables){
-        if(_ke.is_set){
-            _ke.ptr->update(molecule.atom);
-        }
+    if(calculate_observables && _ke_solvent.is_set){
+        _ke_solvent.ptr->value += 0.5 * molecule.m() * normsq(molecule.v());
     }
     return molecule;
 }
@@ -164,8 +155,7 @@ void VerletIntegrator::move(double timestep, simple::AtomState& state,
             // will use both old information from time (t) as well as new
             // information at (t + dt) from unconstrained Verlet integration
             polymer = state.polymers.at(im);
-            state.polymers.at(im) = _move_verlet_full_step(polymer,
-                calculate_observables);
+            state.polymers.at(im) = _move_verlet_full_step(polymer);
         }
         // solvent loop
         for (int is = 0; is < state.nsolvents(); ++is){
@@ -176,5 +166,4 @@ void VerletIntegrator::move(double timestep, simple::AtomState& state,
         // advance state time
         // now velocity, positions, and forces of all atoms have to be at t + dt
         state.advance_time(timestep);
-        // multiply the accumulators by whatever factors necessary
 }

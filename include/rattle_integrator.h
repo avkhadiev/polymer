@@ -25,14 +25,12 @@ protected:
     // stores inv_timestep in addition to half step and full step
     virtual void _set_timestep(double timestep);
     // pointers to accumulators of observables
-    // RATTLE gets its own kinetic energy accumulator, because now that
-    // corrections have to be performed on velocities after Verlet full step,
-    // it doesn't make sense to calculate kinetic energy from (unconstrained)
-    // velocities.  These data members shadows the one in the base class
-    struct obs_t {
-        bool is_set;
-        Observable *ptr;
-    } _ke, _wc;             /**> kinetic energy & negative constraint virial */
+    // RATTLE gets its own kinetic energy accumulator for polymers ---
+    // now corrections have to be performed on velocities after Verlet full
+    // step, it doesn't make sense to calculate kinetic energy from
+    // (unconstrained) velocities.
+    /**> kinetic energy & negative constraint virial */
+    ObservableStruct _ke_polymer, _wc;
     bool _is_constraint_within_tol(double dabsq, double difference_of_squares);
     bool _is_angle_okay(double dabsq, double rr_dot);
     bool _is_constraint_derivative_within_rvtol(double dabsq, double rv_dot);
@@ -97,7 +95,7 @@ public:
     // setters
     void set_tol(double tol);
     void set_tiny(double tiny);
-    virtual void set_ke(Observable *ptr);
+    void set_ke_polymer(Observable *ptr);
     void set_wc(Observable *ptr);
     // main function
     // check for consistency of the state
@@ -115,10 +113,12 @@ public:
     // constructors and a destructor
     RattleIntegrator(ForceUpdater force_updater,
         double tol,
+        Observable *ke_polymer = NULL,
+        Observable *ke_solvent = NULL,
+        Observable *wc = NULL,
+        double box = 0.0,
         double tiny = pow(10, -7.0),
-        int maxiter = pow(10, 3),
-        Observable *ke = NULL,
-        Observable *wc = NULL);
+        int maxiter = pow(10, 3));
     ~RattleIntegrator();
 };
 #endif

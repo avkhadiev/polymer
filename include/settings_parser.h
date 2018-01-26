@@ -52,6 +52,7 @@ public:
     double rho_s;               /**> density of solvents in reduced units   */
     double temperature;         /**> temperature in reduced units           */
     int polymer_planar_conformation;   /**> 0 = 3d otherwise, planar o/w    */
+    double polymer_energy;      /**> total initial energy of the polymer    */
     // integration settings
     double runtime;             /**> run time in reduced units              */
     double dt;                  /**> timestep in reduced units              */
@@ -62,14 +63,15 @@ public:
     std::string cndir;          /**> directory for simulation config i/o    */
     std::string dtdir;          /**> directory for observables i/o          */
     std::string tpdir;          /**> directory for state config i/o         */
+    bool should_write_data;     /**> should output observables?             */
     size_t icalc;               /**> observable update every ... steps      */
     size_t iprint;              /**> status printout every ... steps        */
     size_t isave;               /**> configuration update every ... steps   */
-    size_t idata;               /**> observable writeout every ... steps    */
+    size_t iblock;              /**> block avging&writeout every ... steps  */
     size_t itape;               /**> tapefile update every ... steps        */
     // functions
     void read(std::string fin);
-    void write(std::string fout) const;
+    void write(std::string outdir, std::string sim_name) const;
     SettingsParser();
     SettingsParser(std::string fin);
     ~SettingsParser();

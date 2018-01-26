@@ -1,139 +1,146 @@
 // 2017 Artur Avkhadiev
-/*! \file dynamic_observables.h
+/*! \file polymer_observables.h
 */
 #ifndef POLYMER_POLYMER_OBSERVABLES_H
 #define POLYMER_POLYMER_OBSERVABLES_H
 #include "observable.h"
+#include "general_observables.h"
 namespace polymer{
     /**
-    * calculates potential energy of the polymer
-    * ForceLoop knows how to work with this observable, no update functions
+    * kinetic energy of a polymer, updated in integrator
     */
-    class V :
-        public TimeLogObservable {
+    class KE :
+        public observable::KE {
     public:
-        V();
-        ~V(){};
-    };
-    /**
-    * calculates average potential energy of the polymer
-    * ForceLoop knows how to work with this observable, no update functions
-    */
-    class AvgV :
-        public TimeLogObservable,
-        public AvgObservable {
-    public:
-        AvgV(V& ve, double acc = 0.0);
-        ~AvgV(){};
-    };
-    /**
-    * calculates virial of the polymer
-    * ForceLoop knows how to work with this observable, no update functions
-    */
-    class NegW :
-        public TimeLogObservable {
-    public:
-        NegW();
-        ~NegW(){};
-    };
-    /**
-    * calculates average virial of the polymer
-    * ForceLoop knows how to work with this observable, no update functions
-    */
-    class AvgNegW :
-        public TimeLogObservable,
-        public AvgObservable {
-    public:
-        AvgNegW(NegW& w, double acc = 0.0);
-        ~AvgNegW(){};
-    };
-    /**
-    * calculates negative constraint virial of the polymer
-    * RATTLE knows how to work with this observable, no update functions
-    * necessary
-    */
-    class NegWC :
-        public TimeLogObservable {
-    public:
-        NegWC();
-        ~NegWC(){};
-    };
-    /**
-    * calculates average negative constraint virial of the polymer
-    * RATTLE knows how to work with this observable, no update functions
-    * necessary
-    */
-    class AvgNegWC :
-        public TimeLogObservable,
-        public AvgObservable {
-    public:
-        AvgNegWC(NegWC& wc, double acc = 0.0);
-        ~AvgNegWC(){};
-    };
-    /**
-    * calculates kinetic energy of the polymer
-    * value = internal kinetic energy (motion wrt R_CM)
-    */
-    class IntKE :
-        public TimeLogObservable {
-    private:
-        double _m;              /**> atomic mass */
-    public:
-        virtual void update(const simple::Atom &atom);
-        virtual void update(const simple::AtomPolymer& polymer);
+        virtual bool update_method_specified() const {return true;};
         virtual void update(const simple::AtomState& state);
-        double K(const simple::AtomState& state);
-        IntKE(double m);
-        ~IntKE(){};
+        void update(const simple::AtomPolymer& molecule);
+        ~KE(){};
+        KE( bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing out?
+        );
     };
     /**
-    * calculates average internal kinetic energy of the polymer
-    * value = average internal kinetic energy (motion wrt R_CM)
+    * potential energy of a polymer, updated in force loop
     */
-    class AvgIntKE :
-        public TimeLogObservable,
-        public AvgObservable {
+    class PE :
+        public observable::PE {
     public:
-        AvgIntKE(IntKE& ke, double acc = 0.0);
-        ~AvgIntKE(){};
+        virtual bool update_method_specified() const {return false;};
+        ~PE(){};
+        PE( bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing out?
+        );
     };
     /**
-    * calculates angular momentum of the polymer
-    * value = norm of angular momentum
+    * polymer virial due to potential forces, updated in force loop
     */
-    class LNorm :
-        public TimeLogObservable {
-    private:
-        double _m;              /**> atomic mass */
-        Vector _acc;            /**> intermediate value stored here */
+    class Virial :
+        public observable::Virial {
     public:
-        virtual void zero() {Observable::zero(); _acc = vector(0.0, 0.0, 0.0);};
-        virtual void update(const simple::Atom &atom);
-        virtual void update(const simple::AtomPolymer& polymer);
+        virtual bool update_method_specified() const {return false;};
+        ~Virial(){};
+        Virial( bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing out?
+        );
+    };
+    /**
+    * polymer virial due to constraint forces, updated in RATTLE loop
+    */
+    class ConstraintVirial :
+        public observable::Virial {
+    public:
+        virtual bool update_method_specified() const {return false;};
+        ~ConstraintVirial(){};
+        ConstraintVirial( bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing out?
+        );
+    };
+    /**
+    * kinetic temperature of the polymer
+    */
+    class KineticTemperature :
+        public observable::KineticTemperature {
+    protected:
+        size_t _ndof;
+    public:
+        virtual bool update_method_specified() const {return true;};
         virtual void update(const simple::AtomState& state);
-        // double L(const simple::AtomState& state);
-        LNorm(double m);
-        ~LNorm(){};
+        size_t ndof() const {return _ndof;};
+        void update(const simple::AtomPolymer& polymer);
+        ~KineticTemperature(){};
+        KineticTemperature(
+            bool remove_linear_momentum,
+            bool remove_angular_momentum,
+            bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing out?
+        );
     };
     /**
-    * calculates angular momentum's projection on the specified axis
+    * a component of linear momentum of a polymer, updated in main loop
     */
-    class LProj :
-        public TimeLogObservable {
-    private:
-        double _m;              /**> atomic mass                    */
-        Vector _acc;            /**> intermediate value stored here */
-        Vector _axis;           /**> projected onto this vector     */
+    class LinMomComponent :
+        public observable::LinMomComponent {
     public:
-        virtual std::string to_string() const;
-        Vector L(const simple::AtomState& state);
-        virtual void update(std::string obs_string);
-        virtual void update(const simple::Atom &atom);
-        virtual void update(const simple::AtomPolymer& polymer);
+        virtual bool update_method_specified() const {return true;};
         virtual void update(const simple::AtomState& state);
-        // double L(const simple::AtomState& state);
-        LProj(double m, Vector axis = vector(0.0, 0.0, 1.0));
-        ~LProj(){};
+        void update(const simple::AtomPolymer& polymer);
+        LinMomComponent(Vector component,
+            bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,  // print out inst value in log & state?
+            bool e_format = false // use precision notation when writing)
+        );
+        ~LinMomComponent(){};
     };
+    /**
+    * a component of angular momentum of a polymer, updated in main loop
+    */
+    class AngMomComponent :
+        public observable::AngMomComponent {
+    private:
+        void _update(Vector momentum, Vector component);
+    public:
+        virtual bool update_method_specified() const {return true;};
+        virtual void update(const simple::AtomState& state);
+        void update(const simple::AtomPolymer& polymer);
+        AngMomComponent(Vector component,
+            bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing)
+        );
+        ~AngMomComponent(){};
+    };
+    ///**
+    //* a component of CM of a polymer, updated in main loop
+    //*/
+    //class RCMComponent :
+    //    public observable::RCMComponent {
+    //private:
+    //    virtual Vector rcm(const simple::AtomState& state);
+    //    void _update(Vector rcm, Vector component);
+//public:
+    //    virtual bool update_method_specified() const {return true;};
+    //    virtual void update(const simple::AtomState& state);
+    //    RCMComponent(Vector component,
+    //        size_t molecule_index,
+    //        bool calculate_mean,
+    //        bool calculate_error,
+    //        bool print_inst_val,   // print out inst value in log & state?
+    //        bool e_format = false  // use precision notation when writing)
+    //    );
+    //    ~RCMComponent(){};
+    //};
 } // namespace polymer
 #endif

@@ -45,8 +45,8 @@ namespace simple{
                 + a_str_force_header + " " + a_str_force_value;
         }
         else {
-            // do not include headers or forces or velocites
-            a_str = a_str_position_value + " " + a_str_velocity_value;
+            // do not include headers or forces
+            a_str = a_str_position_value;// + " " + a_str_velocity_value;
         }
         return a_str;
     }
@@ -56,13 +56,20 @@ namespace simple{
         std::istream_iterator<std::string> begin(ss);
         std::istream_iterator<std::string> end;
         std::vector<std::string> words(begin, end);
+        double rx, ry, rz;
+        double vx, vy, vz;
         // convert strings to data
-        double rx = atof(words.at(0).c_str());
-        double ry = atof(words.at(1).c_str());
-        double rz = atof(words.at(2).c_str());
-        double vx = atof(words.at(3).c_str());
-        double vy = atof(words.at(4).c_str());
-        double vz = atof(words.at(5).c_str());
+        rx = atof(words.at(0).c_str());
+        ry = atof(words.at(1).c_str());
+        rz = atof(words.at(2).c_str());
+        if (words.size() == 6){
+            vx = atof(words.at(3).c_str());
+            vy = atof(words.at(4).c_str());
+            vz = atof(words.at(5).c_str());
+        }
+        else{
+            vx = vy = vz = 0.0;
+        }
         Vector r = vector(rx, ry, rz);
         Vector v = vector(vx, vy, vz);
         return Atom(r, v);

@@ -1,5 +1,5 @@
 // 2017 Artur Avkhadiev
-/*! \file simple_polymer.h
+/*! \file simple_polymer.cpp
 * Unlike the regular molecule, a simple::Polymer is assumed to be a freely-jointed chain. All atoms have the same mass and all interatomic bond lengths are fixed and equal. A simple::Polymer does not contain any time records. The atoms it contains are of type simple::Atom
 * simple::Polymer does not contain records on atomic mass or interatomic distance. Those are recorded in the state.
 * a polymer has 2 representations:
@@ -34,40 +34,19 @@ namespace simple {
         static double _m;
         // fixed bond length for all bonds
         static double _d;
-        // position of the center of mass of the molecule
-        Vector _rcm;
-        // velocity of the center of mass of the molecule
-        Vector _vcm;
     public:
-        bool operator==(const BasePolymer &other) const;
-        bool operator!=(const BasePolymer &other) const;
         static int nb() {return _nb;};
         static double m() {return _m;};
         static double d() {return _d;};
         static void set_nb(int nb) {_nb = nb;};
         static void set_m(double m) {_m = m;};
         static void set_d(double d) {_d = d;};
-        Vector rcm() const {return _rcm;};
-        Vector vcm() const {return _vcm;};
-        void set_rcm(Vector rcm) {_rcm = rcm;};
-        void set_vcm(Vector vcm) {_vcm = vcm;};
-        /**
-        * Ouptuts an std::string header
-        * that constains RCM and VCM vectors of the molecule
-        */
-        std::string header_str(bool verbose = true) const;
-        /**
-        * Reads the non-verbose header string of a molecule,
-        * saves rcm and vcm
-        */
-        void read_header(std::string non_verbose_header);
         /**
         * Ouptuts an std::string representation of the molecule
         * Depends on the chosen representation (the derived class)
         */
         virtual std::string to_string(bool verbose = true) const = 0;
-        BasePolymer(Vector rcm = vector(0.0, 0.0, 0.0),
-                    Vector vcm = vector(0.0, 0.0, 0.0));
+        BasePolymer();
         virtual ~BasePolymer();
     };
     class AtomPolymer;
@@ -79,10 +58,28 @@ namespace simple {
         private:
             void subtract_vel_projections();
             friend class AtomPolymer;
+            // position of the center of mass of the molecule
+            Vector _rcm;
+            // velocity of the center of mass of the molecule
+            Vector _vcm;
         public:
             std::vector<Bond> bonds;
             bool operator==(const BondPolymer &other) const;
             bool operator!=(const BondPolymer &other) const;
+            Vector rcm() const {return _rcm;};
+            Vector vcm() const {return _vcm;};
+            void set_rcm(Vector rcm) {_rcm = rcm;};
+            void set_vcm(Vector vcm) {_vcm = vcm;};
+            /**
+            * Ouptuts an std::string header
+            * that constains RCM and VCM vectors of the molecule
+            */
+            std::string write_cm_str(bool verbose = true) const;
+            /**
+            * Reads the non-verbose header string of a molecule,
+            * saves rcm and vcm
+            */
+            void read_cm_str(std::string non_verbose_str);
             /**
             * Ouptuts an std::string representation of the molecule
             * in the bond vector representation
@@ -115,6 +112,8 @@ namespace simple {
             std::vector<Atom> atoms;
             bool operator==(const AtomPolymer &other) const;
             bool operator!=(const AtomPolymer &other) const;
+            Vector rcm() const;
+            Vector vcm() const;
             /**
             * Ouptuts an std::string representation of the molecule
             * in the bond vector representation
@@ -126,9 +125,7 @@ namespace simple {
             * (total momentum in CM frame is 0)
             * Assumes bond velocities projections on the bonds are zero
             */
-            AtomPolymer(const std::vector<Atom>& new_atoms = {},
-                Vector rcm = vector(0.0, 0.0, 0.0),
-                Vector vcm = vector(0.0, 0.0, 0.0));
+            AtomPolymer(const std::vector<Atom>& new_atoms = {});
             /**
             * Creates a polymer in the atom representation using the bond representation
             * Removes projection of bond velocities on the bonds.

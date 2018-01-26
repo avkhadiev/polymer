@@ -10,86 +10,88 @@
 
 class ObservableContainerTest : public ::testing::Test {
  protected:
-    ScalarObservable mock_scalar;
-    VectorObservable mock_vector;
-    std::string sim_name;
-    std::string outdir;
-    std::string indir;
-    bool overwrite;
-    ObservableContainer test_container;
+        std::string sim_name, outdir;
+    // long names, short names, tex names, and units
+    std::string ln1, ln2, sn1, sn2, tn1, tn2, units;
+    observable::name_t name1, name2;
+    observable::update_time_t update_time;
+    observable::calculate_avg_t calculate_instructions;
+    bool print_inst_val;
+    bool e_format;
+    bool verbose;
     virtual void SetUp() {
-        mock_scalar = declare_scalar_observable("Mock Scalar",
-         "scalar unit",
-         "MS");
-        mock_vector = declare_vector_observable("Mock Vector",
-         "vector unit",
-         "MV");
-        sim_name = "testsim";
-        outdir = "/Users/Arthur/stratt/polymer/test/";
-        indir = outdir;
-        overwrite = true;
-        test_container = ObservableContainer();
-        test_container.add_scalar(mock_scalar);
-        test_container.add_vector(mock_vector);
+        sim_name = "test_sim";
+        outdir =  "/Users/Arthur/stratt/polymer/test/";
+        ln1 = "Mock Observable 1";
+        ln2 = "Mock Observable 2";
+        sn1 = "mock obs 1";
+        sn2 = "mock obs 2";
+        tn1 = "\\mathsrc{O}_{\\mathrm{mock} 1}";
+        tn2 = "\\mathsrc{O}_{\\mathrm{mock} 2}";
+        units = "1";
+        name1 = {.full = ln1,
+                .abridged = sn1,
+                .latex = tn1,
+                .units = units};
+        name2 = {.full = ln2,
+                .abridged = sn2,
+                .latex = tn2,
+                .units = units};
+        update_time = observable::MAIN_LOOP;
+        calculate_instructions = {.mean = true, .meansq = true};
+        print_inst_val = true;
+        e_format = true;
+        verbose = true;
      }
   // virtual void TearDown() {}
 };
 
 TEST_F(ObservableContainerTest, Initialization){
-    // test scalars
-    ScalarObservable& ms =
-        test_container.get_scalar(mock_scalar.name);
-    EXPECT_EQ(mock_scalar.name, ms.name);
-    EXPECT_EQ(mock_scalar.units, ms.units);
-    EXPECT_EQ(mock_scalar.axis_name, ms.axis_name);
-    EXPECT_THROW(test_container.get_scalar(mock_vector.name), std::invalid_argument);
-    // test vectors
-    VectorObservable mv =
-        test_container.get_vector(mock_vector.name);
-    EXPECT_EQ(mock_vector.name, mv.name);
-    EXPECT_EQ(mock_vector.units, mv.units);
-    EXPECT_EQ(mock_vector.axis_name, mv.axis_name);
-    EXPECT_THROW(test_container.get_vector(mock_scalar.name), std::invalid_argument);
-}
-
-TEST_F(ObservableContainerTest, ScalarManipulation){
-    double *s_acc = &(test_container.get_scalar(mock_scalar.name).accumulator);
-    // recording observables via accumulators
-    ScalarObservable& ms =
-        test_container.get_scalar(mock_scalar.name);
-    EXPECT_EQ(true, ms.value_time.empty());
-    *s_acc = 3.0;
-    double t = 1.0;
-    test_container.update(mock_scalar.name, t);
-    EXPECT_EQ(false, ms.value_time.empty());
-    EXPECT_EQ(*s_acc, ms.value_time.at(0).first);
-    EXPECT_EQ(t, ms.value_time.at(0).second);
-}
-
-TEST_F(ObservableContainerTest, VectorManipulation){
-    Vector *v_acc = &(test_container.get_vector(mock_vector.name).accumulator);
-    VectorObservable &mv =
-        test_container.get_vector(mock_vector.name);
-    EXPECT_EQ(true, mv.value_time.empty());
-    *v_acc = vector(3.0, 3.0, 3.0);
-    double t = 1.0;
-    test_container.update(mock_vector.name, t);
-    EXPECT_EQ(false, mv.value_time.empty());
-    EXPECT_EQ(*v_acc, mv.value_time.at(0).first);
-    EXPECT_EQ(t, mv.value_time.at(0).second);
+    Observable mo1 = Observable(name1,
+        update_time,
+        calculate_instructions,
+        print_inst_val,
+        e_format);
+    Observable mo2 = Observable(name2,
+        update_time,
+        calculate_instructions,
+        print_inst_val,
+        e_format);
+    mo1.value = 1.0 / 3.0;
+    mo2.value = 2.0 / 3.0;
+    std::vector<Observable*> observables = {&mo1, &mo2};
+    ObservableContainer test_container = ObservableContainer(observables);
+    EXPECT_EQ(test_container.nobservables(), observables.size());
+    std::cout << test_container.status_string(verbose);
 }
 
 TEST_F(ObservableContainerTest, Writeout){
-    double *s_acc = &(test_container.get_scalar(mock_scalar.name).accumulator);
-    Vector *v_acc = &(test_container.get_vector(mock_vector.name).accumulator);
-    double t = 0.0;
-    for (int i = 0; i < 5; ++i){
-        t += 10.0;
-        *s_acc += 1.0;
-        *v_acc = add(*v_acc, vector(1.0, 2.0, 3.0));
-        test_container.update(t);
-    }
-    test_container.writeout(outdir, sim_name, overwrite);
+    Observable mo1 = Observable(name1,
+        update_time,
+        calculate_instructions,
+        print_inst_val,
+        e_format);
+    Observable mo2 = Observable(name2,
+        update_time,
+        calculate_instructions,
+        print_inst_val,
+        e_format);
+    mo1.value = 1.0 / 3.0;
+    mo2.value = 2.0 / 3.0;
+    std::vector<Observable*> observables = {&mo1, &mo2};
+    ObservableContainer test_container = ObservableContainer(observables);
+    std::cout << "Expect values 1/3, 2/3" << std::endl;
+    std::cout << test_container.status_string(!verbose);
+    test_container.prepare_datafiles(outdir, sim_name);
+    test_container.write_data(outdir, sim_name);
+    mo1.value = 2.0 / 3.0;
+    mo2.value = 1.0 / 3.0;
+    std::cout << "Changed values to 2/3, 1/3" << std::endl;
+    std::cout << test_container.status_string(!verbose);
+    test_container.record_observables();
+    test_container.write_data(outdir, sim_name);
+    std::cout << "Observales recorded, so values should be now 0" << std::endl;
+    std::cout << test_container.status_string(!verbose);
 }
 
 int main(int argc, char **argv){

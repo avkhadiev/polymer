@@ -4,148 +4,189 @@
 #include "../include/polymer_observables.h"
 namespace polymer{
     /**************************************************************************
+    * Kinetic Energy
+    **************************************************************************/
+    KE::KE( bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::KE(calculate_mean, calculate_error, print_inst_val, e_format){
+        _name.full += " (Polymer)";
+        _name.abridged += "p";
+        _name.latex += "^{\\mathrm{pol}}";
+    }
+    void KE::update(const simple::AtomPolymer& molecule){
+        double mass = molecule.m();
+        for(const simple::Atom& atom : molecule.atoms){
+            observable::KE::update(atom, mass);
+        }
+    }
+    void KE::update(const simple::AtomState &state){
+        for(const simple::AtomPolymer& polymer : state.polymers){
+            update(polymer);
+        }
+    }
+    /**************************************************************************
     * LJ Potential Energy
     **************************************************************************/
-    V::V() :
-        Observable("LJ Potential", "vlj", "\\varepsilon", ""),
-        TimeLogObservable(){}
-    /**************************************************************************
-    * Average LJ Potential Energy
-    **************************************************************************/
-    AvgV::AvgV(V& ve, double acc ) :
-        Observable("Average LJ Potential", "avgvlj", "\\varepsilon", ""),
-        TimeLogObservable(),
-        AvgObservable(ve, acc){}
-    /**************************************************************************
-    * Negative Virial
-    **************************************************************************/
-    NegW::NegW() :
-        Observable("Negative Virial", "w", "\\varepsilon", ""),
-        TimeLogObservable(){}
-    /**************************************************************************
-    * Average Negative Virial
-    **************************************************************************/
-    AvgNegW::AvgNegW(NegW& w, double acc ) :
-        Observable("Average Negative Virial", "avgw", "\\varepsilon", ""),
-        TimeLogObservable(),
-        AvgObservable(w, acc){}
-    /**************************************************************************
-    * Negative Constraint Virial
-    **************************************************************************/
-    NegWC::NegWC() :
-        Observable("Negative Constraint Virial", "wc", "\\varepsilon", ""),
-        TimeLogObservable(){}
-    /**************************************************************************
-    * Average Negative Virial
-    **************************************************************************/
-    AvgNegWC::AvgNegWC(NegWC& wc, double acc) :
-        Observable("Average Negative Constraint Virial",
-            "avgwc", "\\varepsilon", ""),
-        TimeLogObservable(),
-        AvgObservable(wc, acc){}
-    /**************************************************************************
-    * Internal Kinetic Energy
-    **************************************************************************/
-    IntKE::IntKE(double m) :
-        Observable("Internal Kinetic Energy", "ik", "\\varepsilon", ""),
-        TimeLogObservable(),
-        _m(m){}
-    void IntKE::update(const simple::Atom &atom){
-        _value += _m * normsq(atom.velocity) / 2;
+    PE::PE(bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::PE(calculate_mean, calculate_error, print_inst_val, e_format){
+        _name.full += " (Polymer)";
+        _name.abridged += "p";
+        _name.latex += "^{\\mathrm{pol}}";
     }
-    void IntKE::update(const simple::AtomPolymer &polymer){
-        for(const simple::Atom& atom : polymer.atoms){
-            update(atom);
+    /**************************************************************************
+    * Kinetic Temperature
+    **************************************************************************/
+    KineticTemperature::KineticTemperature(
+        bool remove_linear_momentum,
+        bool remove_angular_momentum,
+        bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::KineticTemperature(
+        remove_linear_momentum, remove_angular_momentum,
+        calculate_mean, calculate_error, print_inst_val, e_format),
+    _ndof(std::max(0,
+            3 * ((simple::BaseState::nm())
+                - (int)_remove_linear_momentum
+                - (int)_remove_angular_momentum)
+            + 2 * (simple::BaseState::nm() * simple::BasePolymer::nb())
+        ))
+    {
+        _name.full += " (Polymer)";
+        _name.abridged += "p";
+        _name.latex += "^{\\mathrm{pol}}";
+        if (DEBUG) {
+            fprintf(stderr, "%s %zu\n", "KineticTemperature: ndof is", _ndof);
         }
     }
-    void IntKE::update(const simple::AtomState &state){
-        // assumes there is only one molecule in the state
-        update(state.polymers.at(0));
-    }
-    double IntKE::K(const simple::AtomState &state){
-        double K = 0.0;
-        for(const simple::Atom& atom : state.polymers.at(0).atoms){
-            K += _m * normsq(atom.velocity) / 2;
+    void KineticTemperature::update(const simple::AtomPolymer& molecule){
+        double mass = molecule.m();
+        for(const simple::Atom& atom : molecule.atoms){
+            observable::KineticTemperature::update(atom, mass, ndof());
         }
-        return K;
+    }
+    void KineticTemperature::update(const simple::AtomState &state){
+        for(const simple::AtomPolymer& polymer : state.polymers){
+            update(polymer);
+        }
     }
     /**************************************************************************
-    * Average Internal Kinetic Energy
+    * Virial from Potential Forces
     **************************************************************************/
-    AvgIntKE::AvgIntKE(IntKE& ke, double acc) :
-        Observable("Average Internal Kinetic Energy", "avgik",
-            "\\varepsilon",
-            ""),
-        TimeLogObservable(),
-        AvgObservable(ke, acc){}
-    /**************************************************************************
-    * Angular Momentum Norm
-    **************************************************************************/
-    LNorm::LNorm(double m) :
-        Observable("Angular Momentum Norm", "ln",
-            "m * \\sigma^2 / \\tau",
-            ""),
-        TimeLogObservable(),
-        _m(m),
-        _acc(vector(0.0, 0.0, 0.0)) {}
-    void LNorm::update(const simple::Atom &atom){
-        _acc += cross(atom.position, multiply(atom.velocity, _m));
-    }
-    void LNorm::update(const simple::AtomPolymer &polymer){
-        _acc = vector(0.0, 0.0, 0.0);
-        for (const simple::Atom& atom : polymer.atoms){
-            update(atom);
-        }
-        Observable::update(norm(_acc));
-    }
-    void LNorm::update(const simple::AtomState &state){
-        _acc = vector(0.0, 0.0, 0.0);
-        // assumes there is only one molecule in the state
-        update(state.polymers.at(0));
+    Virial::Virial(bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::Virial(calculate_mean,calculate_error,print_inst_val, e_format){
+        _name.full += " (Polymer)";
+        _name.abridged += "p";
+        _name.latex += "^{\\mathrm{pol}}_{\\mathrm{LJ}}";
     }
     /**************************************************************************
-    * Angular Momentum Projection
+    * Virial from Constraint Forces
     **************************************************************************/
-    LProj::LProj(double m, Vector axis) :
-        Observable("Angular Momentum Projection on " + vector_to_string(axis),
-            "lp", "", ""),
-        TimeLogObservable(),
-        _m(m),
-        _acc(vector(0.0, 0.0, 0.0)),
-        _axis(divide(axis, norm(axis))){}
-    std::string LProj::to_string() const {
-        return "lproj " + vector_to_string(_axis) + " " + print_value();
+    ConstraintVirial::ConstraintVirial(bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::Virial(calculate_mean,calculate_error,print_inst_val, e_format){
+        _name.full += " from Constraint Forces (Polymer)";
+        _name.abridged += "cp";
+        _name.latex += "^{\\mathrm{pol}}_{\\mathrm{c}}";
+        // constraint virial is calculated by RATTLE
+        _update_time = observable::update_time_t::INTEGRATION_STEP;
     }
-    void LProj::update(std::string obs_string){
-        std::istringstream ss(obs_string.c_str());
-        std::istream_iterator<std::string> begin(ss);
-        std::istream_iterator<std::string> end;
-        std::vector<std::string> words(begin, end);
-        _axis.x = atof(words.at(1).c_str());
-        _axis.y = atof(words.at(2).c_str());
-        _axis.z = atof(words.at(3).c_str());
-        Observable::update(atof(words.back().c_str()));
+    /**************************************************************************
+    * Linear Momentum Component
+    **************************************************************************/
+    LinMomComponent::LinMomComponent(Vector component,
+        bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::LinMomComponent(component,
+        calculate_mean, calculate_error,
+        print_inst_val, e_format){
+            _name.full += " (Polymer)";
+            _name.abridged += "p";
+            _name.latex += "^{\\mathrm{pol}}";
     }
-    void LProj::update(const simple::Atom &atom){
-        _acc += cross(atom.position, multiply(atom.velocity, _m));
-    }
-    void LProj::update(const simple::AtomPolymer &polymer){
-        _acc = vector(0.0, 0.0, 0.0);
-        for (const simple::Atom& atom : polymer.atoms){
-            update(atom);
+    void LinMomComponent::update(const simple::AtomPolymer& molecule){
+        double mass = molecule.m();
+        for(const simple::Atom& atom : molecule.atoms){
+            observable::LinMomComponent::update(atom, mass);
         }
-        Observable::update(dot(_acc, _axis)/norm(_acc));
     }
-    void LProj::update(const simple::AtomState &state){
-        _acc = vector(0.0, 0.0, 0.0);
-        // assumes there is only one molecule in the state
-        update(state.polymers.at(0));
-    }
-    Vector LProj::L(const simple::AtomState &state){
-        Vector L = vector(0.0, 0.0, 0.0);
-        for (const simple::Atom& atom : state.polymers.at(0).atoms){
-            L += cross(atom.position, multiply(atom.velocity, _m));
+    void LinMomComponent::update(const simple::AtomState &state){
+        for(const simple::AtomPolymer& polymer : state.polymers){
+            update(polymer);
         }
-        return L;
     }
+    /**************************************************************************
+    * Angular Momentum Component
+    **************************************************************************/
+    AngMomComponent::AngMomComponent(Vector component,
+        bool calculate_mean,
+        bool calculate_error,
+        bool print_inst_val,
+        bool e_format) :
+    observable::AngMomComponent(component,
+        calculate_mean, calculate_error,
+        print_inst_val, e_format){
+            _name.full += " (Polymer)";
+            _name.abridged += "p";
+            _name.latex += "^{\\mathrm{pol}}";
+    }
+    void AngMomComponent::update(const simple::AtomPolymer& molecule){
+        double mass = molecule.m();
+        for(const simple::Atom& atom : molecule.atoms){
+            observable::AngMomComponent::update(atom, mass);
+        }
+    }
+    void AngMomComponent::update(const simple::AtomState &state){
+        for(const simple::AtomPolymer& polymer : state.polymers){
+            update(polymer);
+        }
+    }
+    /**************************************************************************
+    * RCM Component
+    **************************************************************************/
+//    RCMComponent::RCMComponent(Vector component,
+//        size_t molecule_index,
+//        bool calculate_mean,
+//        bool calculate_error,
+//        bool print_inst_val,
+//        bool e_format) :
+//    observable::RCMComponent(component, molecule_index,
+//        calculate_mean, calculate_error,
+//        print_inst_val, e_format){
+//            _name.full += " (Polymer)";
+//            _name.abridged += "p";
+//            _name.latex += "(\\mathrm{pol})";
+//    }
+//    Vector RCMComponent::rcm(const simple::AtomState& state){
+//        Vector rcm = vector(0.0, 0.0, 0.0);
+//        if(molecule_index() > simple::BaseState::nm()){
+//            fprintf(stderr, "%s\n", "Polymer RCMComponent: molecule index exceeds number of polymer molecules in the state. Returning a zero vector.");
+//        }
+//        else {
+//            Vector ri;
+//            size_t natoms = simple::BasePolymer::nb() + 1;
+//            for(size_t ia = 0; ia < natoms; ++ia){
+//                ri = state.polymers.at(molecule_index()).atoms.at(ia).position;
+//                add(rcm, ri);
+//            }
+//            divide(rcm, natoms);
+//        }
+//        return rcm;
+//    }
+//    void RCMComponent::update(const simple::AtomState& state){
+//        _update(rcm(state), component());
+//    }
 } // namespace polymer

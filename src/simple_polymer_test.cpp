@@ -58,7 +58,7 @@ class SimplePolymerTest : public ::testing::Test {
          atoms.push_back(atom1);
          atom2 = simple::Atom(r2, v2);
          atoms.push_back(atom2);
-         atom_polymer = simple::AtomPolymer(atoms, rcm, vcm);
+         atom_polymer = simple::AtomPolymer(atoms);
          /*
          * BOND REPRESENTATION:
          *  BOND1_R = BOND2_R = (0, 1, 0)
@@ -93,7 +93,7 @@ TEST_F(SimplePolymerTest, Initalization) {
     atoms.push_back(atom1);
     atom2 = simple::Atom(r2, v2);
     atoms.push_back(atom2);
-    atom_polymer_check = simple::AtomPolymer(atoms, rcm, vcm);
+    atom_polymer_check = simple::AtomPolymer(atoms);
     // add small projection along bond; it should be subtracted during
     // initialization
     Vector ddot1_proj = multiply(d1, 0.01);

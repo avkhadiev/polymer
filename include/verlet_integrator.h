@@ -20,11 +20,12 @@ protected:
     double _timestep;
     double _halfstep;
     virtual void _set_timestep(double timestep);
-    // pointers to accumulators of observables
-    struct obs_t {
+    typedef struct obs_t {
         bool is_set;
         Observable *ptr;
-    } _ke;                                          /**> kinetic energy*/
+    } ObservableStruct;
+    void _setup_observable(ObservableStruct* obs, Observable* obs_ptr);
+    ObservableStruct _ke_solvent;
     struct mirror_image_t {
         bool is_set;
         double box;
@@ -43,14 +44,13 @@ protected:
     * where the latter is the (unconstrained) value of the bond vector at t+dt.
     */
     simple::AtomPolymer _move_verlet_half_step(simple::AtomPolymer molecule);
-    simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule,
-        bool calculate_observables);
+    simple::AtomPolymer _move_verlet_full_step(simple::AtomPolymer molecule);
     simple::Solvent _move_verlet_half_step(simple::Solvent molecule);
     simple::Solvent _move_verlet_full_step(simple::Solvent molecule, bool calculate_observables);
     virtual void _zero_accumulators();
 public:
     virtual ForceUpdater& get_force_updater();
-    virtual void set_ke(Observable *ptr);
+    virtual void set_ke_solvent(Observable *ptr);
     virtual void move(double timestep,
         simple::AtomState& state,
         bool calculate_observables = false);
@@ -58,7 +58,7 @@ public:
     // if *observable = NULL, that observable will not be updated
     // if box = 0.0, no mirror image convention will be applied to solvent pos's
     VerletIntegrator(ForceUpdater& force_updater,
-        Observable* ke = NULL,
+        Observable* ke_solvent = NULL,
         double box = 0.0);
     virtual ~VerletIntegrator();
 };

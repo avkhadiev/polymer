@@ -6,10 +6,20 @@
 #include <map>
 #include <fstream>
 #include "../include/config_handler.h"
-ConfigHandler::ConfigHandler() :
+#include "../include/default_macros.h"
+namespace cf_observables{
+    bool calc_mean = false;
+    bool calc_err = false;
+    bool print_val = false;
+} // namespace cf_observables
+ConfigHandler::ConfigHandler(ForceUpdater* fupd) :
 _bond_state(),
-_atom_state(_bond_state) {}
-ConfigHandler::ConfigHandler(std::string indir, std::string fname){
+_atom_state(_bond_state),
+_fupd(fupd){}
+ConfigHandler::ConfigHandler(std::string indir, std::string fname,
+    ForceUpdater* fupd) :
+    _fupd(fupd)
+    {
     std::vector<simple::BondState> states;
     read_states_from_file(indir, fname, states);
     if (states.empty()){
@@ -24,6 +34,14 @@ ConfigHandler::ConfigHandler(std::string indir, std::string fname){
         _atom_state.update(_bond_state);
     }
 }
+ConfigHandler::ConfigHandler(simple::BondState& state, ForceUpdater* fupd) :
+    _bond_state(state),
+    _atom_state(state),
+    _fupd(fupd) {}
+ConfigHandler::ConfigHandler(simple::AtomState& state, ForceUpdater* fupd) :
+    _bond_state(state),
+    _atom_state(state),
+    _fupd(fupd) {}
 ConfigHandler::~ConfigHandler(){}
 /*
 * There are two state representations. They are independent: any time you do something to one representation, another one is not changed. The next 2 methods ensure that whenever you query representation A, the handler will check if representation B corresponds to the later time and if so, update A to reflect the most recent state.

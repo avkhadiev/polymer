@@ -3,6 +3,8 @@
 */
 #ifndef POLYMER_DEFAULT_MACROS_H
 #define POLYMER_DEFAULT_MACROS_H
+#define VERBOSE 1
+#define DEBUG 1
 #define DEFAULT_NB 0                    // number of bonds in a polymer
 #define DEFAULT_M 1.0                   // atomic mass
 #define DEFAULT_D 3.0                   // bond length

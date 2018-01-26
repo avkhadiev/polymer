@@ -5,17 +5,18 @@
 #include <limits>                           /**> controls output precision */
 #include <string>
 #include <stdexcept>
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include "../include/settings_parser.h"
 namespace default_settings {
     const std::string potential_header =
-        "# potential: 1. epsilon polymer-polymer (epp), 2. epsilon solvent-solvent (ess), 3. epsilon polymer-solvent (eps), 4. polymer sigma (sp), 5. solvent sigma (ss), 6. solvent-solvent cutoff (rc_ss), 7. polymer-solvent cutoff (rc_ps)";
+        "# potential: epp ess eps ss sp rc_ss rc_sp";
     const std::string state_config_header
-        = "# state configuration: 1. polymer mass (mp), 2. solvent mass (ms), 3. number of polymers (np), 4. number of bonds (nb), 5. number of fcc cells (nc), 6. bond length (d/sp)";
-    const std::string init_header = "# initialization: 1. solvent density (rho_s), 2. temperature (kbT/epsilon), 3. polymer conformation (0 => 3d, planar o/w)";
-    const std::string integration_header = "# integration: 1. runtime, 2. dt, 3. rattle tolerance";
-    const std::string io_header = "# i/o: 1. simulation status, 2. observables, 3. state config, 4. icalc, 5. iprint, 6. isave, 7. idata, 8. itape";
+        = "# state configuration: mp ms np nb nc d/s";
+    const std::string init_header = "# initialization: rho_s kbT/e pol_conformation pol_energy_per_atom";
+    const std::string integration_header = "# integration: runtime dt tol";
+    const std::string io_header = "i/o: cndir datadir tpdir icalc iprint isave idata itape should_write_data";
     // POTENTIAL SETTINGS
     const double epp = 1.0;
     const double ess = 1.0;
@@ -45,10 +46,11 @@ namespace default_settings {
     const std::string cndir = "/Users/Arthur/stratt/polymer/test/";
     const std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
     const std::string tpdir = "/Users/Arthur/stratt/polymer/test/";
+    const bool should_write_data = true;
     const size_t icalc = 10;
     const size_t iprint = 10;
     const size_t isave = 100;
-    const size_t idata = 100;
+    const size_t iblock = 100;
     const size_t itape = 10;
 } // namespace default_settings
 SettingsParser::SettingsParser() :
@@ -85,11 +87,14 @@ SettingsParser::SettingsParser() :
     cndir(default_settings::cndir),
     dtdir(default_settings::dtdir),
     tpdir(default_settings::tpdir),
+    should_write_data(default_settings::should_write_data),
     icalc(default_settings::icalc),
     iprint(default_settings::iprint),
     isave(default_settings::isave),
-    idata(default_settings::idata),
-    itape(default_settings::itape){}
+    iblock(default_settings::iblock),
+    itape(default_settings::itape){
+        if (DEBUG) fprintf(stdout, "%s\n", "SettingsParser set up successfully!");
+    }
 SettingsParser::~SettingsParser(){}
 std::vector<std::string> SettingsParser::get_args(std::string line){
     std::istringstream ss(line.c_str());
@@ -99,7 +104,8 @@ std::vector<std::string> SettingsParser::get_args(std::string line){
     return args;
 }
 SettingsParser::SettingsParser(std::string fin) :
-    SettingsParser(){
+    SettingsParser()
+{
     read(fin);
 }
 void SettingsParser::read_potential(std::ifstream& stream){
@@ -136,6 +142,7 @@ void SettingsParser::read_init(std::ifstream& stream){
     rho_s = atof(args.at(0).c_str());
     temperature = atof(args.at(1).c_str());
     polymer_planar_conformation = atoi(args.at(2).c_str());
+    polymer_energy = atof(args.at(3).c_str());
 }
 void SettingsParser::read_integration(std::ifstream& stream){
     std::string line;
@@ -162,8 +169,10 @@ void SettingsParser::read_io(std::ifstream& stream){
     // writing simulation status to file,
     // writing observables to file,
     // writing stat configuration to a "tape" file
-    sscanf(line.c_str(), "%zu %zu %zu %zu %zu",
-        &icalc, &iprint, &isave, &idata, &itape);
+    int should_write_int;
+    sscanf(line.c_str(), "%zu %zu %zu %zu %zu %d",
+        &icalc, &iprint, &isave, &iblock, &itape, &should_write_int);
+    should_write_data = should_write_int;
 }
 void SettingsParser::read(std::string fin){
     std::ifstream readout;
@@ -228,7 +237,8 @@ void SettingsParser::write_init(std::ofstream& stream) const{
         // output values
         stream << std::to_string(rho_s) << " ";
         stream << std::to_string(temperature) << " ";
-        stream << std::to_string(polymer_planar_conformation) << std::endl;
+        stream << std::to_string(polymer_planar_conformation) << " ";
+        stream << std::to_string(polymer_energy) << std::endl;
     }
     else {
         // if file still could not be opened
@@ -264,8 +274,9 @@ void SettingsParser::write_io(std::ofstream& stream) const{
         stream << std::to_string(icalc) << " ";
         stream << std::to_string(iprint) << " ";
         stream << std::to_string(isave) << " ";
-        stream << std::to_string(idata) << " ";
-        stream << std::to_string(itape) << std::endl;
+        stream << std::to_string(iblock) << " ";
+        stream << std::to_string(itape) << " ";
+        stream << std::to_string((int)should_write_data) << std::endl;
     }
     else {
         // if file still could not be opened
@@ -274,8 +285,9 @@ void SettingsParser::write_io(std::ofstream& stream) const{
         perror("open");
     }
 }
-void SettingsParser::write(std::string fout) const{
+void SettingsParser::write(std::string outdir, std::string sim_name) const{
     std::ofstream writeout;
+    std::string fout = outdir + sim_name + ".cfg";
     // open writeout for output operations in truncate mode
     writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
     if (writeout.is_open()) {

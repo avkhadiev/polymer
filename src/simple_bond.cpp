@@ -49,7 +49,7 @@ namespace simple {
                 + b_str_velocity_header + " " + b_str_velocity_value;
         }
         else {
-            b_str = b_str_position_value + " " + b_str_velocity_value;
+            b_str = b_str_position_value;// + " " + b_str_velocity_value;
         }
         return b_str;
     }

@@ -41,6 +41,8 @@ class SimpleStateTest : public ::testing::Test {
      std::vector<simple::Bond> bonds;
      std::vector<simple::BondPolymer> bond_polymers;
      simple::BondState bond_state;
+     simple::BondState get_bond_state() const {return bond_state;};
+     simple::AtomState get_atom_state() const {return atom_state;};
      virtual void SetUp() {
          verbose = true;
          overwrite = true;
@@ -105,7 +107,7 @@ class SimpleStateTest : public ::testing::Test {
             atoms.push_back(atom[i][0]);
             atoms.push_back(atom[i][1]);
             atoms.push_back(atom[i][2]);
-            atom_polymers.push_back(simple::AtomPolymer(atoms, rcm[i], vcm[i]));
+            atom_polymers.push_back(simple::AtomPolymer(atoms));
             atoms.clear();
          }
          Vector solvent_r;

@@ -20,7 +20,7 @@ SolventConfigHandler::SolventConfigHandler(double solvent_sigma,
         }
         else {
             if (n == 0) {
-                if (_nc <= 0) _nc = DEFAULT_NC;
+                if (_nc < 0) _nc = DEFAULT_NC;
                 n = 4 * pow(_nc, 3);
             }
             _box = cbrt(n / density);

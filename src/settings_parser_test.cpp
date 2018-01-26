@@ -9,20 +9,22 @@
 
 class SettingsParserTest : public ::testing::Test {
  protected:
-     std::string file1;
-     std::string file2;
+     std::string outdir;
+     std::string name1;
+     std::string name2;
      virtual void SetUp() {
-        file1 = "/Users/Arthur/stratt/polymer/test/settings_parser_test1.cfg";
-        file2 = "/Users/Arthur/stratt/polymer/test/settings_parser_test2.cfg";
+        outdir = "/Users/Arthur/stratt/polymer/test/";
+        name1 = "/Users/Arthur/stratt/polymer/test/settings_parser_test1.cfg";
+        name2 = "/Users/Arthur/stratt/polymer/test/settings_parser_test2.cfg";
      }
   // virtual void TearDown() {}
 };
 
 TEST_F(SettingsParserTest, Initalization) {
     SettingsParser test_out = SettingsParser();
-    test_out.write(file1);
-    SettingsParser test_in =  SettingsParser(file1);
-    test_in.write(file2);
+    test_out.write(outdir, name1);
+    SettingsParser test_in = SettingsParser(outdir + name1);
+    test_in.write(outdir, name2);
 }
 
 int main(int argc, char **argv){

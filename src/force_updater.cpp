@@ -9,76 +9,32 @@
 #include "../include/simple_state.h"
 ForceUpdater::ForceUpdater(Potential* polymer_potential,
     Potential *solvent_potential,
-    Potential *inter_potential,
-    Observable *pe,
-    Observable *w) :
+    Potential *inter_potential) :
     _polymer_potential (polymer_potential),
     _solvent_potential (solvent_potential),
     _inter_potential (inter_potential){
-        _pe.ptr = pe;
-        _w.ptr = w;
         if ((polymer_potential == NULL)
             || (solvent_potential == NULL)
             || (inter_potential == NULL)){
             std::string err_msg = "force updater initialization: NULL pointer to one of the potentials given!";
             throw std::invalid_argument(err_msg);
         }
-        if(_pe.ptr == NULL){
-            _pe.is_set = false;
-        }
-        else{
-            _pe.is_set = true;
-        }
-        if(_w.ptr == NULL){
-            _w.is_set = false;
-        }
-        else{
-            _w.is_set = true;
-        }
+        if (DEBUG) fprintf(stdout, "%s\n", "ForceUpdater set up successfully!");
 }
 ForceUpdater::~ForceUpdater(){}
-void ForceUpdater::set_pe(Observable *ptr){
-    if (ptr != NULL){
-        _pe.is_set = true;
-    }
-    else {
-        _pe.is_set = false;
-    }
-    _pe.ptr = ptr;
-}
-void ForceUpdater::set_w(Observable *ptr){
-    if (ptr != NULL){
-        _w.is_set = true;
-    }
-    else {
-        _w.is_set = false;
-    }
-    _w.ptr = ptr;
-}
 void ForceUpdater::zero_observables(){
-    if (_pe.is_set) _pe.ptr->zero();
-    if (_w.is_set) _w.ptr->zero();
+    _polymer_potential->zero_observables();
+    _solvent_potential->zero_observables();
+    _inter_potential->zero_observables();
 }
 void ForceUpdater::_update_forces_in_atomic_pair(simple::Atom &atom_i,
     simple::Atom &atom_j, Potential* potential, bool calculate_observables){
         Vector ri = atom_i.position;
         Vector rj = atom_j.position;
-        Vector fij = potential->fij(ri, rj);
+        Vector fij = potential->fij(ri, rj, calculate_observables);
         // update forces
         atom_i.force += fij;
         atom_j.force -= fij;
-        // if observables need to be calculated and respective pointers are set,
-        // zero the accumulators
-        if(calculate_observables){
-            if(_pe.is_set){
-                double vij = potential->vij(ri, rj);
-                _pe.ptr->update( _pe.ptr->value() + vij );
-            }
-            if(_w.is_set){
-                double wij = potential->wij(ri, rj);
-                _w.ptr->update( _w.ptr->value() + wij );
-            }
-        }
 }
 void ForceUpdater::_update_forces_intramolecular(simple::AtomState &state, bool calculate_observables){
     // loop over all intramolecular interactions
@@ -137,27 +93,88 @@ void ForceUpdater::_update_forces_intermolecular(simple::AtomState &state,
         }
     }
 }
+void ForceUpdater::_zero_forces(simple::AtomState &state) {
+    int na = state.polymer_nb() + 1;
+    // set all forces to zero
+    // for polymers
+    for(int im = 0; im < state.nm(); ++im){
+        for(int ia = 0; ia < na; ++ia){
+            simple::Atom& atom = state.polymers.at(im).atoms.at(ia);
+            atom.force = vector(0.0, 0.0, 0.0);
+        }
+    }
+    // for solvents
+    for (int is = 0; is < state.nsolvents(); ++is){
+        state.solvents.at(is).atom.force = vector(0.0, 0.0, 0.0);
+    }
+}
 void ForceUpdater::update_forces(simple::AtomState &state, bool calculate_observables){
-        int na = state.polymer_nb() + 1;
-        // set all forces to zero
-        // for polymers
-        for(int im = 0; im < state.nm(); ++im){
-            for(int ia = 0; ia < na; ++ia){
-                simple::Atom& atom = state.polymers.at(im).atoms.at(ia);
-                atom.force = vector(0.0, 0.0, 0.0);
-            }
-        }
-        // for solvents
-        for (int is = 0; is < state.nsolvents(); ++is){
-            state.solvents.at(is).atom.force = vector(0.0, 0.0, 0.0);
-        }
-        // if observables need to be calculated and respective pointers are set,
-        // zero the accumulators
-        if(calculate_observables){
-            if(_pe.is_set) _pe.ptr->zero();
-            if(_w.is_set) _w.ptr->zero();
-        }
+        _zero_forces(state);
+        // if observables need to be calculated, zero the accumulators
+        if(calculate_observables) zero_observables();
         // update all inter- and intra- molecular interactions
         _update_forces_intermolecular(state, calculate_observables);
         _update_forces_intramolecular(state, calculate_observables);
+}
+double ForceUpdater::polymer_potential_energy(const simple::AtomPolymer& polymer){
+    double V = 0.0;
+    int na = polymer.nb() + 1;
+    Vector ri, rj;
+    for(int ia = 0; ia < na - 2; ++ia){
+        ri = polymer.atoms.at(ia).position;
+        for(int ja = ia + 2; ja < na; ++ja){
+            rj = polymer.atoms.at(ja).position;
+            V += _polymer_potential->vij(ri, rj);
+        }
+    }
+    return V;
+}
+double ForceUpdater::calc_pot_energy(const simple::AtomState &state){
+    double V = 0.0;
+    Vector ri, rj;
+    // INTRAMOLECULAR
+    // within a polymer
+    // loop over all intramolecular interactions
+    int na = state.polymer_nb() + 1;
+    for(int im = 0; im < state.nm(); ++im){
+        // loop over all atomic pairs in polymers,
+        // except the ones connected with a bond
+        for(int ia = 0; ia < na - 2; ++ia){
+            ri = state.polymers.at(im).atoms.at(ia).position;
+            for(int ja = ia + 2; ja < na; ++ja){
+                rj = state.polymers.at(im).atoms.at(ja).position;
+                V += _polymer_potential->vij(ri, rj);
+            }
+        }
+    }
+    // INTERMOLECULAR
+    // solvent-solvent
+    for(int is = 0; is < state.nsolvents() - 1; ++is){
+        ri = state.solvents.at(is).atom.position;
+        for(int js = is + 1; js < state.nsolvents(); ++js){
+            rj = state.solvents.at(js).atom.position;
+            V += _solvent_potential->vij(ri, rj);
+        }
+    }
+    for(int im = 0; im < state.nm(); ++im){
+        // polymer-polymer
+        for(int jm = im + 1; jm < state.nm(); ++jm){
+            for(int ia = 0; ia < na; ++ia){
+                ri = state.polymers.at(im).atoms.at(ia).position;
+                for(int ja = 0; ja < na; ++ja){
+                    rj = state.polymers.at(im).atoms.at(ja).position;
+                    V += _polymer_potential->vij(ri, rj);
+                }
+            }
+        }
+        // polymer-solvent
+        for(int ia = 0; ia < na; ++ia){
+            ri = state.polymers.at(im).atoms.at(ia).position;
+            for(int js = 0; js < state.nsolvents(); ++js){
+                rj = state.solvents.at(js).atom.position;
+                V += _inter_potential->vij(ri, rj);
+            }
+        }
+    }
+    return V;
 }
