@@ -7,17 +7,33 @@
 #include "../include/vector.h"
 #include "../include/ljpotential.h"
 #include "../include/simple_state.h"
+ForceUpdater::ForceUpdater() :
+    _default_polymer_potential(LJPotential()),
+    _default_solvent_potential(AdjustedLJPotential()),
+    _default_inter_potential(AdjustedLJPotential()),
+    _polymer_potential (&_default_polymer_potential),
+    _solvent_potential (&_default_solvent_potential),
+    _inter_potential (&_default_inter_potential){}
 ForceUpdater::ForceUpdater(Potential* polymer_potential,
     Potential *solvent_potential,
     Potential *inter_potential) :
+    _default_polymer_potential(LJPotential()),
+    _default_solvent_potential(AdjustedLJPotential()),
+    _default_inter_potential(AdjustedLJPotential()),
     _polymer_potential (polymer_potential),
     _solvent_potential (solvent_potential),
     _inter_potential (inter_potential){
-        if ((polymer_potential == NULL)
-            || (solvent_potential == NULL)
-            || (inter_potential == NULL)){
-            std::string err_msg = "force updater initialization: NULL pointer to one of the potentials given!";
-            throw std::invalid_argument(err_msg);
+        if (_polymer_potential == NULL){
+            fprintf(stderr, "%s\n", "force updater initialization: NULL pointer to polymer potential given! will initialize a default potential");
+            _polymer_potential = &_default_polymer_potential;
+        }
+        if (_solvent_potential == NULL){
+            fprintf(stderr, "%s\n", "force updater initialization: NULL pointer to solvent potential given! will initialize a default potential");
+            _solvent_potential = &_default_solvent_potential;
+        }
+        if (_inter_potential == NULL){
+            fprintf(stderr, "%s\n", "force updater initialization: NULL pointer to solvent potential given! will initialize a default potential");
+            _inter_potential = &_default_inter_potential;
         }
         if (DEBUG) fprintf(stdout, "%s\n", "ForceUpdater set up successfully!");
 }

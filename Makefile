@@ -80,17 +80,6 @@ install/local/fast: preinstall/fast
 	/Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/Applications/CMake.app/Contents/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -101,6 +90,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/Applications/CMake.app/Contents/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # Special rule for the target list_install_components
 list_install_components:
@@ -157,6 +157,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named geodesic_manager_test
+
+# Build rule for target.
+geodesic_manager_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 geodesic_manager_test
+.PHONY : geodesic_manager_test
+
+# fast build rule for target.
+geodesic_manager_test/fast:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/build
+.PHONY : geodesic_manager_test/fast
+
+#=============================================================================
 # Target rules for targets named geodesic_path_test
 
 # Build rule for target.
@@ -207,19 +220,6 @@ simple_solvent_test: cmake_check_build_system
 simple_solvent_test/fast:
 	$(MAKE) -f CMakeFiles/simple_solvent_test.dir/build.make CMakeFiles/simple_solvent_test.dir/build
 .PHONY : simple_solvent_test/fast
-
-#=============================================================================
-# Target rules for targets named simple_polymer_test
-
-# Build rule for target.
-simple_polymer_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 simple_polymer_test
-.PHONY : simple_polymer_test
-
-# fast build rule for target.
-simple_polymer_test/fast:
-	$(MAKE) -f CMakeFiles/simple_polymer_test.dir/build.make CMakeFiles/simple_polymer_test.dir/build
-.PHONY : simple_polymer_test/fast
 
 #=============================================================================
 # Target rules for targets named parsing_test
@@ -352,17 +352,17 @@ MD_simulation/fast:
 .PHONY : MD_simulation/fast
 
 #=============================================================================
-# Target rules for targets named observables
+# Target rules for targets named simple_polymer_test
 
 # Build rule for target.
-observables: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 observables
-.PHONY : observables
+simple_polymer_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 simple_polymer_test
+.PHONY : simple_polymer_test
 
 # fast build rule for target.
-observables/fast:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/build
-.PHONY : observables/fast
+simple_polymer_test/fast:
+	$(MAKE) -f CMakeFiles/simple_polymer_test.dir/build.make CMakeFiles/simple_polymer_test.dir/build
+.PHONY : simple_polymer_test/fast
 
 #=============================================================================
 # Target rules for targets named simple_state_test
@@ -555,7 +555,7 @@ src/general_observables.o: src/general_observables.cpp.o
 
 # target to build an object file
 src/general_observables.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/general_observables.cpp.o
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/general_observables.cpp.o
 .PHONY : src/general_observables.cpp.o
 
 src/general_observables.i: src/general_observables.cpp.i
@@ -564,7 +564,7 @@ src/general_observables.i: src/general_observables.cpp.i
 
 # target to preprocess a source file
 src/general_observables.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/general_observables.cpp.i
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/general_observables.cpp.i
 .PHONY : src/general_observables.cpp.i
 
 src/general_observables.s: src/general_observables.cpp.s
@@ -573,8 +573,62 @@ src/general_observables.s: src/general_observables.cpp.s
 
 # target to generate assembly for a file
 src/general_observables.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/general_observables.cpp.s
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/general_observables.cpp.s
 .PHONY : src/general_observables.cpp.s
+
+src/geodesic_manager.o: src/geodesic_manager.cpp.o
+
+.PHONY : src/geodesic_manager.o
+
+# target to build an object file
+src/geodesic_manager.cpp.o:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.o
+.PHONY : src/geodesic_manager.cpp.o
+
+src/geodesic_manager.i: src/geodesic_manager.cpp.i
+
+.PHONY : src/geodesic_manager.i
+
+# target to preprocess a source file
+src/geodesic_manager.cpp.i:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.i
+.PHONY : src/geodesic_manager.cpp.i
+
+src/geodesic_manager.s: src/geodesic_manager.cpp.s
+
+.PHONY : src/geodesic_manager.s
+
+# target to generate assembly for a file
+src/geodesic_manager.cpp.s:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.s
+.PHONY : src/geodesic_manager.cpp.s
+
+src/geodesic_manager_test.o: src/geodesic_manager_test.cpp.o
+
+.PHONY : src/geodesic_manager_test.o
+
+# target to build an object file
+src/geodesic_manager_test.cpp.o:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.o
+.PHONY : src/geodesic_manager_test.cpp.o
+
+src/geodesic_manager_test.i: src/geodesic_manager_test.cpp.i
+
+.PHONY : src/geodesic_manager_test.i
+
+# target to preprocess a source file
+src/geodesic_manager_test.cpp.i:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.i
+.PHONY : src/geodesic_manager_test.cpp.i
+
+src/geodesic_manager_test.s: src/geodesic_manager_test.cpp.s
+
+.PHONY : src/geodesic_manager_test.s
+
+# target to generate assembly for a file
+src/geodesic_manager_test.cpp.s:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.s
+.PHONY : src/geodesic_manager_test.cpp.s
 
 src/geodesic_path.o: src/geodesic_path.cpp.o
 
@@ -582,6 +636,7 @@ src/geodesic_path.o: src/geodesic_path.cpp.o
 
 # target to build an object file
 src/geodesic_path.cpp.o:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.o
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.o
 .PHONY : src/geodesic_path.cpp.o
 
@@ -591,6 +646,7 @@ src/geodesic_path.i: src/geodesic_path.cpp.i
 
 # target to preprocess a source file
 src/geodesic_path.cpp.i:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.i
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.i
 .PHONY : src/geodesic_path.cpp.i
 
@@ -600,6 +656,7 @@ src/geodesic_path.s: src/geodesic_path.cpp.s
 
 # target to generate assembly for a file
 src/geodesic_path.cpp.s:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.s
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.s
 .PHONY : src/geodesic_path.cpp.s
 
@@ -636,6 +693,7 @@ src/geodesic_record.o: src/geodesic_record.cpp.o
 
 # target to build an object file
 src/geodesic_record.cpp.o:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.o
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.o
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.o
 .PHONY : src/geodesic_record.cpp.o
@@ -646,6 +704,7 @@ src/geodesic_record.i: src/geodesic_record.cpp.i
 
 # target to preprocess a source file
 src/geodesic_record.cpp.i:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.i
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.i
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.i
 .PHONY : src/geodesic_record.cpp.i
@@ -656,6 +715,7 @@ src/geodesic_record.s: src/geodesic_record.cpp.s
 
 # target to generate assembly for a file
 src/geodesic_record.cpp.s:
+	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.s
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.s
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.s
 .PHONY : src/geodesic_record.cpp.s
@@ -777,7 +837,6 @@ src/observable.cpp.o:
 	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable.cpp.o
 	$(MAKE) -f CMakeFiles/observable_test.dir/build.make CMakeFiles/observable_test.dir/src/observable.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.o
 .PHONY : src/observable.cpp.o
 
 src/observable.i: src/observable.cpp.i
@@ -789,7 +848,6 @@ src/observable.cpp.i:
 	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable.cpp.i
 	$(MAKE) -f CMakeFiles/observable_test.dir/build.make CMakeFiles/observable_test.dir/src/observable.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.i
 .PHONY : src/observable.cpp.i
 
 src/observable.s: src/observable.cpp.s
@@ -801,7 +859,6 @@ src/observable.cpp.s:
 	$(MAKE) -f CMakeFiles/observable_container_test.dir/build.make CMakeFiles/observable_container_test.dir/src/observable.cpp.s
 	$(MAKE) -f CMakeFiles/observable_test.dir/build.make CMakeFiles/observable_test.dir/src/observable.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/observable.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/observable.cpp.s
 .PHONY : src/observable.cpp.s
 
 src/observable_container.o: src/observable_container.cpp.o
@@ -898,7 +955,6 @@ src/parsing.cpp.o:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.o
@@ -914,7 +970,6 @@ src/parsing.cpp.i:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.i
@@ -930,7 +985,6 @@ src/parsing.cpp.s:
 	$(MAKE) -f CMakeFiles/parsing_test.dir/build.make CMakeFiles/parsing_test.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/parsing.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/parsing.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/parsing.cpp.s
@@ -969,7 +1023,7 @@ src/polymer_observables.o: src/polymer_observables.cpp.o
 
 # target to build an object file
 src/polymer_observables.cpp.o:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.o
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/polymer_observables.cpp.o
 .PHONY : src/polymer_observables.cpp.o
 
 src/polymer_observables.i: src/polymer_observables.cpp.i
@@ -978,7 +1032,7 @@ src/polymer_observables.i: src/polymer_observables.cpp.i
 
 # target to preprocess a source file
 src/polymer_observables.cpp.i:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.i
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/polymer_observables.cpp.i
 .PHONY : src/polymer_observables.cpp.i
 
 src/polymer_observables.s: src/polymer_observables.cpp.s
@@ -987,7 +1041,7 @@ src/polymer_observables.s: src/polymer_observables.cpp.s
 
 # target to generate assembly for a file
 src/polymer_observables.cpp.s:
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/polymer_observables.cpp.s
+	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/polymer_observables.cpp.s
 .PHONY : src/polymer_observables.cpp.s
 
 src/potential.o: src/potential.cpp.o
@@ -1136,7 +1190,6 @@ src/simple_atom.o: src/simple_atom.cpp.o
 src/simple_atom.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.o
@@ -1150,7 +1203,6 @@ src/simple_atom.i: src/simple_atom.cpp.i
 src/simple_atom.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.i
@@ -1164,7 +1216,6 @@ src/simple_atom.s: src/simple_atom.cpp.s
 src/simple_atom.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_atom.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_atom.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_atom.cpp.s
@@ -1205,7 +1256,6 @@ src/simple_bond.o: src/simple_bond.cpp.o
 src/simple_bond.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.o
 .PHONY : src/simple_bond.cpp.o
@@ -1218,7 +1268,6 @@ src/simple_bond.i: src/simple_bond.cpp.i
 src/simple_bond.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.i
 .PHONY : src/simple_bond.cpp.i
@@ -1231,7 +1280,6 @@ src/simple_bond.s: src/simple_bond.cpp.s
 src/simple_bond.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_bond.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_bond.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/simple_bond.cpp.s
 .PHONY : src/simple_bond.cpp.s
@@ -1271,7 +1319,6 @@ src/simple_polymer.o: src/simple_polymer.cpp.o
 src/simple_polymer.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.o
 .PHONY : src/simple_polymer.cpp.o
 
@@ -1283,7 +1330,6 @@ src/simple_polymer.i: src/simple_polymer.cpp.i
 src/simple_polymer.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.i
 .PHONY : src/simple_polymer.cpp.i
 
@@ -1295,7 +1341,6 @@ src/simple_polymer.s: src/simple_polymer.cpp.s
 src/simple_polymer.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_polymer.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_polymer.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_polymer.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/simple_polymer.cpp.s
 .PHONY : src/simple_polymer.cpp.s
 
@@ -1361,7 +1406,6 @@ src/simple_solvent.o: src/simple_solvent.cpp.o
 src/simple_solvent.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_solvent.cpp.o
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.o
 .PHONY : src/simple_solvent.cpp.o
 
@@ -1373,7 +1417,6 @@ src/simple_solvent.i: src/simple_solvent.cpp.i
 src/simple_solvent.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_solvent.cpp.i
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.i
 .PHONY : src/simple_solvent.cpp.i
 
@@ -1385,7 +1428,6 @@ src/simple_solvent.s: src/simple_solvent.cpp.s
 src/simple_solvent.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_solvent.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_solvent.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_solvent.cpp.s
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/simple_solvent.cpp.s
 .PHONY : src/simple_solvent.cpp.s
 
@@ -1424,7 +1466,6 @@ src/simple_state.o: src/simple_state.cpp.o
 src/simple_state.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.o
 .PHONY : src/simple_state.cpp.o
 
 src/simple_state.i: src/simple_state.cpp.i
@@ -1435,7 +1476,6 @@ src/simple_state.i: src/simple_state.cpp.i
 src/simple_state.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.i
 .PHONY : src/simple_state.cpp.i
 
 src/simple_state.s: src/simple_state.cpp.s
@@ -1446,7 +1486,6 @@ src/simple_state.s: src/simple_state.cpp.s
 src/simple_state.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/simple_state.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/simple_state.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/simple_state.cpp.s
 .PHONY : src/simple_state.cpp.s
 
 src/simple_state_test.o: src/simple_state_test.cpp.o
@@ -1513,7 +1552,6 @@ src/vector.cpp.o:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.o
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.o
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.o
@@ -1529,7 +1567,6 @@ src/vector.cpp.i:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.i
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.i
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.i
@@ -1545,7 +1582,6 @@ src/vector.cpp.s:
 	$(MAKE) -f CMakeFiles/state.dir/build.make CMakeFiles/state.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/vector_test.dir/build.make CMakeFiles/vector_test.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/MD_simulation.dir/build.make CMakeFiles/MD_simulation.dir/src/vector.cpp.s
-	$(MAKE) -f CMakeFiles/observables.dir/build.make CMakeFiles/observables.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/polymer.dir/build.make CMakeFiles/polymer.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/solvent.dir/build.make CMakeFiles/solvent.dir/src/vector.cpp.s
 	$(MAKE) -f CMakeFiles/atom_and_bond.dir/build.make CMakeFiles/atom_and_bond.dir/src/vector.cpp.s
@@ -1613,15 +1649,15 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install/local"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... rebuild_cache"
+	@echo "... geodesic_manager_test"
 	@echo "... geodesic_path_test"
 	@echo "... list_install_components"
 	@echo "... vector_and_parsing"
 	@echo "... observable_container_test"
 	@echo "... install"
 	@echo "... simple_solvent_test"
-	@echo "... simple_polymer_test"
 	@echo "... parsing_test"
 	@echo "... simple_atom_test"
 	@echo "... state"
@@ -1632,7 +1668,7 @@ help:
 	@echo "... geodesic_record_test"
 	@echo "... settings_parser_test"
 	@echo "... MD_simulation"
-	@echo "... observables"
+	@echo "... simple_polymer_test"
 	@echo "... simple_state_test"
 	@echo "... polymer"
 	@echo "... solvent"
@@ -1653,6 +1689,12 @@ help:
 	@echo "... src/general_observables.o"
 	@echo "... src/general_observables.i"
 	@echo "... src/general_observables.s"
+	@echo "... src/geodesic_manager.o"
+	@echo "... src/geodesic_manager.i"
+	@echo "... src/geodesic_manager.s"
+	@echo "... src/geodesic_manager_test.o"
+	@echo "... src/geodesic_manager_test.i"
+	@echo "... src/geodesic_manager_test.s"
 	@echo "... src/geodesic_path.o"
 	@echo "... src/geodesic_path.i"
 	@echo "... src/geodesic_path.s"

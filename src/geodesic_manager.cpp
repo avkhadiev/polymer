@@ -59,9 +59,24 @@ namespace geodesic{
     }
     void Manager::write_geodesic_inputs(std::string outdir, std::string sim_name) const{
         bool overwrite = true;
-        std::string ini_fname = outdir + sim_name + "_ini.txt";
-        std::string fin_fname = outdir + sim_name + "_fin.txt";
+        std::string ini_fname = outdir + sim_name + "_ini.cfg";
+        std::string fin_fname = outdir + sim_name + "_fin.cfg";
         initial().write(ini_fname, overwrite);
         final().write(fin_fname, overwrite);
+    }
+    Path Manager::MD_path(){
+        Path MD_path = Path();
+        if (_states_read){
+            std::list<Record> records;
+            // build a list of records from a vector of states
+            for(simple::BondState& state : _states){
+                records.push_back(Record(state, _pe(state)));
+            }
+            MD_path = Path(records);
+        }
+        else {
+            fprintf(stderr, "%s\n", "geodesic::Manager: no states have been read yet, but MD path requested");
+        }
+        return MD_path;
     }
 } // namespace geodesic

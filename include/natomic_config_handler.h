@@ -61,13 +61,13 @@ protected:
     typedef struct rng_t {
         unsigned seed;
         std::mt19937 generator;             /**> Standard Mersenne Twister */
-        const double phi_min = 0.0;
-        const double phi_max = 2.0;
+        double phi_min = 0.0;
+        double phi_max = 2.0;
         std::uniform_real_distribution<double> phi_dist;
-        const double theta_min = 0.0;
-        const double theta_max = 1.0;
+        double theta_min = 0.0;
+        double theta_max = 1.0;
         std::uniform_real_distribution<double> theta_dist;
-        const double speedsq_mean = 1.0;
+        double speedsq_mean = 1.0;
         std::exponential_distribution<double> speedsq_dist;
     } RNG;
     void setup_rng();
@@ -77,7 +77,7 @@ protected:
     // initialization methods
     void random_positions();
     void random_velocities();
-    const size_t maxiter_overlap = 10000;
+    size_t maxiter_overlap = 10000;
     bool is_overlap(Vector ri, Vector rj, double sigmasq);
     // given a polymer atom index, checks for a potential overlap
     // of that atom with any previous (< index) atom in the molecule
@@ -87,6 +87,6 @@ protected:
     void remove_angular_momentum();
     RNG rng;
 private:
-    const size_t _maxiter_init_given_tot_energy = 10000;
+    size_t _maxiter_init_given_tot_energy = 10000;
 };
 #endif

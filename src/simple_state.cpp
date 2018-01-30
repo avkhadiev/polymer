@@ -413,7 +413,7 @@ namespace simple {
         BondState next_state;
         int nstates = 0;
         std::string fin;                  /*>> stores path to input file */
-        fin = indir + fname + ".cfg";     /*>> stores path to input directory */
+        fin = indir + fname;              /*>> stores path to input directory */
         std::ifstream readout;
         readout.open(fin, std::ifstream::in);
         if (!readout.is_open()) {
@@ -461,7 +461,7 @@ namespace simple {
         AtomState next_state;
         int nstates = 0;
         std::string fin;                  /*>> stores path to input file */
-        fin = indir + fname + ".cfg";     /*>> stores path to input directory */
+        fin = indir + fname;              /*>> stores path to input directory */
         std::ifstream readout;
         readout.open(fin, std::ifstream::in);
         if (!readout.is_open()) {

@@ -5,10 +5,15 @@
 #define POLYMER_FORCE_UPDATER_H
 #include "potential.h"
 #include "simple_state.h"
+#include "ljpotential.h"
 #include "observable.h"
 // Is only meant to be called inside the function update_forces
 class ForceUpdater {
 private:
+    // in case pointers are not provided, there will be default potentials
+    LJPotential _default_polymer_potential;
+    AdjustedLJPotential _default_solvent_potential;
+    AdjustedLJPotential _default_inter_potential;
     Potential* _polymer_potential;
     Potential* _solvent_potential;
     Potential* _inter_potential;
@@ -38,6 +43,7 @@ public:
     double calc_pot_energy(const simple::AtomState &state);
     void update_forces(simple::AtomState &state,
         bool calculate_observables = false);
+    ForceUpdater();
     ForceUpdater(Potential* polymer_potential,
         Potential* solvent_potential,
         Potential* inter_potential);

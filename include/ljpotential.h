@@ -73,6 +73,7 @@ class AdjustedLJPotential :
         // calculates force on atom i from atom j
         virtual Vector fij(Vector ri, Vector rj,
             bool calculate_observables = false);
+        AdjustedLJPotential();
         AdjustedLJPotential(double cutoff, double box,
             Observable *pe_shftd = NULL, Observable* _pe_unshftd = NULL,
             Observable *w_shftd = NULL, Observable* w_unshftd = NULL);

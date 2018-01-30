@@ -35,7 +35,6 @@ namespace geodesic{
         void read_states(std::string cndir, std::string sim_name);
         void write_geodesic_inputs(std::string outdir, std::string sim_name) const;
         /**
-        * TODO
         * Will turn the sequence of states (from the MD trajectory)
         * into a geodesic::Path with PE calculated along the way
         */

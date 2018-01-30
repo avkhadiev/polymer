@@ -154,16 +154,23 @@ AdjustedLJPotential::AdjustedLJPotential(double cutoff, double box,
     _box(box),
     _corr1(_calculate_corr1()),
     _corr2(_calculate_corr2()){
-        if (cutoff > 0.5 * box){
-            fprintf(stderr, "%s: %s (%f) > %s (%f), %s.\n", "ljpotential", "cutoff distance", cutoff, "half box", box/2.0, "will set cutoff to half box length");
-            _rc = 0.5 * box;
-            _rcsq = pow(_rc, 2.0);
-        }
-        _setup_observable(&_pe_shftd, pe_shftd);
-        _setup_observable(&_pe_unshftd, pe_unshftd);
-        _setup_observable(&_w_shftd, w_shftd);
-        _setup_observable(&_w_unshftd, w_unshftd);
+        _setup_observable(&_pe_shftd, NULL);
+        _setup_observable(&_pe_unshftd, NULL);
+        _setup_observable(&_w_shftd, NULL);
+        _setup_observable(&_w_unshftd, NULL);
 };
+AdjustedLJPotential::AdjustedLJPotential() :
+    LJPotential(),
+    _rc(5.0),
+    _rcsq(pow(5.0, 2.0)),
+    _box(10.0),
+    _corr1(_calculate_corr1()),
+    _corr2(_calculate_corr2()){
+        _setup_observable(&_pe_shftd, NULL);
+        _setup_observable(&_pe_unshftd, NULL);
+        _setup_observable(&_w_shftd, NULL);
+        _setup_observable(&_w_unshftd, NULL);
+    }
 AdjustedLJPotential::AdjustedLJPotential(double epsilon,
     double sigma, double cutoff, double box,
     Observable *pe_shftd, Observable* pe_unshftd,
