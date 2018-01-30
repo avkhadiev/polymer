@@ -46,6 +46,16 @@ public:
     void read_bond_state(std::ifstream& input_stream);
     void read_atom_state(std::ifstream& input_stream);
     void set_force_updater(ForceUpdater* fupd){_fupd = fupd;};
+    bool is_force_updater_set() const {return (_fupd != NULL);};
+    ForceUpdater get_force_updater() const {
+        if (is_force_updater_set()){
+            return *_fupd;
+        }
+        else {
+            fprintf(stderr, "%s\n", "ConfigHandler: force updater is not set");
+            exit(1);
+        }
+    };
     // INITIALIZATION
     bool check_overlap;
     // GETTERS

@@ -29,6 +29,15 @@ public:
     void initialize3D(double temperature = 5.0);
     void initialize2D_given_tot_energy(double target_energy_per_atom = 3.0);
     void initialize3D_given_tot_energy(double target_energy_per_atom = 3.0);
+    void scale_velocities_to_temperature(double temperature);
+    void scale_velocities_to_energy(double energy);
+    // helpful quantities
+    double polymer_kinetic_energy();
+    double polymer_potential_energy();
+    double polymer_kin_temperature();
+    Vector polymer_linear_momentum();
+    Vector polymer_angular_momentum();
+    Vector polymer_rcm();
 protected:
     // Observables
     polymer::KE ke_polymer;
@@ -65,15 +74,6 @@ protected:
     void generate_bond_position(simple::Bond& b, double phi, double theta);
     void generate_bond_position(simple::Bond& b);
     void generate_bond_velocity(simple::Bond& b);
-    void scale_velocities_to_temperature(double temperature);
-    void scale_velocities_to_energy(double energy);
-    // helpful quantities
-    double polymer_kinetic_energy();
-    double polymer_potential_energy();
-    double polymer_kin_temperature();
-    Vector polymer_linear_momentum();
-    Vector polymer_angular_momentum();
-    Vector polymer_rcm();
     // initialization methods
     void random_positions();
     void random_velocities();

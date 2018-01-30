@@ -43,6 +43,14 @@ ConfigHandler::ConfigHandler(simple::AtomState& state, ForceUpdater* fupd) :
     _atom_state(state),
     _fupd(fupd) {}
 ConfigHandler::~ConfigHandler(){}
+void ConfigHandler::set_state(simple::BondState &state){
+    _bond_state = state;
+    _atom_state.update(_bond_state);
+}
+void ConfigHandler::set_state(simple::AtomState &state){
+    _atom_state = state;
+    _bond_state.update(_atom_state);
+}
 /*
 * There are two state representations. They are independent: any time you do something to one representation, another one is not changed. The next 2 methods ensure that whenever you query representation A, the handler will check if representation B corresponds to the later time and if so, update A to reflect the most recent state.
 */
