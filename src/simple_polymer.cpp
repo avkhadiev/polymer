@@ -59,6 +59,7 @@ namespace simple {
         for(int i = 0; i < nb(); ++i){
             molecules = molecules && (bonds.at(i) == other.bonds.at(i));
         }
+        //fprintf(stderr, "%s: %d, %s: %d\n", "cm", cm, "molecules", molecules);
         return cm && molecules;
     }
     bool BondPolymer::operator!=(const BondPolymer &other) const{

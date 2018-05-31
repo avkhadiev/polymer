@@ -60,8 +60,13 @@ double LJPotential::rijsq(Vector rij) const{
 };
 double LJPotential::vij(Vector ri, Vector rj) const{
     double vij;
-    double frac = pow(_sigmasq / rijsq(rij(ri, rj)), 3.0);
-    vij = 4.0 * _epsilon * (pow(frac, 2.0) - frac);
+    if (_epsilon != 0.0){
+        double frac = pow(_sigmasq / rijsq(rij(ri, rj)), 3.0);
+        vij = 4.0 * _epsilon * (pow(frac, 2.0) - frac);
+    }
+    else {
+        vij = 0.0;
+    }
     return vij;
 };
 void LJPotential::_update_vij(Vector ri, Vector rj) {
@@ -70,15 +75,27 @@ void LJPotential::_update_vij(Vector ri, Vector rj) {
     }
 };
 double LJPotential::_wij(Vector ri, Vector rj) const{
-    double frac = pow(_sigmasq / rijsq(rij(ri, rj)), 3.0);
-    double wij = 24.0 * _epsilon * (2 * pow(frac, 2.0) - frac);
+    double wij;
+    if (_epsilon != 0.0){
+        double frac = pow(_sigmasq / rijsq(rij(ri, rj)), 3.0);
+        wij = 24.0 * _epsilon * (2 * pow(frac, 2.0) - frac);
+    }
+    else {
+        wij = 0.0;
+    }
     return wij;
 };
 Vector LJPotential::fij(Vector ri, Vector rj, bool calculate_observables) {
     // Allen & Tildesley Eq. 5.3
-    Vector r = rij(ri, rj);
+    Vector fij;
     double wij = LJPotential::_wij(ri, rj);
-    Vector fij = multiply(r, wij / rijsq(r));
+    if (_epsilon != 0.0){
+        Vector r = rij(ri, rj);
+        fij = multiply(r, wij / rijsq(r));
+    }
+    else {
+        fij = vector(0.0, 0.0, 0.0);
+    }
     if (calculate_observables) {
         if (_w.is_set) _w.ptr->value += wij;
         _update_vij(ri, rj);
@@ -215,29 +232,50 @@ double AdjustedLJPotential::rijsq(Vector rij) const{
     return LJPotential::rijsq(rij);
 };
 double AdjustedLJPotential::vij(Vector ri, Vector rj) const{
-    double rsq = rijsq(rij(ri, rj));
-    double unadj = 0.0;
-    double adjst = 0.0;
-    double vij = unadj + adjst;
-    if (rsq < _rcsq){
-        double frac = pow(_sigmasq / rsq, 3.0);
-        unadj = 4.0 * _epsilon * (pow(frac, 2.0) - frac);
-        adjst = _corr1 + _corr2 * (rsq / _rcsq);
-        vij = unadj + adjst;
-    }
-    return vij;
-}
-void AdjustedLJPotential::_update_vij(Vector ri, Vector rj) {
-    if (_pe_shftd.is_set || _pe_unshftd.is_set){
+    double vij;
+    if (_epsilon != 0.0){
         double rsq = rijsq(rij(ri, rj));
         double unadj = 0.0;
         double adjst = 0.0;
-        double vij = unadj + adjst;
+        vij = unadj + adjst;
         if (rsq < _rcsq){
             double frac = pow(_sigmasq / rsq, 3.0);
             unadj = 4.0 * _epsilon * (pow(frac, 2.0) - frac);
             adjst = _corr1 + _corr2 * (rsq / _rcsq);
             vij = unadj + adjst;
+        }
+        else {
+            vij = 0.0;
+        }
+    }
+    else {
+        vij = 0.0;
+    }
+    return vij;
+}
+void AdjustedLJPotential::_update_vij(Vector ri, Vector rj) {
+    double vij;
+    double unadj;
+    if (_pe_shftd.is_set || _pe_unshftd.is_set){
+        if (_epsilon != 0.0){
+            double rsq = rijsq(rij(ri, rj));
+            double adjst = 0.0;
+            unadj = 0.0;
+            vij = unadj + adjst;
+            if (rsq < _rcsq){
+                double frac = pow(_sigmasq / rsq, 3.0);
+                unadj = 4.0 * _epsilon * (pow(frac, 2.0) - frac);
+                adjst = _corr1 + _corr2 * (rsq / _rcsq);
+                vij = unadj + adjst;
+            }
+            else {
+                vij = 0.0;
+                unadj = 0.0;
+            }
+        }
+        else {
+            vij = 0.0;
+            unadj = 0.0;
         }
         if (_pe_shftd.is_set) _pe_shftd.ptr->value += vij;
         if (_pe_unshftd.is_set) _pe_shftd.ptr->value += unadj;
@@ -248,13 +286,15 @@ double AdjustedLJPotential::_wij(Vector ri, Vector rj,
     double unadj = 0.0;
     double adjst = 0.0;
     double wij = unadj + adjst;
-    double rsq = rijsq(rij(ri, rj));
-    if (rsq < _rcsq){
-        // if within cutoff distance
-        double frac = pow(_sigmasq / rsq, 3.0);
-        double unadj = 24.0 * _epsilon * (2 * pow(frac, 2.0) - frac);
-        double adjst = - 2.0 * _corr2 * (rsq / _rcsq);
-        wij = unadj + adjst;
+    if (_epsilon != 0.0){
+        double rsq = rijsq(rij(ri, rj));
+        if (rsq < _rcsq){
+            // if within cutoff distance
+            double frac = pow(_sigmasq / rsq, 3.0);
+            double unadj = 24.0 * _epsilon * (2 * pow(frac, 2.0) - frac);
+            double adjst = - 2.0 * _corr2 * (rsq / _rcsq);
+            wij = unadj + adjst;
+        }
     }
     if (calculate_observables){
         if (_w_shftd.is_set) _w_shftd.ptr->value += wij;
@@ -264,9 +304,15 @@ double AdjustedLJPotential::_wij(Vector ri, Vector rj,
 };
 Vector AdjustedLJPotential::fij(Vector ri, Vector rj,
     bool calculate_observables){
-    Vector r = rij(ri, rj);
     double wij = AdjustedLJPotential::_wij(ri, rj, calculate_observables);
-    Vector fij = multiply(r, wij / rijsq(r));
+    Vector fij;
+    if (_epsilon != 0.0){
+        Vector r = rij(ri, rj);
+        fij = multiply(r, wij / rijsq(r));
+    }
+    else {
+        fij = vector(0.0, 0.0, 0.0);
+    }
     if (calculate_observables) {
         _update_vij(ri, rj);
     }

@@ -1,9 +1,10 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 class Plotter:
     """Plotter Class"""
-    def __init__(self, plot_directory, fontsize = 14):
+    def __init__(self, plot_directory, fontsize = 20):
         self.plot_directory = plot_directory
         self.fontsize = fontsize
         self.nfigures = 0
@@ -12,6 +13,7 @@ class Plotter:
         self.data_dir = data_dir
         self.meta_data = pd.read_csv(self.file_dir('meta_data'))
         self.inst_data = pd.read_csv(self.file_dir('inst_data'))
+        self.block_data = pd.read_csv(self.file_dir('block_data'))
         self.run_summary = pd.read_csv(self.file_dir('run_summary'))
     def file_dir(self, name):
         return self.data_dir + self.sim_name + '_' + name + '.csv'
@@ -29,7 +31,7 @@ class Plotter:
         return self.math_mode('\\frac{' + axis_symbol + '}{' + axis_unit + '}')
 
 class RelaxationTimePlotter(Plotter):
-    def __init__(self, plot_directory, fontsize = 14):
+    def __init__(self, plot_directory, fontsize = 20):
         Plotter.__init__(self, plot_directory, fontsize)
         self.plot_title = 'Polymer Relaxation'
         self.xlim = [0.0, 100.0]
@@ -50,11 +52,14 @@ class RelaxationTimePlotter(Plotter):
     def make_axes_and_title(self):
         plt.xlabel(self.axis_label(self.tex_name('t'), self.units('t')), fontsize = self.fontsize)
         plt.ylabel(self.axis_label('E', self.units('kep')), fontsize = self.fontsize)
-        plt.title(self.plot_title)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
     def make_plots(self, sim_name, data_dir):
         self.bind_to_data(sim_name, data_dir)
         self.make_energy_plot()
         self.make_temperature_plot()
+        self.make_momentum_plot()
+        self.make_another_energy_plot()
     def make_energy_plot(self):
         self.nfigures += 1
         plt.figure(self.nfigures)
@@ -64,8 +69,57 @@ class RelaxationTimePlotter(Plotter):
         # configure x-axis range
         plt.xlim(self.xlim)
         plt.legend()
+        plt.legend(prop={'size':14})
         plt.grid()
         directory = self.plot_directory + sim_name + "_relax_time_energy.png"
+        plt.tight_layout()
+        plt.savefig(directory, dpi = 300)
+    def make_another_energy_plot(self):
+        self.nfigures += 1
+        plt.figure(self.nfigures)
+        # plot kinetic energy
+        plt.plot(self.inst_data['t'], self.inst_data['kep'], label = self.label('t', 'kep'), color = 'red', linestyle = '-')
+        # plot potential energy
+        plt.plot(self.inst_data['t'], self.inst_data['vljp'], label = self.label('t', 'vljp'), color = 'blue', linestyle = '-')
+        # plot total energy
+        tot_energy_label =  self.label('t', 'vljp') + self.math_mode('+') + self.label('t', 'kep')
+        plt.plot(self.inst_data['t'], self.inst_data['vljp'] + self.inst_data['kep'], label = tot_energy_label, color = 'k', linestyle = '-')
+        # average data plot
+        ke_avg_label = self.math_mode(self.average('kep'))
+        pe_avg_label = self.math_mode(self.average('vljp'))
+        plt.axhline(y = self.run_summary['kep_mean'].iloc[0], label = ke_avg_label, color = 'k', linestyle = '--')
+        plt.axhline(y = self.run_summary['vljp_mean'].iloc[0], label = pe_avg_label, color = 'k', linestyle = '-.')
+        # cosmetics
+        plt.legend()
+        plt.legend(prop={'size':14})
+        plt.grid()
+        plt.xlabel(self.axis_label(self.tex_name('t'), self.units('t')), fontsize = self.fontsize)
+        plt.ylabel(self.axis_label('E', self.units('kep')), fontsize = self.fontsize)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        directory = self.plot_directory + sim_name + "_energy.png"
+        plt.tight_layout()
+        plt.savefig(directory, dpi = 300)
+    def make_momentum_plot(self):
+        self.nfigures += 1
+        plt.figure(self.nfigures)
+        # plot momentum virial
+        plt.plot(self.inst_data['t'], self.inst_data['l_xp'], label = self.label('t', 'l_xp'), color = 'red', linestyle = '-', linewidth = 5.0)
+        plt.plot(self.inst_data['t'], self.inst_data['l_yp'], label = self.label('t', 'l_yp'), color = 'blue', linestyle = '-', linewidth = 5.0)
+        plt.plot(self.inst_data['t'], self.inst_data['l_zp'], label = self.label('t', 'l_zp'), color = 'yellow', linestyle = '-', linewidth = 5.0)
+        plt.plot(self.inst_data['t'],
+                np.sqrt(np.power(self.inst_data['l_xp'], 2.0)
+                        + np.power(self.inst_data['l_yp'], 2.0)
+                        + np.power(self.inst_data['l_zp'], 2.0)),
+                label = "$L^{\\mathrm{pol}}_{\\mathrm{tot}}(\\tau)$", color = 'black', linestyle = '-', linewidth = 5.0)
+        plt.xlabel(self.axis_label(self.tex_name('t'), self.units('t')), fontsize = self.fontsize)
+        plt.ylabel(self.axis_label('l', self.units('l_xp')), fontsize = self.fontsize)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.legend(prop={'size':14})
+        plt.grid()
+        directory = self.plot_directory + sim_name + "_ang_momentum.png"
+        plt.tight_layout()
         plt.savefig(directory, dpi = 300)
     def make_temperature_plot(self):
         self.nfigures += 1
@@ -78,12 +132,16 @@ class RelaxationTimePlotter(Plotter):
         # axes and title
         plt.xlabel(self.axis_label(self.tex_name('t'), self.units('t')), fontsize = self.fontsize)
         plt.ylabel(self.axis_label('k_{B}T', self.units('temp_kinp')), fontsize = self.fontsize)
-        plt.title(self.plot_title)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        #plt.title(self.plot_title)
         # configure x-axis range
         plt.xlim(self.xlim)
         plt.legend()
+        plt.legend(prop={'size':14})
         plt.grid()
         directory = self.plot_directory + sim_name + "_relax_time_temperature.png"
+        plt.tight_layout()
         plt.savefig(directory, dpi = 300)
 
 if __name__ == '__main__':

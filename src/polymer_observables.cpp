@@ -22,6 +22,7 @@ namespace polymer{
         }
     }
     void KE::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::AtomPolymer& polymer : state.polymers){
             update(polymer);
         }
@@ -72,6 +73,7 @@ namespace polymer{
         }
     }
     void KineticTemperature::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::AtomPolymer& polymer : state.polymers){
             update(polymer);
         }
@@ -124,6 +126,7 @@ namespace polymer{
         }
     }
     void LinMomComponent::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::AtomPolymer& polymer : state.polymers){
             update(polymer);
         }
@@ -150,6 +153,7 @@ namespace polymer{
         }
     }
     void AngMomComponent::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::AtomPolymer& polymer : state.polymers){
             update(polymer);
         }

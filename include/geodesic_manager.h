@@ -13,6 +13,7 @@
 #include "geodesic_record.h"
 #include "geodesic_path.h"
 #include "natomic_config_handler.h"
+#include "observable_container.h"
 #include "general_observables.h"
 namespace geodesic{
     /***************************************************************************
@@ -26,7 +27,10 @@ namespace geodesic{
     */
     class Manager {
     public:
-        Manager(ForceUpdater* fupd = NULL); /**> need fupd to calculate PE */
+        Manager();
+        Manager(Potential* polymer_potential,
+            Potential* solvent_potential,
+            Potential* inter_potential);
         ~Manager();
         /**
         * Read states from cndir + sim_name + "_cn.cfg" and store the sequence
@@ -39,17 +43,20 @@ namespace geodesic{
         * into a geodesic::Path with PE calculated along the way
         */
         Path MD_path();
-        void set_fupd(ForceUpdater *fupd);
+        void output_observables(Path& path,
+                                std::string dtdir, std::string name);
+        void set_fupd(ForceUpdater& fupd);
         ForceUpdater fupd() const;
+        std::string ini_fname(std::string sim_name) const;
+        std::string fin_fname(std::string sim_name) const;
         Record initial() const;
         Record final() const;
     protected:
-        NAtomicConfigHandler _config_handler;
+        ForceUpdater _fupd;
         std::vector<simple::BondState> _states;
         bool _states_read;
         Record _initial;
         Record _final;
-        void _load_state_to_cfg_manager(simple::BondState& state);
         double _pe(simple::BondState& state);
     };
 } // namespace geodesic

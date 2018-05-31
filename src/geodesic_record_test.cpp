@@ -115,14 +115,21 @@ TEST_F(GeodesicRecordTest, DataMembers) {
 }
 
 TEST_F(GeodesicRecordTest, BinaryOperators) {
+    //fprintf(stderr, "%s\n", "checking equality");
+    // FIXME this comparison is not being done yet; see source for
+    // == operator in geodesic record
     EXPECT_EQ(record == record, true);
     EXPECT_EQ(record != record, false);
 }
 
 TEST_F(GeodesicRecordTest, IO) {
+    //fprintf(stderr, "%s\n", "creating new record");
     geodesic::Record r_expect = record;
+    //fprintf(stderr, "%s\n", "writing to file");
     r_expect.write(file, overwrite);
+    //fprintf(stderr, "%s\n", "assigning from file");
     geodesic::Record r_check = geodesic::Record(file);
+    //fprintf(stderr, "%s\n", "checking equality");
     EXPECT_EQ(r_check, r_expect);
 }
 

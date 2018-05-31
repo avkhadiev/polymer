@@ -13,10 +13,12 @@ namespace default_settings {
     const std::string potential_header =
         "# potential: epp ess eps ss sp rc_ss rc_sp";
     const std::string state_config_header
-        = "# state configuration: mp ms np nb nc d/s";
+        = "# state configuration: mp ms np nb nc d/sp";
     const std::string init_header = "# initialization: rho_s kbT/e pol_conformation pol_energy_per_atom";
     const std::string integration_header = "# integration: runtime dt tol";
-    const std::string io_header = "i/o: cndir datadir tpdir icalc iprint isave idata itape should_write_data";
+    const std::string geodesic_header
+        = "# geodesic: geodir_input geodir_output geodir_data el dtau save_md_path";
+    const std::string io_header = "i/o: cndir datadir tpdir icalc iprint isave iblock itape should_write_data";
     // POTENTIAL SETTINGS
     const double epp = 1.0;
     const double ess = 1.0;
@@ -42,6 +44,16 @@ namespace default_settings {
     const double tol = pow(dt, 2.0);
     // const double tiny = pow(10, -8.0);
     // const int maxiter = pow(10, 4.0);
+    // GEODESIC SETTINGS
+    const std::string geodir_input
+        = "/Users/Arthur/stratt/polymer/test/geodesics/";
+    const std::string geodir_output
+        = "/Users/Arthur/stratt/polymer/test/geodesics/";
+    const std::string geodir_data
+        = "/Users/Arthur/stratt/polymer/test/geodesics/";
+    const double el = 0.0;
+    const double dtau = 0.001;
+    const int save_md_path = 0;
     // I/O SETTINGS
     const std::string cndir = "/Users/Arthur/stratt/polymer/test/";
     const std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
@@ -59,6 +71,7 @@ SettingsParser::SettingsParser() :
     state_config_header(default_settings::state_config_header),
     init_header(default_settings::init_header),
     integration_header(default_settings::integration_header),
+    geodesic_header(default_settings::geodesic_header),
     io_header(default_settings::io_header),
     // POTENTIAL SETTINGS
     epp(default_settings::epp),
@@ -83,6 +96,13 @@ SettingsParser::SettingsParser() :
     runtime(default_settings::runtime),
     dt(default_settings::dt),
     tol(default_settings::tol),
+    // GEODESOC SETTINGS
+    geodir_input(default_settings::geodir_input),
+    geodir_output(default_settings::geodir_output),
+    geodir_data(default_settings::geodir_data),
+    el(default_settings::el),
+    dtau(default_settings::dtau),
+    save_md_path(default_settings::save_md_path),
     // I/O SETTINGS
     cndir(default_settings::cndir),
     dtdir(default_settings::dtdir),
@@ -92,9 +112,7 @@ SettingsParser::SettingsParser() :
     iprint(default_settings::iprint),
     isave(default_settings::isave),
     iblock(default_settings::iblock),
-    itape(default_settings::itape){
-        if (DEBUG) fprintf(stdout, "%s\n", "SettingsParser set up successfully!");
-    }
+    itape(default_settings::itape){}
 SettingsParser::~SettingsParser(){}
 std::vector<std::string> SettingsParser::get_args(std::string line){
     std::istringstream ss(line.c_str());
@@ -153,6 +171,21 @@ void SettingsParser::read_integration(std::ifstream& stream){
     dt = atof(args.at(1).c_str());
     tol = atof(args.at(2).c_str());
 }
+void SettingsParser::read_geodesic(std::ifstream& stream){
+    std::string line;
+    std::getline(stream, line);     // comment string
+    std::getline(stream, line);     // geodesic directory for inputs
+    geodir_input = line;
+    std::getline(stream, line);     // geodesic directory for outputs
+    geodir_output = line;
+    std::getline(stream, line);     // geodesic directory for observables
+    geodir_data = line;
+    std::getline(stream, line);     // landscape energy and ``affine parameter''
+    std::vector<std::string> args = get_args(line);
+    el = atof(args.at(0).c_str());
+    dtau = atof(args.at(1).c_str());
+    save_md_path = atoi(args.at(2).c_str());
+}
 void SettingsParser::read_io(std::ifstream& stream){
     std::string line;
     std::getline(stream, line);    // header lineg
@@ -187,6 +220,7 @@ void SettingsParser::read(std::string fin){
         read_state_config(readout);
         read_init(readout);
         read_integration(readout);
+        read_geodesic(readout);
         read_io(readout);
     }
     readout.close();
@@ -254,9 +288,28 @@ void SettingsParser::write_integration(std::ofstream& stream) const{
         // output values
         stream << std::to_string(runtime) << " ";
         stream << std::to_string(dt) << " ";
-        stream << std::to_string(tol) << std::endl;
+        stream << std::to_string(tol) << " ";
+        stream << std::to_string(save_md_path) << std::endl;
     }
     else {
+        // if file still could not be opened
+        std::string err_msg = "writeout: unable to open file";
+        fprintf(stderr, "%s\n", err_msg.c_str());
+        perror("open");
+    }
+}
+void SettingsParser::write_geodesic(std::ofstream& stream) const{
+    if (stream.is_open()) {
+        // output header
+        stream << geodesic_header << std::endl;
+        // output values
+        stream << geodir_input << " ";
+        stream << geodir_output << " ";
+        stream << geodir_data << " ";
+        stream << std::to_string(el) << " ";
+        stream << std::to_string(dtau) << std::endl;
+    }
+    else{
         // if file still could not be opened
         std::string err_msg = "writeout: unable to open file";
         fprintf(stderr, "%s\n", err_msg.c_str());
@@ -296,6 +349,7 @@ void SettingsParser::write(std::string outdir, std::string sim_name) const{
         write_state_config(writeout);
         write_init(writeout);
         write_integration(writeout);
+        write_geodesic(writeout);
         write_io(writeout);
     }
     else {

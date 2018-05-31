@@ -20,10 +20,8 @@ class GeodesicManagerTest : public ::testing::Test {
         LJPotential pp;
         AdjustedLJPotential ss;
         AdjustedLJPotential ps;
-        ForceUpdater fupd;
         // The manager itself
-        geodesic::Manager manager_w_p;
-        geodesic::Manager manager_wo_p;
+        geodesic::Manager manager;
     virtual void SetUp() {
         // setup IO
         overwrite = true;
@@ -40,25 +38,21 @@ class GeodesicManagerTest : public ::testing::Test {
         ss = AdjustedLJPotential(1.0, 1.0, 5.0, 10.0);
         //                       eps  sps  rc   box
         ps = AdjustedLJPotential(1.0, 1.0, 5.0, 10.0);
-        fupd = ForceUpdater(&pp, &ss, &ps);
         // setup managers
-        manager_w_p = geodesic::Manager(&fupd);
-        manager_wo_p = geodesic::Manager();
-        manager_w_p.read_states(cndir, sim_name);
-        manager_wo_p.read_states(cndir, sim_name);
+        manager = geodesic::Manager(&pp, &ss, &ps);
+        manager.read_states(cndir, sim_name);
     }
     // virtual void TearDown() {}
 };
 
 TEST_F(GeodesicManagerTest, IO) {
-    manager_w_p.write_geodesic_inputs(outdir, sim_name + "_w_p");
-    manager_wo_p.write_geodesic_inputs(outdir, sim_name + "_wo_p");
-    manager_w_p.initial().write(ini_file, overwrite);
-    manager_w_p.final().write(fin_file, overwrite);
+    manager.write_geodesic_inputs(outdir, sim_name);
+    manager.initial().write(ini_file, overwrite);
+    manager.final().write(fin_file, overwrite);
 }
 
 TEST_F(GeodesicManagerTest, MDPath) {
-    geodesic::Path path = manager_w_p.MD_path();
+    geodesic::Path path = manager.MD_path();
     path.write(md_path_file, overwrite);
 }
 

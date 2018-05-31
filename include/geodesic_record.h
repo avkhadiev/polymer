@@ -21,11 +21,13 @@ namespace geodesic{
         bool operator==(const Record &other) const;
         bool operator!=(const Record &other) const;
         simple::BondState state() const {return _state;};
+        simple::BondState& modifiable_state() {return _state;};
         double pe() const {return _pe;};
+        void set_pe(double pe) {_pe = pe;};
         /* Record output */
-        std::string to_string(bool output_header) const;
+        std::string to_string(bool output_header, bool verbose = false) const;
         /* writes to file stream can output state header */
-        void write(std::ofstream& input_stream, bool output_header) const;
+        void write(std::ofstream& output_stream, bool output_header) const;
         /* writes to file, truncates and outputs header if overwrite = true */
         void write(std::string file, bool overwrite) const;
     private:

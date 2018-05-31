@@ -127,6 +127,7 @@ namespace solvent{
         _update(molecule, _component);
     }
     void MomComponent::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::Solvent& solvent : state.solvents){
             update(solvent);
         }
@@ -150,6 +151,7 @@ namespace solvent{
         value += molecule.m() * normsq(molecule.v());
     }
     void MomMagSq::update(const simple::AtomState &state){
+        value = 0.0;
         for(const simple::Solvent& solvent : state.solvents){
             update(solvent);
         }

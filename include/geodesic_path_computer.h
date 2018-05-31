@@ -10,37 +10,155 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
+#include <cmath>
 #include "geodesic_record.h"
 #include "geodesic_path.h"
 #include "geodesic_manager.h"
 #include "observable.h"
 #include "potential.h"
 #include "force_updater.h"
+#include "observable_container.h"
+#include "general_observables.h"            /** Potential Energy    */
+#include "geodesic_observables.h"           /** angles, steps, etc. */
 namespace geodesic{
     /***************************************************************************
-    *                          GEODESIC PATH COMPUTER
+    *                 GEODESIC PATH COMPUTER (BASE CLASS)
     ***************************************************************************/
-    class PathComputer{
+    /**
+    * An interface class providing methods for incremental propagation of a path
+    * Given a reference to a Record and a constant reference to the final Record
+    * these methods help to propagate the Record toward the final Record,
+    * one step at a time
+    */
+    class PathComputer {
     public:
-        PathComputer(double landscape_energy, double dt,
-            Potential* polymer_potential,
+        PathComputer(Potential* polymer_potential,
             Potential* solvent_potential,
-            Potential* inter_potential);
+            Potential* inter_potential,
+            double epsilon = 0.001);
         ~PathComputer();
-        double landscape_energy() const {return _E_l;};
-        void set_landscape_energy(double energy) {_E_l = energy;};
-        double dt() const {return _dt;};
-        void set_dt(double dt) {_dt = dt;};
-        /**
-        * Path computation methods
+        double epsilon() const {return _epsilon;};
+        void set_epsilon(double epsilon) {_epsilon = epsilon;};
+        void update_PE(Record& rec);
+        /** if current record is close enough to final record, return false
+        * if not, return true and move current record dtau towards final record
         */
-        Path naive_SLERP(Record initial, Record final);
-        Path perturbative_SLERP(Record initial, Record final);
-        Path perturbative_new(Record initial, Record final);
+        virtual bool move(Record &cur, const Record &fin, double dtau) = 0;
+        /**> TODO */
+        virtual void escape(Record &cur, const Record &fin, double param) = 0;
+    protected:
+        ForceUpdater _fupd;                /** to compute PE    */
+        double _epsilon;                   /** measure how close records are  */
+    };
+    /***************************************************************************
+    *                       GEODESIC SLERP PATH COMPUTER
+    ***************************************************************************/
+    class SLERP : public PathComputer {
+    public:
+        SLERP(Potential* polymer_potential,
+            Potential* solvent_potential,
+            Potential* inter_potential,
+            double epsilon = 0.001);
+        ~SLERP();
+        class Omega {
+        public:
+            Omega();
+            Omega(const simple::Bond& cur, const simple::Bond& fin);
+            ~Omega();
+            Vector cur() const {return _cur;};
+            Vector fin() const {return _fin;};
+            double cosPsi() const {return _cosPsi;};
+            double sinPsi() const {return _sinPsi;};
+            double psi() const {return _psi;};
+            double a(double dtau) const {return _a(dtau);};
+            double b(double dtau) const {return _b(dtau);};
+            virtual void update(const simple::Bond& bond);
+            virtual void update(Vector cur);
+            void set_should_move(bool should_move){_should_move = should_move;};
+            bool should_move() const {return _should_move;};
+            bool is_close(double epsilon) const;
+            virtual Vector at(double dtau) const;
+        protected:
+            bool _should_move;
+            Vector _cur;    /**> current orientation                        */
+            Vector _fin;    /**> final orientation                          */
+            double _cosPsi;
+            double _sinPsi;
+            double _psi;    /**> SLERP angle between ini and fin            */
+            void _recompute_angles();
+        private:
+            //*> sin (Psi(1 - tau))/sinPsi */
+            double _a(double dtau) const;
+            //*> sin (Psi tau) / sinPsi    */
+            double _b(double dtau) const;
+        };
+        virtual bool move(Record &cur, const Record &fin, double dtau);
+        /**> TODO */
+        virtual void escape(Record &cur, const Record &fin, double param);
+    public:
+        Psi psi1, psi2;                  /** remaining angle */
+        DeltaPsi delta_psi1, delta_psi2; /** in-plane step   */
     private:
-        ForceUpdater _fupd;
-        double _E_l;
-        double _dt;
+        bool _is_path_complete(std::vector< Omega>& links, double epsilon);
+        void _update_bond_from_link(simple::Bond& bond, const Omega& omega);
+        void _update_record_from_links(Record& record,
+            const std::vector<Omega>& links);
+        void _update_links_from_record(std::vector<Omega>& links,
+            const Record& record);
+    };
+    /***************************************************************************
+    *                 GEODESIC SHORT-STEP PATH COMPUTER
+    ***************************************************************************/
+    class ShortStep : public SLERP {
+    public:
+        ShortStep(Potential* polymer_potential,
+            Potential* solvent_potential,
+            Potential* inter_potential,
+            double epsilon = 0.001);
+        ~ShortStep();
+        class Omega : public SLERP::Omega {
+        public:
+            Omega();
+            Omega(const simple::Bond& cur, const simple::Bond& fin);
+            ~Omega();
+            void set_theta(double theta){
+                _theta = theta;
+                _theta_computed = true;
+            };
+            bool theta_computed() const {return _theta_computed;};
+            virtual void update(const simple::Bond& bond);
+            virtual void update(Vector cur);
+            Vector nhat() const {return _nhat;};
+            Vector uhat() const {return _uhat;};
+            double theta() const {return _theta;};
+            virtual Vector at(double dtau) const;
+        protected:
+            bool _theta_computed;
+            Vector _SLERP(double dtau) const {return SLERP::Omega::at(dtau);};
+            Vector _nhat;   /**> normal to the plane defined by cur and fin */
+            Vector _uhat;   /**> lin velocity unit vector when omega = cur  */
+            double _theta;  /**> ~ to step out of plane of motion           */
+            void _recompute_nhat();
+            void _recompute_uhat();
+        private:
+            double _dtheta(double dtau) const {return _theta * dtau;};
+        };
+        virtual bool move(Record &cur, const Record &fin, double dtau);
+        /**> TODO */
+        virtual void escape(Record &cur, const Record &fin, double param);
+    public:
+        Theta theta1, theta2;                    /** out-of-plane parameter */
+        DeltaTheta delta_theta1, delta_theta2;   /** out-of-plane step      */
+        DeltaPhi delta_phi1, delta_phi2;         /** totals step            */
+    private:
+        bool _is_path_complete(std::vector< Omega>& links, double epsilon);
+        void _update_bond_from_link(simple::Bond& bond, const Omega& omega);
+        void _update_record_from_links(Record& record,
+            const std::vector< Omega>& links);
+        void _update_links_from_record(std::vector< Omega>& links,
+            const Record& record);
+        /** that's the meat of the algorithm! */
+        void _compute_thetas(std::vector< Omega>& links);
     };
 } // namespace geodesic
 #endif

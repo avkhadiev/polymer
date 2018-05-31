@@ -88,6 +88,13 @@ ObservableContainer::ObservableContainer(std::vector<Observable*> observables) :
         _observable_logs.push_back(observable::BlockRecord(obs));
     }
 }
+void ObservableContainer::add_observable(Observable* obs){
+    if (obs->should_average()) {
+        _average_data = true;
+        ++_observables_to_average;
+    }
+    _observable_logs.push_back(observable::BlockRecord(obs));
+}
 ObservableContainer::~ObservableContainer(){
     _observable_logs.clear();
 }
@@ -101,15 +108,17 @@ void ObservableContainer::calculate_observables(const simple::AtomState& state){
 void ObservableContainer::record_observables(){
     for (observable::BlockRecord& record : _observable_logs){
         record.add_newest_record();
-        record.obs()->zero_value();
+        // if necessary, values should be zeroed each time BEFORE computation
+        // other observables (e.g. length of the path) should not be zeroed
+        //record.obs()->zero_value();
     }
 }
 void ObservableContainer::run_begin(std::string dtdir, std::string sim_name, bool should_write_data){
-    if (should_write_data) prepare_datafiles(dtdir, sim_name);
     _blockstep = 0;
     for (observable::BlockRecord& record : _observable_logs){
         record.obs()->start_new_run();
     }
+    if (should_write_data) prepare_datafiles(dtdir, sim_name);
 }
 void ObservableContainer::run_end(){
     if (_average_data) {

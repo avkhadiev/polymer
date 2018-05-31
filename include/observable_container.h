@@ -74,6 +74,7 @@ public:
     // will calculate any observables to be calculated in the MAIN_LOOP
     virtual void calculate_observables(const simple::AtomState& state);
     // will record all observables' instantaneous values and then zero them
+    void add_observable(Observable* observable);
     void record_observables();
     void zero_accumulators();
     // will erase all recorded data

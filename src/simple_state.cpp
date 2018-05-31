@@ -224,6 +224,7 @@ namespace simple {
         for(int i = 0; i < nsolvents(); ++i){
             solvents_equal = solvents_equal && (solvents.at(i) == other.solvents.at(i));
         }
+        //fprintf(stderr, "%s: %d, %s: %d\n", "polymers equal", polymers_equal, "solvents_equal", solvents_equal);
         return time_equals && polymers_equal && solvents_equal;
     }
     bool BondState::operator!=(const BondState &other) const{

@@ -20,17 +20,20 @@ private:
     void read_state_config(std::ifstream& stream);
     void read_init(std::ifstream& stream);
     void read_integration(std::ifstream& stream);
+    void read_geodesic(std::ifstream& stream);
     void read_io(std::ifstream& stream);
     // write helpers
     void write_potential(std::ofstream& stream) const;
     void write_state_config(std::ofstream& stream) const;
     void write_init(std::ofstream& stream) const;
     void write_integration(std::ofstream& stream) const;
+    void write_geodesic(std::ofstream& stream) const;
     void write_io(std::ofstream& stream) const;
     std::string potential_header;
     std::string state_config_header;
     std::string init_header;
     std::string integration_header;
+    std::string geodesic_header;
     std::string io_header;
 public:
     // potential settings
@@ -51,7 +54,7 @@ public:
     // initialization settings
     double rho_s;               /**> density of solvents in reduced units   */
     double temperature;         /**> temperature in reduced units           */
-    int polymer_planar_conformation;   /**> 0 = 3d otherwise, planar o/w    */
+    int polymer_planar_conformation;   /**> 0 = 3d, planar o/w              */
     double polymer_energy;      /**> total initial energy of the polymer    */
     // integration settings
     double runtime;             /**> run time in reduced units              */
@@ -59,6 +62,15 @@ public:
     double tol;                 /**> tolerance for rattle                   */
     const double tiny = pow(10, -8.0);
     const double maxiter = pow(10, 4.0);
+    // geodesic settings
+    std::string geodir_input;   /**> dir for storing geosim inputs          */
+    std::string geodir_output;  /**> dir for storing geosim inputs          */
+    std::string geodir_data;    /**> dir for storing geosim observables     */
+    double el;                  /**> landscape energy mass                  */
+    double dtau;                /**> change in progress variable            */
+    int save_md_path;           /**> 0 = don't save md_path, save o/w       */
+    const double max_propag_steps = 5000;
+    const double max_escape_steps = 1000;
     // i/o settings
     std::string cndir;          /**> directory for simulation config i/o    */
     std::string dtdir;          /**> directory for observables i/o          */

@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 #include "default_macros.h"
 #include "simple_solvent.h"
 #include "simple_polymer.h"
@@ -59,6 +60,9 @@ namespace simple {
             bool overwrite = true) const;
     public:
         std::vector<Solvent> solvents;
+        const std::vector<Solvent> get_solvents() const {
+            return solvents;
+        };
         // getters
         static int nsolvents() {return _nsolvents;};
         static double solvent_mass() {return Solvent::m();};
@@ -87,6 +91,14 @@ namespace simple {
         */
         void set_time(double time) {_time = time;};
         void advance_time(double timestep) {_time += timestep;};
+        /**
+        * Moment of Inertia Matrix
+        * D_ij = frac{min(i,j)(Nb + 1) - ij}{(Nb + 1)}
+        */
+        static double Dij(size_t i, size_t j){
+            double na = (double)(polymer_nb()) + 1.0;
+            return ((std::min(i, j) * na - (i * j))/(na));
+        }
         /**
         * Reads the non-verbose header string of a state,
         * saves nsolvents, solvent mass,
@@ -127,6 +139,9 @@ namespace simple {
         virtual std::string _molecules_str(bool verbose = true) const;
     public:
         std::vector<BondPolymer> polymers;
+        const std::vector<BondPolymer> get_polymers() const {
+            return polymers;
+        }
         bool operator==(const BondState &other) const;
         bool operator!=(const BondState &other) const;
         virtual std::string to_string(bool verbose = true,
@@ -153,6 +168,9 @@ namespace simple {
         virtual std::string _molecules_str(bool verbose = true) const;
     public:
         std::vector<AtomPolymer> polymers;
+        const std::vector<AtomPolymer> get_polymers() const {
+            return polymers;
+        }
         bool operator==(const AtomState &other) const;
         bool operator!=(const AtomState &other) const;
         virtual std::string to_string(bool verbose = true,

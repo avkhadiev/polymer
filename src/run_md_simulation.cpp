@@ -1,6 +1,6 @@
 // 2017 Artur Avkhadiev
-/*! \file run_simulation.cpp
-* Usage: run_simulation <name> <config_file> <optional initial_state_file>
+/*! \file run_md_simulation.cpp
+* Usage: run_md_simulation <name> <config_file> <optional initial_state_file>
 */
 #include<string>
 #include<vector>
@@ -28,7 +28,7 @@ namespace args{
     bool is_input_given = false;
 }
 namespace messages{
-    std::string usage = "Usage: run_simulation <name> <config_file> <optional initial_state_file>";
+    std::string usage = "Usage: run_md_simulation <name> <config_file> <optional initial_state_file>";
 }
 bool read_arguments(int argc, char **argv){
     bool success = true;
@@ -56,6 +56,19 @@ int main(int argc, char **argv){
         simple::BaseState::set_nm(settings.np);
         simple::BaseState::set_nsolvents(4 * pow(settings.nc, 3.0));
         simple::BasePolymer::set_nb(settings.nb);
+        // change in units if potential is zero
+        bool no_potential = false;
+        if ((settings.epp == 0.0)
+            && (settings.ess == 0.0)
+            && (settings.eps == 0.0)){
+            /*
+            * having no LJ potential requires a change in units
+            */
+            settings.np = 1.0;
+            settings.mp = 1.0;
+            settings.d = 1.0;
+            no_potential = true;
+        }
         simple::BasePolymer::set_m(settings.mp);
         simple::BasePolymer::set_d(settings.d);
         // make observables
@@ -128,37 +141,6 @@ int main(int argc, char **argv){
             //solvent_config.fcc_positions();
             //solvent_config.ran_velocities(settings.temperature);
         }
-        //fprintf(stdout, "%s\n%s",
-        //    "State initialized by the Configuration Handler:",
-        //    cfg.bond_state().to_string(true, true).c_str());
-        //if (settings::potential != settings::potential_default){
-            //if (settings::potential == settings::potential_none){
-                //force_loop.set_potential(&empty);
-                ///*
-                //* having no LJ potential requires a change in units
-                //*/
-                //parameters::D = 1.0;
-                //parameters::M = 1.0;
-                //// positions of polymer atoms in the atomic representation
-                //// have to be recalculated once bondlength is reset
-                //cfg.atom_state().update(cfg.bond_state());
-                //// find rms bond velocity
-                //double acc = 0.0;
-                //for (int i = 0; i < cfg.nmolecules(); ++i){
-                    //for (int j = 0; j < cfg.polymer_nb(); ++j){
-                        //acc += norm(cfg.bond_state().polymers.at(i).bonds.at(j).velocity);
-                    //}
-                //}
-                //double rms_bondv = acc / (cfg.nmolecules() * cfg.polymer_nb());
-                //double scalef = 2 * PI / rms_bondv;
-                //settings::dt = settings::dt * scalef;
-                //settings::runtime = settings::runtime * scalef;
-            //}
-            //else {
-                //fprintf(stderr, "potential '%s' is not recognized\n", settings::potential.c_str());
-                //exit(1);
-            //}
-        //}
         ForceUpdater force_loop = ForceUpdater(&pp, &ss, &ps);
         cfg.set_force_updater(&force_loop);
         if (settings.polymer_planar_conformation) {
@@ -171,6 +153,33 @@ int main(int argc, char **argv){
                 settings.temperature
             );
         }
+        // scale time units if no potential
+        if (no_potential){
+            double omega_avg = settings.temperature / settings.d;
+            double scale_factor = 2 * PI / omega_avg;
+            double dt_old = settings.dt;
+            double runtime_old = settings.runtime;
+            settings.dt = dt_old * scale_factor;
+            settings.runtime = runtime_old * scale_factor;
+            fprintf(stderr, "%s\n", "Zero potential requires change in units:");
+            fprintf(stderr, "%s %5.3f %s %5.3f %s %5.3f\n",
+                "dt change from",
+                dt_old,
+                "to",
+                settings.dt,
+                "with scale factor",
+                scale_factor);
+            fprintf(stderr, "%s %5.3f %s %5.3f %s %5.3f\n",
+                "runtime change from",
+                runtime_old,
+                "to",
+                settings.runtime,
+                "with scale factor",
+                scale_factor);
+        }
+        fprintf(stdout, "%s\n%s",
+            "State initialized by the Configuration Handler:",
+            cfg.bond_state().to_string(true, true).c_str());
         RattleIntegrator rattle = RattleIntegrator(force_loop,
             settings.tol,
             &ke_polymer, NULL,
@@ -181,8 +190,8 @@ int main(int argc, char **argv){
             = VerletIntegrator(force_loop, NULL, solvent_config.box());
         Integrator& integrator = rattle;
         // simulation setup
-        simple::Simulation sim
-            = simple::Simulation(args::sim_name,
+        simple::MDSimulation sim
+            = simple::MDSimulation(args::sim_name,
                 settings.cndir,
                 settings.tpdir,
                 settings.dtdir,

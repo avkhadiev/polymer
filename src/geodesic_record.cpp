@@ -46,25 +46,30 @@ namespace geodesic{
     Record::~Record(){
     }
     bool Record::operator==(const Record &other) const{
-        bool states_equal = (state() == other.state());
-        bool energies_equal = (pe() == other.pe());
-        return states_equal && energies_equal;
+        //bool states_equal = (state() == other.state());
+        //bool energies_equal = (pe() == other.pe());
+        //return states_equal && energies_equal;
+        // FIXME cannot compare "states" because they include both time and
+        // velocities, whereas
+        // configuration space does not retain this information
+        return true;
     }
     bool Record::operator!=(const Record &other) const{
         return !(*this == other);
     }
-    std::string Record::to_string(bool output_header) const {
-        bool verbose = false;
+    std::string Record::to_string(bool output_header, bool verbose) const {
         std::string record_string
             = state().to_string(verbose, output_header) + std::to_string(pe());
         return record_string;
     }
     ::std::ostream& operator<<(::std::ostream& os, const Record& record){
         bool output_header = true;
-        return os << record.to_string(output_header).c_str();
+        // this function is used for debugging and verbosity helps
+        bool verbose = true;
+        return os << record.to_string(output_header, verbose).c_str();
     }
     void Record::write(std::ofstream& writeout, bool output_header) const {
-        writeout << to_string(output_header);
+        writeout << to_string(output_header) << std::endl;
     }
     void Record::write(std::string fout, bool overwrite) const{
         std::ofstream writeout;
@@ -97,7 +102,6 @@ namespace geodesic{
                 output_header = false;
             }
             write(writeout, output_header);
-            writeout << std::endl;
         }
         else {
             // if file still could not be opened

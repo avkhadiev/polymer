@@ -64,6 +64,7 @@ namespace simple {
             Vector _vcm;
         public:
             std::vector<Bond> bonds;
+            const std::vector<Bond> get_bonds() const {return bonds;};
             bool operator==(const BondPolymer &other) const;
             bool operator!=(const BondPolymer &other) const;
             Vector rcm() const {return _rcm;};
@@ -110,6 +111,7 @@ namespace simple {
             friend class BondPolymer;
         public:
             std::vector<Atom> atoms;
+            const std::vector<Atom>& get_atoms() const {return atoms;};
             bool operator==(const AtomPolymer &other) const;
             bool operator!=(const AtomPolymer &other) const;
             Vector rcm() const;

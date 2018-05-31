@@ -48,13 +48,11 @@ TEST_F(GeodesicPathTest, DataMembers) {
 
 TEST_F(GeodesicPathTest, BasicGetters) {
     EXPECT_EQ(path.nrecords(), 2);
-    EXPECT_EQ(path.time(), abs(fin_time - ini_time));
 }
 
 TEST_F(GeodesicPathTest, ListInitialization) {
     geodesic::Path new_path = geodesic::Path(records);
     EXPECT_EQ(new_path.nrecords(), 3);
-    EXPECT_EQ(path.time(), new_path.time());
 }
 
 TEST_F(GeodesicPathTest, IO) {
@@ -64,7 +62,6 @@ TEST_F(GeodesicPathTest, IO) {
     geodesic::Path p_check = geodesic::Path(file);
     EXPECT_EQ(p_check.initial(), p_expect.initial());
     EXPECT_EQ(p_check.final(), p_expect.final());
-    EXPECT_EQ(p_check.time(), p_expect.time());
     EXPECT_EQ(p_check.nrecords(), p_expect.nrecords());
 }
 
