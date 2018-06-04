@@ -40,7 +40,6 @@ class GeodesicRecordTest : public ::testing::Test {
         file = "/Users/Arthur/stratt/polymer/test/geodesic/record_expect.cfg";
         file2 = "/Users/Arthur/stratt/polymer/test/geodesic/record_check.cfg";
         // SOLVENT molecules
-        fprintf(stderr, "%s\n", "initializing solvents...");
         Vector solvent_r;
         Vector solvent_v;
         nsolvents = 2;
@@ -92,7 +91,6 @@ class GeodesicRecordTest : public ::testing::Test {
         *  BOND1_R = BOND2_R = (0, 1, 0)
         *  BOND1_V = (0, 0, 1), BOND2_V = (0, 0, -1)
         */
-        fprintf(stderr, "%s\n", "setting up bonds...");
         d1 = vector(0.0, 1.0, 0.0);
         d2 = vector(0.0, 1.0, 0.0);
         ddot1 = vector(0, 0, 1.0);

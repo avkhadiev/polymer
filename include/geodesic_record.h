@@ -14,6 +14,7 @@ namespace geodesic{
     ***************************************************************************/
     class Record {
     public:
+        static const bool use_atomic = true;
         Record();
         Record(simple::BondState state, double pe);
         Record(simple::AtomState state, double pe);
@@ -21,7 +22,7 @@ namespace geodesic{
             bool read_state_header = true,
             bool atom_state = false);        /**> read bond state by default */
         /**> state header always read */
-        Record(std::string file, bool atom_state = false);
+        Record(std::string file, bool atom_state = use_atomic);
         ~Record();
         // can't really compare records, because records have states while completely ignoring time- and velocity- related information in them
         // these operators are only needed for testing with the Google suite
@@ -37,18 +38,18 @@ namespace geodesic{
         /* Record output. By default, outputs bond_state representation */
         std::string to_string(bool output_header,
             bool verbose = false,
-            bool atom_state = false) const;
+            bool atom_state = use_atomic) const;
         /* writes to file stream can output state header
         By default, outputs bond_state representation */
         void write(std::ofstream& output_stream,
             bool output_header,
             bool verbose = false,
-            bool atom_state = false) const;
+            bool atom_state = use_atomic) const;
         /* writes to file, truncates and outputs header if overwrite = true
         By default, outputs bond_state representation */
         void write(std::string file, bool overwrite,
             bool verbose = false,
-            bool atom_state = false) const;
+            bool atom_state = use_atomic) const;
     private:
         double _pe;
     };
