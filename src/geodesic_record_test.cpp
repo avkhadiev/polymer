@@ -14,6 +14,7 @@ class GeodesicRecordTest : public ::testing::Test {
         bool overwrite;
         bool output_header;
         std::string file;
+        std::string file2;
         // Base State Variables
         int nsolvents;
         double solvent_m;
@@ -36,10 +37,16 @@ class GeodesicRecordTest : public ::testing::Test {
     virtual void SetUp() {
         overwrite = true;
         output_header = true;
-        file = "/Users/Arthur/stratt/polymer/test/geodesic/record_check.cfg";
+        file = "/Users/Arthur/stratt/polymer/test/geodesic/record_expect.cfg";
+        file2 = "/Users/Arthur/stratt/polymer/test/geodesic/record_check.cfg";
         // SOLVENT molecules
+        fprintf(stderr, "%s\n", "initializing solvents...");
         Vector solvent_r;
         Vector solvent_v;
+        nsolvents = 2;
+        solvent_m = 0.5;
+        simple::BaseState::set_nsolvents(nsolvents);
+        simple::Solvent::set_m(solvent_m);
         for(int i = 0; i < nsolvents; ++i){
             double k = i;
             solvent_v = solvent_r = vector(k, k, k);
@@ -59,10 +66,6 @@ class GeodesicRecordTest : public ::testing::Test {
         *   RCM                    origin            origin + cm_displacement
         *   VCM                    (0.0, 0.0, 0.0)   (0.0, 0.0, 0.0)
         */
-        nsolvents = 2;
-        solvent_m = 0.5;
-        simple::BaseState::set_nsolvents(nsolvents);
-        simple::Solvent::set_m(solvent_m);
         nm = 2;
         nb = 2;
         m = 1.0;
@@ -89,6 +92,7 @@ class GeodesicRecordTest : public ::testing::Test {
         *  BOND1_R = BOND2_R = (0, 1, 0)
         *  BOND1_V = (0, 0, 1), BOND2_V = (0, 0, -1)
         */
+        fprintf(stderr, "%s\n", "setting up bonds...");
         d1 = vector(0.0, 1.0, 0.0);
         d2 = vector(0.0, 1.0, 0.0);
         ddot1 = vector(0, 0, 1.0);
@@ -110,16 +114,8 @@ class GeodesicRecordTest : public ::testing::Test {
 };
 
 TEST_F(GeodesicRecordTest, DataMembers) {
-    EXPECT_EQ(bond_state, record.state());
+    EXPECT_EQ(bond_state, record.bond_state());
     EXPECT_EQ(pe, record.pe());
-}
-
-TEST_F(GeodesicRecordTest, BinaryOperators) {
-    //fprintf(stderr, "%s\n", "checking equality");
-    // FIXME this comparison is not being done yet; see source for
-    // == operator in geodesic record
-    EXPECT_EQ(record == record, true);
-    EXPECT_EQ(record != record, false);
 }
 
 TEST_F(GeodesicRecordTest, IO) {

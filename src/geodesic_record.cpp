@@ -7,14 +7,18 @@ namespace geodesic{
     *                               GEODESIC RECORD
     ***************************************************************************/
     Record::Record():
-        _state(),
+        cfg_handler(),
         _pe(){}
     Record::Record(simple::BondState state, double pe):
-        _state(state),
+        cfg_handler(state),
         _pe(pe){}
-    Record::Record(std::ifstream& input_stream, bool read_state_header):
-        _state(),
-        _pe()
+    Record::Record(simple::AtomState state, double pe):
+        cfg_handler(state),
+        _pe(pe){}
+    Record::Record(std::ifstream& input_stream,
+        bool read_state_header,
+        bool atom_state):
+        Record::Record()
     {
         std::string line;
         // read header information first, if it is provided
@@ -22,14 +26,24 @@ namespace geodesic{
             std::getline(input_stream, line);
             simple::BaseState::read_header(line);
         }
-        _state = simple::string_to_bond_state(input_stream);
+        // if reading in atomic state representation
+        if (atom_state){
+            simple::AtomState state
+                = simple::string_to_atom_state(input_stream);
+            cfg_handler.set_state(state);
+        }
+        // else reading in bond state representation
+        else {
+            simple::BondState state
+                = simple::string_to_bond_state(input_stream);
+            cfg_handler.set_state(state);
+        }
         // read potential energy
         std::getline(input_stream, line);
         _pe = std::stof(line);
     }
-    Record::Record(std::string file) :
-        _state(),
-        _pe(0.0)
+    Record::Record(std::string file, bool atom_state) :
+        Record::Record()
     {
         std::ifstream readout;
         readout.open(file, std::ifstream::in);
@@ -40,38 +54,74 @@ namespace geodesic{
         }
         else{
             bool read_state_header = true;
-            *this = Record(readout, read_state_header);
+            *this = Record(readout, read_state_header, atom_state);
         }
     }
     Record::~Record(){
     }
     bool Record::operator==(const Record &other) const{
-        //bool states_equal = (state() == other.state());
-        //bool energies_equal = (pe() == other.pe());
-        //return states_equal && energies_equal;
-        // FIXME cannot compare "states" because they include both time and
-        // velocities, whereas
-        // configuration space does not retain this information
-        return true;
+        simple::AtomState this_state = cfg_handler.atom_state();
+        simple::AtomState other_state = other.cfg_handler.atom_state();
+        // check polymer equality
+        bool polymers_equal = true;
+        simple::AtomPolymer this_polymer;
+        simple::AtomPolymer other_polymer;
+        for(int i = 0; i < simple::BaseState::nm(); ++i){
+            this_polymer = this_state.polymers.at(i);
+            other_polymer = this_state.polymers.at(i);
+            for(int j = 0; j < simple::BasePolymer::nb() + 1; ++j){
+                polymers_equal = polymers_equal &&
+                (this_polymer.atoms.at(j).position
+                    == other_polymer.atoms.at(j).position);
+            }
+        }
+        bool solvents_equal = true;
+        for(int i = 0; i < simple::BaseState::nsolvents(); ++i){
+            solvents_equal = solvents_equal &&
+                (this_state.solvents.at(i).atom.position
+                    == other_state.solvents.at(i).atom.position);
+        }
+        bool pe_equal = (pe() == other.pe());
+        return pe_equal && polymers_equal && solvents_equal;
     }
     bool Record::operator!=(const Record &other) const{
         return !(*this == other);
     }
-    std::string Record::to_string(bool output_header, bool verbose) const {
-        std::string record_string
-            = state().to_string(verbose, output_header) + std::to_string(pe());
+    simple::BondState& Record::bond_state(){
+        return cfg_handler.bond_state();
+    }
+    simple::AtomState& Record::atom_state(){
+        return cfg_handler.atom_state();
+    }
+    std::string Record::to_string(bool output_header,
+        bool verbose,
+        bool atom_state) const{
+        std::string state_string;
+        // if using atom_state representation
+        if (atom_state) {
+            state_string
+                = cfg_handler.atom_state().to_string(verbose, output_header);
+        }
+        else {
+            state_string
+                = cfg_handler.bond_state().to_string(verbose, output_header);
+        }
+        // else using bond_state representation
+        std::string record_string = state_string + std::to_string( pe() );
         return record_string;
     }
-    ::std::ostream& operator<<(::std::ostream& os, const Record& record){
+    ::std::ostream& operator<<(::std::ostream& os, Record& record){
         bool output_header = true;
         // this function is used for debugging and verbosity helps
         bool verbose = true;
         return os << record.to_string(output_header, verbose).c_str();
     }
-    void Record::write(std::ofstream& writeout, bool output_header) const {
-        writeout << to_string(output_header) << std::endl;
+    void Record::write(std::ofstream& writeout,
+        bool output_header, bool verbose, bool atom_state) const{
+        writeout << to_string(output_header, verbose, atom_state) << std::endl;
     }
-    void Record::write(std::string fout, bool overwrite) const{
+    void Record::write(std::string fout,
+        bool overwrite, bool verbose, bool atom_state) const{
         std::ofstream writeout;
         bool overwritten = false;
         // open writeout for output operations and
@@ -101,7 +151,7 @@ namespace geodesic{
             else{
                 output_header = false;
             }
-            write(writeout, output_header);
+            write(writeout, output_header, verbose, atom_state);
         }
         else {
             // if file still could not be opened

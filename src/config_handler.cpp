@@ -54,6 +54,12 @@ void ConfigHandler::set_state(simple::AtomState &state){
 /*
 * There are two state representations. They are independent: any time you do something to one representation, another one is not changed. The next 2 methods ensure that whenever you query representation A, the handler will check if representation B corresponds to the later time and if so, update A to reflect the most recent state.
 */
+const simple::BondState& ConfigHandler::bond_state() const{
+    return _bond_state;
+}
+const simple::AtomState& ConfigHandler::atom_state() const{
+    return _atom_state;
+}
 simple::BondState& ConfigHandler::bond_state(){
     if(_atom_state.time() > _bond_state.time()){
         _bond_state.update(_atom_state);

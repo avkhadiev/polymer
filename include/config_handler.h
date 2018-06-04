@@ -43,6 +43,8 @@ public:
     }
     simple::BondState& bond_state();
     simple::AtomState& atom_state();
+    const simple::BondState& bond_state() const;
+    const simple::AtomState& atom_state() const;
     void read_bond_state(std::ifstream& input_stream);
     void read_atom_state(std::ifstream& input_stream);
     void set_force_updater(ForceUpdater* fupd){_fupd = fupd;};
