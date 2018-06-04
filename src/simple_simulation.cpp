@@ -165,7 +165,7 @@ namespace simple{
         bool verbose = false;
         bool output_header = false;
         if (writeout.is_open()) {
-            writeout << _cfg.bond_state().to_string(verbose, output_header);
+            writeout << _cfg.atom_state().to_string(verbose, output_header);
         }
         else {
             perror("open");
