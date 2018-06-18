@@ -8,16 +8,19 @@ namespace geodesic{
     ***************************************************************************/
     Manager::Manager() :
         _fupd(),
+        _obs(NULL),
         _states(),
         _states_read(false),
         _initial(),
         _final(){}
     Manager::Manager(Potential* polymer_potential,
                      Potential* solvent_potential,
-                     Potential* inter_potential) :
+                     Potential* inter_potential,
+                     ObservableContainer* container) :
         _fupd(ForceUpdater( polymer_potential,
                             solvent_potential,
                             inter_potential)),
+        _obs(container),
         _states(),
         _states_read(false),
         _initial(),
@@ -30,6 +33,11 @@ namespace geodesic{
         _fupd = fupd;
     }
     double Manager::_pe(simple::BondState& state){
+        simple::AtomState atom_state = simple::AtomState(state);
+        double pe = _fupd.calc_pot_energy(atom_state);
+        return pe;
+    }
+    double Manager::_pe(simple::AtomState& state){
         simple::AtomState atom_state = simple::AtomState(state);
         double pe = _fupd.calc_pot_energy(atom_state);
         return pe;
@@ -79,7 +87,7 @@ namespace geodesic{
         if (_states_read){
             std::list<Record> records;
             // build a list of records from a vector of states
-            for(simple::BondState& state : _states){
+            for(simple::AtomState& state : _states){
                 records.push_back(Record(state, _pe(state)));
             }
             MD_path = Path(records);
@@ -101,8 +109,8 @@ namespace geodesic{
         Length length = Length(print_val, e_format);
         // omega projections
         std::vector<simple::Bond> ini_bonds, fin_bonds;
-        ini_bonds = path.initial().state().get_polymers().at(0).get_bonds();
-        fin_bonds = path.final().state().get_polymers().at(0).get_bonds();
+        ini_bonds = path.initial().bond_state().get_polymers().at(0).get_bonds();
+        fin_bonds = path.final().bond_state().get_polymers().at(0).get_bonds();
         Vector ini_omega1, ini_omega2, fin_omega1, fin_omega2;
         ini_omega1 = ini_bonds.at(0).position;
         ini_omega2 = ini_bonds.at(1).position;
@@ -123,12 +131,24 @@ namespace geodesic{
         DeltaTheta delta_theta2
             = DeltaTheta(2, fin_omega2,
                 compute_mean, compute_err, print_val, e_format);
+        if (_obs){
+            _obs->add_observable(&length);
+            _obs->add_observable(&omega_proj1);
+            _obs->add_observable(&omega_proj2);
+            _obs->add_observable(&psi1);
+            _obs->add_observable(&psi2);
+            _obs->add_observable(&delta_theta1);
+            _obs->add_observable(&delta_theta2);
+        }
+        else {
+            std::vector<Observable*> observables_vec
+                = { &length,
+                    &omega_proj1, &omega_proj2,
+                    &psi1, &psi2, &delta_theta1, &delta_theta2};
+            ObservableContainer obs = ObservableContainer(observables_vec);
+            _obs = &obs;
+        }
         // observable container
-        std::vector<Observable*> observables_vec
-            = { &length,
-                &omega_proj1, &omega_proj2,
-                &psi1, &psi2, &delta_theta1, &delta_theta2};
-        ObservableContainer obs = ObservableContainer(observables_vec);
         // traverse path, compute observables
         std::list<Record> full_path = path.get_path();
         std::list<Record>::const_iterator rec;
@@ -137,7 +157,7 @@ namespace geodesic{
         size_t idata = 1000;
         size_t iprint = 1000;
         size_t step = 0;
-        obs.run_begin(dtdir, name, should_write_data);
+        _obs->run_begin(dtdir, name, should_write_data);
         for (rec = full_path.begin();
              rec != std::prev(full_path.end());
              std::advance(rec, 1))
@@ -150,12 +170,15 @@ namespace geodesic{
             psi2.update(*(std::next(rec)));
             delta_theta1.update(*rec, *(std::next(rec)));
             delta_theta2.update(*rec, *(std::next(rec)));
-            obs.record_observables();
+            _obs->calculate_observables(rec->atom_state());
+            _obs->record_observables();
             if (step % iprint == 0) {
-                fprintf(stdout, "%s", obs.status_string(verbose).c_str());
+                fprintf(stdout, "%s", _obs->status_string(verbose).c_str());
             }
-            if (step % idata == 0) obs.write_data(dtdir, name);
+            if (step % idata == 0) _obs->write_data(dtdir, name);
         }
-        if (step % idata != 0) obs.write_data(dtdir, name);
+        _obs->calculate_observables(path.final().atom_state());
+        _obs->record_observables();
+        _obs->write_data(dtdir, name);
     }
 } // namespace geodesic

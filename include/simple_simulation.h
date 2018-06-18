@@ -166,6 +166,7 @@ namespace simple{
         // temporary observables to check algorithm implementation
         geodesic::OmegaProj omega_proj1;
         geodesic::OmegaProj omega_proj2;
+        geodesic::Path path() const {return _path;};
         double landscape_energy() const {return _el;};
         void set_landscape_energy(double el) {_el = el;};
         void compute_path();
@@ -232,6 +233,28 @@ namespace simple{
             size_t _maxiter = 500000,   // max propagation steps
             size_t _max_escape_iter = 10000);   // max escape steps
         ~ShortStepGeodesicSimulation();
+    };
+    class ShoveGeodesicSimulation : public GeodesicSimulation {
+    public:
+        ShoveGeodesicSimulation(std::string name,
+            std::string initial,
+            std::string final,
+            std::string cndir,
+            std::string tpdir,
+            std::string dtdir,
+            ObservableContainer& container,
+            geodesic::SHOVE* comp,
+            double landscape_energy,
+            bool should_write_data = true,
+            double sigma = 0.005,       // max step in configuration space
+            size_t icalc = 10,          // calculate every 10 steps
+            size_t iblock = 100,        // average every 100 calcsteps
+            size_t iprint = 1000,       // print status every 1000 steps
+            size_t isave = 1000,        // save config + obs every 1000 steps
+            size_t itape = 100,         // save config every 100 steps
+            size_t _maxiter = 500000,   // max propagation steps
+            size_t _max_escape_iter = 10000);   // max escape steps
+        ~ShoveGeodesicSimulation();
     };
 } // namespace simple
 #endif

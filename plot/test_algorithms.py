@@ -36,19 +36,19 @@ def make_title(sim, yl, ell):
             + mathenv("\\ell=" + "%5.3f" % ell))
 
 sim_name = 'test'
-sims = ['slerp','shortstep','md']
-lbls = ['Slerp','Enhanced Slerp','MD']
-fdir = "test/geodesic/"
+sims = ['slerp','shove']#,'md']
+lbls = ['Slerp','new algorithm']#,'MD']
+fdir = "test/geodesic/exact/"
 outdir = "/Users/Arthur/stratt/lab_notebook/"
 # xlabel, xunits
 xl = "\\tau = \\ell^{(m)}/\\,\\ell^{\\mathrm{f}}"
 xu = "1"
 xr = [-0.01, 1.01]
 fs = 14  # fontsize
-observables = ['omega_proj', 'psi', 'delta_theta']
-ylabels = ['\\hat{\\Omega} \\cdot \\hat{n}', '\\psi', '\\delta\\theta']
-yunits = ['1', '\\mathrm{rad}', '\\mathrm{rad}']
-yranges = [[-1.01, 1.01], [-0.2, pi + 0.2], [-pi/130., +pi/100.]]
+observables = ['omega_proj', 'psi']
+ylabels = ['\\hat{\\Omega} \\cdot \\hat{n}', '\\psi', '\\left|1 - \\left|\\hat{\\Omega}\\right|\\right|']
+yunits = ['1', '\\mathrm{rad}', '1']
+yranges = [[-1.01, 1.01], [-0.2, pi + 0.2], [-0.1, 2.1]]
 # indices = [1, 2]                              # only plot first link
 colors = ['b', 'r', 'k']
 styles = ['--', '--', '-']
@@ -71,26 +71,18 @@ for (obs, yl, yu, yr) in zip(observables, ylabels, yunits, yranges):
         plt.ylim(yr)
         if ((sim == 'slerp') and (obs == 'delta_theta')):
             plt.plot(tau[0:idx], np.zeros((tau[0:idx]).shape), color = c, linestyle = l, label = (lbl + " link"))
+            plt.plot(tau[0:idx], np.zeros((tau[0:idx]).shape), color = c, linestyle = l, label = (lbl + " link"))
+        elif ((obs == 'omega_norm') and (sim != 'shove')):
+            continue
         else:
-            col = colname(obs, 1)
+            col = colname(obs, 2)
             tex = meta.query(search("short_name", col))['tex_name'].item()  # wut label to use?
             var = data[col].values
-            plt.plot(tau[0:idx], var[0:idx], color = c, linestyle = l, label = (lbl + " link"))
+            if (obs == 'omega_norm'):
+                plt.semilogy(tau[0:idx], abs(1 - var[0:idx]), color = c, linestyle = l, label = (lbl + " link"))
+            else:
+                plt.plot(tau[0:idx], var[0:idx], color = c, linestyle = l, label = (lbl + " link"))
     plt.legend(prop={'size': fs})
     plt.tight_layout()
     plt.savefig(outdir + obs + ".png", dpi = 300)
     plt.close(fig)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

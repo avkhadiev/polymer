@@ -138,6 +138,7 @@ namespace geodesic{
     }
     void Path::recompute_length(){
         //length._zero();
+
         if (_path.size() == 0){
             // no intermediate values
             _increment_length(initial(), final());
@@ -212,6 +213,64 @@ namespace geodesic{
             perror("open");
         }
         writeout.close();
+    }
+    Path Path::get_slice(size_t n_slices, size_t mth_slice){
+        if (n_slices > nrecords() - 1){
+            fprintf(stderr, "%s\n", "Path::get_slice number of slices should be no greater than one less the number of records. Returning an empty path");
+            return Path();
+        }
+        if ((mth_slice > n_slices) || (mth_slice < 1)) {
+            fprintf(stderr, "%s\n", "Path::get_slice number of the slice should be a positive number no greater than the number of slices. Returning an empty path");
+            return Path();
+        }
+        size_t overlap = n_slices - 1;
+        double check = (double)(nrecords() + overlap);
+        size_t nrecords_per_slice
+            = (size_t)(std::ceil(check / ((double)n_slices)));
+        fprintf(stderr, "%s %zu %s %zu %s %zu\n",
+            "nrecords", nrecords(), "overlap", overlap,
+            "nrecords_per_slice", nrecords_per_slice);
+        // these indices index the path excluding the endpoints
+        // if the entire path, including endpoints, is 0-index, then
+        // the range has to be from 1 to nrecords - 2;
+        size_t start_index = (mth_slice - 1) * (nrecords_per_slice - 1);
+        size_t finish_index = start_index + nrecords_per_slice - 1;
+        // if this is the first or the last slice,
+        // will have to start later or end earlier
+        if (start_index == 0) ++start_index;
+        if (finish_index >= nrecords() - 1){
+            finish_index = nrecords() - 2;
+        }
+        // find initial and final iterators for the list of records
+        fprintf(stderr, "start %zu finish %zu\n", start_index, finish_index);
+        std::list<Record>::const_iterator begin;
+        std::list<Record>::const_iterator end;
+        size_t running_index = 1;
+        for (std::list<Record>::const_iterator rec = _path.begin();
+             rec != _path.end();
+             std::advance(rec, 1)){
+            if (running_index == start_index){
+                begin = rec;
+            }
+            else if (running_index == finish_index){
+                end = rec;
+                fprintf(stderr, "%s\n", "got final index");
+                break;
+            }
+            ++running_index;
+        }
+        fprintf(stderr, "%s %zu\n", "running index", running_index);
+        // use range constructor to make a new_path,
+        // add the endpoints if necessary
+        fprintf(stderr, "%s\n", "constructing new record");
+        std::list<Record> new_path(begin, end);
+        if (start_index == 1) new_path.push_front(initial());
+        if (finish_index == nrecords() - 2) new_path.push_back(final());
+        fprintf(stderr, "%s\n", "making a path");
+        Path sliced_path = Path(new_path);
+        fprintf(stderr, "%s with %zu records\n", "Returning sliced path with",
+            sliced_path.nrecords());
+        return sliced_path;
     }
     std::string Path::_header_str() const{
         bool verbose = false;

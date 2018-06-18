@@ -83,27 +83,29 @@ namespace simple{
         //*********************************************************************
         _prepare_observables();
         //*********************************************************************
-        fprintf(stdout, "%s\n", "Simulation is set up:");
-        fprintf(stdout, "%s: %s\n", "Name", _name.c_str());
-        fprintf(stdout, "%s\n", _cfg.get_info_str().c_str());
-        ForceUpdater& fupd = integrator.get_force_updater();
-        if (_cfg.nmolecules() > 0){
-            fprintf(stdout, "%s:\n%s", "Polymer-Polymer potential",
-                fupd.get_polymer_potential()->get_str().c_str());
-        }
-        if (_cfg.nsolvents() > 0){
-            fprintf(stdout, "%s:\n%s", "Solvent-Solvent potential",
-                fupd.get_solvent_potential()->get_str().c_str());
-        }
-        if ((_cfg.nsolvents() > 0) and (_cfg.nmolecules() > 0)){
-            fprintf(stdout, "%s:\n%s", "Polymer-Solvent potential",
-                fupd.get_inter_potential()->get_str().c_str());
-        }
-        if (_is_input_given){
-            fprintf(stdout, "%s: %s\n",
-                "Input Config File",
-                _infile.c_str());
-            _read_config();                 // may change state
+        if (VERBOSE) {
+            fprintf(stdout, "%s\n", "Simulation is set up:");
+            fprintf(stdout, "%s: %s\n", "Name", _name.c_str());
+            fprintf(stdout, "%s\n", _cfg.get_info_str().c_str());
+            ForceUpdater& fupd = integrator.get_force_updater();
+            if (_cfg.nmolecules() > 0){
+                fprintf(stdout, "%s:\n%s", "Polymer-Polymer potential",
+                    fupd.get_polymer_potential()->get_str().c_str());
+            }
+            if (_cfg.nsolvents() > 0){
+                fprintf(stdout, "%s:\n%s", "Solvent-Solvent potential",
+                    fupd.get_solvent_potential()->get_str().c_str());
+            }
+            if ((_cfg.nsolvents() > 0) and (_cfg.nmolecules() > 0)){
+                fprintf(stdout, "%s:\n%s", "Polymer-Solvent potential",
+                    fupd.get_inter_potential()->get_str().c_str());
+            }
+            if (_is_input_given){
+                fprintf(stdout, "%s: %s\n",
+                    "Input Config File",
+                    _infile.c_str());
+                _read_config();                 // may change state
+            }
         }
         if (VERBOSE) {
             fprintf(stdout, "%s: %s%s\n",
@@ -248,7 +250,9 @@ namespace simple{
         _itape = 0;
         bool should_avg_og = _obs.should_average();
         _obs.set_average_data(false);
-        fprintf(stdout, "%s %f\n", "RELAXATION TIME: ", relax_time);
+        if (VERBOSE) {
+            fprintf(stdout, "%s %f\n", "RELAXATION TIME: ", relax_time);
+        }
         evolve(relax_time);
         _obs.zero_accumulators();
         _obs.set_average_data(should_avg_og);
@@ -311,7 +315,6 @@ namespace simple{
             if (calc){
                 _record_observables();
                 if ((_should_write_data) and (_calcstep % iblock == 0)) {
-                    fprintf(stderr, "%s\n", "writing data");
                     _write_data();
                 }
             }
@@ -359,20 +362,20 @@ namespace simple{
         _maxiter(maxiter),
         _max_escape_iter(max_escape_iter),
         //  mean  err  print e_format
-        _pe(true, true, true, true),
+        _pe(false, false, false, false),
         omega_proj1(vector(0.0,0.0,0.0), vector(0.0,0.0,0.0), 1,
-                    false, false, true, false),
+                    false, false, false, false),
         omega_proj2(vector(0.0,0.0,0.0), vector(0.0,0.0,0.0), 2,
-                    false, false, true, false)
+                    false, false, false, false)
     {
         // add potential energy and omega projections as observables
         _obs.add_observable(&_pe);
         _obs.add_observable(_path.get_length());
         // TEMPRORARY OBSERVABLES : CHECKING CONVERGENCE
         std::vector<simple::Bond> ini_bonds
-            = _path.initial().state().get_polymers().at(0).get_bonds();
+            = _path.initial().bond_state().get_polymers().at(0).get_bonds();
         std::vector<simple::Bond> fin_bonds
-            = _path.final().state().get_polymers().at(0).get_bonds();
+            = _path.final().bond_state().get_polymers().at(0).get_bonds();
         Vector ini_omega1, ini_omega2, fin_omega1, fin_omega2;
         ini_omega1 = ini_bonds.at(0).position;
         fin_omega1 = fin_bonds.at(0).position;
@@ -396,10 +399,6 @@ namespace simple{
         omega_proj1.set_fin(fin_omega1);
         omega_proj2.set_ini(ini_omega2);
         omega_proj2.set_fin(fin_omega2);
-        fprintf(stderr, "%s: %s\n",
-            "nhat1", vector_to_string(omega_proj1.nhat()).c_str());
-        fprintf(stderr, "%s: %s\n",
-            "nhat2", vector_to_string(omega_proj2.nhat()).c_str());
         _obs.add_observable(&omega_proj1);
         _obs.add_observable(&omega_proj2);
         _prepare_observables();
@@ -410,7 +409,6 @@ namespace simple{
                 "Setting default value", 0.001);
             _dtau = 0.001;
         }
-        fprintf(stdout, "%s\n", "Geodesic simulation is set up!");
     }
     GeodesicSimulation::~GeodesicSimulation(){}
     void GeodesicSimulation::_prepare_outstream(std::ofstream &stream,
@@ -454,8 +452,8 @@ namespace simple{
         size_t isave = _isave;
         size_t itape = _itape;
         //size_t itape = _itape;
-        // _i<interval> == 0 => don't perform the action, but evolve() will
-        // use modular arithmetic: if _step % i<interval> == 0
+        // _i<interval> == 0 => don't perform the action, but compute_path()
+        // will use modular arithmetic: if _step % i<interval> == 0
         if (icalc == 0) icalc = _maxiter + 1;
         if (iblock == 0) {
             // if there is no block averaging...
@@ -474,7 +472,7 @@ namespace simple{
         bool escaped;
         size_t escape_iter;
         // FIXME add this as a parameter in simulation initializer
-        double delta_pe = pow(10.0, 8.0);
+        double delta_pe = pow(10.0, -8.0);
         _calcstep = 0;
         _blockstep = 0;
         geodesic::Record rec = _path.current_tail();
@@ -485,7 +483,8 @@ namespace simple{
             _prepare_pfstream(pfstream);
             //rec.write(pfstream, output_header);
         }
-        while( (_step < _maxiter) && (_comp->move(rec, _path.final(), _dtau)) ){
+        // removed condition: (_step < _maxiter) &&
+        while( _comp->move(rec, _path.final(), _dtau) ){
             _comp->update_PE(rec);
             if (rec.pe() > _el + delta_pe){
                 fprintf(stderr, "%s\n", "Forbidden area encountered!");
@@ -506,7 +505,7 @@ namespace simple{
             _path.append(rec);
             // take care of observables and bookkeeping
             _step = _step + 1;
-            if (_step % 10000 == 0) {
+            if (_step % iprint == 0) {
                 fprintf(stderr, "%s\n", "********************************");
                 fprintf(stderr, "%s %zu\n", "STEP", _step);
                 fprintf(stderr, "%s\n", "********************************");
@@ -519,7 +518,7 @@ namespace simple{
                 omega_proj1.update(rec);
                 omega_proj2.update(rec);
                 // manage observable calculation and averaging
-                // calculate_observables(iblock, _path.current_tail().state());
+                _calculate_observables(iblock,   _path.current_tail().atom_state());
                 // printing updates and saving a configuration will only happen
                 // if observables are being calculated
                 if (_step % iprint == 0) _write_status();
@@ -534,6 +533,26 @@ namespace simple{
                 }
             }
             rec = _path.current_tail();
+        }
+        // write last status once run is complete
+        _write_status();
+        // compute how close each atom is to its final position
+        simple::AtomPolymer cur = rec.atom_state().polymers.at(0);
+        simple::AtomPolymer fin = _path.final().atom_state().polymers.at(0);
+        fprintf(stderr, "%s %zu %s\n", "Path computed in", _step, "steps");
+        double diffsq = 0.0;
+        for (size_t i = 0; i < BasePolymer::nb() + 1; ++i){
+            diffsq += normsq(subtract(fin.atoms.at(i).position,
+                                 cur.atoms.at(i).position));
+        }
+        fprintf(stderr, "%s: %3.8f\n",
+            "Config space distance from the endpoint", sqrt(diffsq));
+        fprintf(stderr, "%s: %s\n",
+            "Final R_CM:", vector_to_string(cur.rcm()).c_str());
+        // output last data results if they haven't been output just now
+        _record_observables();
+        if ((_should_write_data) and (_calcstep % iblock != 0)) {
+            _write_data();
         }
         if (_isave != 0){
             // output endpoint record before closing
@@ -590,4 +609,27 @@ namespace simple{
             dtau, icalc, iblock, iprint, isave, itape,
             maxiter, max_escape_iter){}
     ShortStepGeodesicSimulation::~ShortStepGeodesicSimulation(){}
+    ShoveGeodesicSimulation::ShoveGeodesicSimulation(std::string name,
+        std::string initial,
+        std::string final,
+        std::string cndir,
+        std::string tpdir,
+        std::string dtdir,
+        ObservableContainer& container,
+        geodesic::SHOVE* comp,
+        double landscape_energy,
+        bool should_write_data,
+        double sigma,               // max step in configuration space
+        size_t icalc,               // calculate every 10 steps
+        size_t iblock,              // average every 100 calcsteps
+        size_t iprint,              // print status every 1000 steps
+        size_t isave,               // save config + obs every 1000 steps
+        size_t itape,               // save config every 100 steps
+        size_t maxiter,             // max propagation steps
+        size_t max_escape_iter) :   // max escape steps
+    GeodesicSimulation(name, initial, final, cndir, tpdir, dtdir,
+        container, comp, landscape_energy, should_write_data,
+        sigma, icalc, iblock, iprint, isave, itape,
+        maxiter, max_escape_iter){}
+    ShoveGeodesicSimulation::~ShoveGeodesicSimulation(){}
 } // namespace simple

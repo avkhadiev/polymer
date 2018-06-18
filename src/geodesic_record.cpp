@@ -90,7 +90,13 @@ namespace geodesic{
     simple::BondState& Record::bond_state(){
         return cfg_handler.bond_state();
     }
+    const simple::BondState& Record::bond_state() const{
+        return cfg_handler.bond_state();
+    }
     simple::AtomState& Record::atom_state(){
+        return cfg_handler.atom_state();
+    }
+    const simple::AtomState& Record::atom_state() const{
         return cfg_handler.atom_state();
     }
     std::string Record::to_string(bool output_header,

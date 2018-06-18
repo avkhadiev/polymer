@@ -17,7 +17,7 @@ namespace default_settings {
     const std::string init_header = "# initialization: rho_s kbT/e pol_conformation pol_energy_per_atom";
     const std::string integration_header = "# integration: runtime dt tol";
     const std::string geodesic_header
-        = "# geodesic: geodir_input geodir_output geodir_data el dtau save_md_path";
+        = "# geodesic: geodir_input geodir_output geodir_data el dtau epsilon save_md_path reverse_path";
     const std::string io_header = "i/o: cndir datadir tpdir icalc iprint isave iblock itape should_write_data";
     // POTENTIAL SETTINGS
     const double epp = 1.0;
@@ -53,7 +53,9 @@ namespace default_settings {
         = "/Users/Arthur/stratt/polymer/test/geodesics/";
     const double el = 0.0;
     const double dtau = 0.001;
+    const double epsilon = 0.0001;
     const int save_md_path = 0;
+    const int reverse_path = 0;
     // I/O SETTINGS
     const std::string cndir = "/Users/Arthur/stratt/polymer/test/";
     const std::string dtdir = "/Users/Arthur/stratt/polymer/test/";
@@ -103,6 +105,7 @@ SettingsParser::SettingsParser() :
     el(default_settings::el),
     dtau(default_settings::dtau),
     save_md_path(default_settings::save_md_path),
+    reverse_path(default_settings::reverse_path),
     // I/O SETTINGS
     cndir(default_settings::cndir),
     dtdir(default_settings::dtdir),
@@ -184,7 +187,9 @@ void SettingsParser::read_geodesic(std::ifstream& stream){
     std::vector<std::string> args = get_args(line);
     el = atof(args.at(0).c_str());
     dtau = atof(args.at(1).c_str());
-    save_md_path = atoi(args.at(2).c_str());
+    epsilon = atof(args.at(2).c_str());
+    save_md_path = atoi(args.at(3).c_str());
+    reverse_path = atoi(args.at(4).c_str());
 }
 void SettingsParser::read_io(std::ifstream& stream){
     std::string line;
@@ -303,11 +308,14 @@ void SettingsParser::write_geodesic(std::ofstream& stream) const{
         // output header
         stream << geodesic_header << std::endl;
         // output values
-        stream << geodir_input << " ";
-        stream << geodir_output << " ";
-        stream << geodir_data << " ";
+        stream << geodir_input << std::endl;
+        stream << geodir_output << std::endl;
+        stream << geodir_data << std::endl;
         stream << std::to_string(el) << " ";
-        stream << std::to_string(dtau) << std::endl;
+        stream << std::to_string(dtau) << " ";
+        stream << std::to_string(epsilon) << " ";
+        stream << std::to_string(save_md_path) << " ";
+        stream << std::to_string(reverse_path) << std::endl;
     }
     else{
         // if file still could not be opened

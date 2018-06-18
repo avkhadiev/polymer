@@ -105,13 +105,33 @@ int main(int argc, char **argv){
         polymer::AngMomComponent lz
             = polymer::AngMomComponent(vector(0.0, 0.0, 1.0),
                 !calc_mean, !calc_err, !print_val);
+        polymer::PolAtomPosComponent r1x
+            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 0);
+        polymer::PolAtomPosComponent r2x
+            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 1);
+        polymer::PolAtomPosComponent r3x
+            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 2);
+        polymer::PolAtomPosComponent r1y
+            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 0);
+        polymer::PolAtomPosComponent r2y
+            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 1);
+        polymer::PolAtomPosComponent r3y
+            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 2);
+        polymer::PolAtomPosComponent r1z
+            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 0);
+        polymer::PolAtomPosComponent r2z
+            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 1);
+        polymer::PolAtomPosComponent r3z
+            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 2);
         std::vector<Observable*> observables_vec
             = {&time,
                 &ke_polymer, &pe_polymer,
                 &temp_kin_polymer,
                 &w_polymer, &wc_polymer,
                 &px, &py, &pz,
-                &lx, &ly, &lz};
+                &lx, &ly, &lz,
+                &r1x, &r1y, &r1z, &r2x, &r2y,
+                &r2z, &r3x, &r3y, &r3z };
         ObservableContainer container = ObservableContainer(observables_vec);
         ObservableContainer& obs = container;
         bool is_planar;
@@ -177,9 +197,11 @@ int main(int argc, char **argv){
                 "with scale factor",
                 scale_factor);
         }
-        fprintf(stdout, "%s\n%s",
-            "State initialized by the Configuration Handler:",
-            cfg.bond_state().to_string(true, true).c_str());
+        if (DEBUG){
+            fprintf(stdout, "%s\n%s",
+                "State initialized by the Configuration Handler:",
+                cfg.bond_state().to_string(true, true).c_str());
+        }
         RattleIntegrator rattle = RattleIntegrator(force_loop,
             settings.tol,
             &ke_polymer, NULL,

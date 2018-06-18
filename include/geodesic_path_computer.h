@@ -17,6 +17,7 @@
 #include "observable.h"
 #include "potential.h"
 #include "force_updater.h"
+#include "shove_integrator.h"               /** For the new algorithm */
 #include "observable_container.h"
 #include "general_observables.h"            /** Potential Energy    */
 #include "geodesic_observables.h"           /** angles, steps, etc. */
@@ -35,7 +36,7 @@ namespace geodesic{
         PathComputer(Potential* polymer_potential,
             Potential* solvent_potential,
             Potential* inter_potential,
-            double epsilon = 0.001);
+            double epsilon = 0.000001);
         ~PathComputer();
         double epsilon() const {return _epsilon;};
         void set_epsilon(double epsilon) {_epsilon = epsilon;};
@@ -43,10 +44,11 @@ namespace geodesic{
         /** if current record is close enough to final record, return false
         * if not, return true and move current record dtau towards final record
         */
-        virtual bool move(Record &cur, const Record &fin, double dtau) = 0;
+        virtual bool move(Record &cur, const Record &fin, double dr) = 0;
         /**> TODO */
         virtual void escape(Record &cur, const Record &fin, double param) = 0;
     protected:
+        bool _is_path_complete(Record &cur, const Record &fin, double epsilon);
         ForceUpdater _fupd;                /** to compute PE    */
         double _epsilon;                   /** measure how close records are  */
     };
@@ -58,7 +60,7 @@ namespace geodesic{
         SLERP(Potential* polymer_potential,
             Potential* solvent_potential,
             Potential* inter_potential,
-            double epsilon = 0.001);
+            double epsilon = 0.000001);
         ~SLERP();
         class Omega {
         public:
@@ -107,14 +109,14 @@ namespace geodesic{
             const Record& record);
     };
     /***************************************************************************
-    *                 GEODESIC SHORT-STEP PATH COMPUTER
+    *             GEODESIC SHORT-STEP PATH COMPUTER (Enhanced SLERP)
     ***************************************************************************/
     class ShortStep : public SLERP {
     public:
         ShortStep(Potential* polymer_potential,
             Potential* solvent_potential,
             Potential* inter_potential,
-            double epsilon = 0.001);
+            double epsilon = 0.000001);
         ~ShortStep();
         class Omega : public SLERP::Omega {
         public:
@@ -159,6 +161,43 @@ namespace geodesic{
             const Record& record);
         /** that's the meat of the algorithm! */
         void _compute_thetas(std::vector< Omega>& links);
+    };
+    /***************************************************************************
+    *                          GEODESIC SHOVE COMPUTER
+    ***************************************************************************/
+    class SHOVE : public PathComputer {
+    public:
+        SHOVE(Potential* polymer_potential,
+            Potential* solvent_potential,
+            Potential* inter_potential,
+            double tol = pow(10, -8.0),
+            double epsilon = 0.000001);
+        ~SHOVE();
+        virtual bool move(Record &cur, const Record &fin, double dr);
+        /**> TODO */
+        virtual void escape(Record &cur, const Record &fin, double param);
+        Psi psi1, psi2;                             /** remaining angle */
+    private:
+        ShoveIntegrator _integrator;
+        std::vector<bool> _move_atom;
+        bool _is_path_complete(Record &cur, const Record &fin, double epsilon);
+        void _assign_velocities(Record &cur, const Record &fin, double dr);
+    };
+    /***************************************************************************
+    *                          GEODESIC PLERP COMPUTER
+    ***************************************************************************/
+    class PLERP : public PathComputer {
+    public:
+        PLERP(Potential* polymer_potential,
+            Potential* solvent_potential,
+            Potential* inter_potential,
+            double epsilon = 0.000001);
+        ~PLERP();
+        virtual bool move(Record &cur, const Record &fin, double dr);
+        /**> TODO */
+        virtual void escape(Record &cur, const Record &fin, double param);
+    private:
+        bool _is_path_complete(Record &cur, const Record &fin, double epsilon);
     };
 } // namespace geodesic
 #endif

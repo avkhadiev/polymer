@@ -17,35 +17,54 @@ namespace geodesic{
                      print_inst_val, e_format),
         increment_sq(0.0){}
     Length::Length() : Length(true, false){}
+    // Old (SLERP) version of Length calculation
+    //void Length::update( const geodesic::Record &last,
+    //                     const geodesic::Record &next){
+    //    simple::BondState last_state = last.bond_state();
+    //    simple::BondState next_state = next.bond_state();
+    //    increment_sq = 0;
+    //    size_t nb = simple::BasePolymer::nb();
+    //    std::vector<simple::Bond> last_bonds
+    //        = last_state.get_polymers().at(0).get_bonds();
+    //    std::vector<simple::Bond> next_bonds
+    //        = next_state.get_polymers().at(0).get_bonds();
+    //    Vector omega1, omega2;
+    //    for (size_t i = 0; i < nb; ++i){
+    //        omega1 = last_bonds.at(i).position;
+    //        omega2 = next_bonds.at(i).position;
+    //        double delta;
+    //        if (omega1 == omega2) {
+    //            delta = 0.0;
+    //        }
+    //        else {
+    //            delta = acos(dot(omega1, omega2)/(norm(omega1) * norm(omega2)));
+    //        }
+    //        if (std::isnan(delta)){
+    //            fprintf(stderr, "%s\n%s: %s\n%s: %s\n",
+    //                "Length increment is NaN",
+    //                "omega1", vector_to_string(omega1).c_str(),
+    //                "omega2", vector_to_string(omega2).c_str());
+    //            fprintf(stderr, "vectors equal: %d\n", omega1 == omega2);
+    //        }
+    //        increment_sq += pow(delta, 2.0);
+    //    }
+    //    value += sqrt(increment_sq);
+    //}
     void Length::update(const geodesic::Record &last,
                         const geodesic::Record &next){
-        simple::BondState last_state = last.state();
-        simple::BondState next_state = next.state();
-        increment_sq = 0;
-        size_t nb = simple::BasePolymer::nb();
-        std::vector<simple::Bond> last_bonds
-            = last_state.get_polymers().at(0).get_bonds();
-        std::vector<simple::Bond> next_bonds
-            = next_state.get_polymers().at(0).get_bonds();
-        Vector omega1, omega2;
-        for (size_t i = 0; i < nb; ++i){
-            omega1 = last_bonds.at(i).position;
-            omega2 = next_bonds.at(i).position;
-            double delta;
-            if (omega1 == omega2) {
-                delta = 0.0;
-            }
-            else {
-                delta = acos(dot(omega1, omega2)/(norm(omega1) * norm(omega2)));
-            }
-            if (std::isnan(delta)){
-                fprintf(stderr, "%s\n%s: %s\n%s: %s\n",
-                    "Length increment is NaN",
-                    "omega1", vector_to_string(omega1).c_str(),
-                    "omega2", vector_to_string(omega2).c_str());
-                fprintf(stderr, "vectors equal: %d\n", omega1 == omega2);
-            }
-            increment_sq += pow(delta, 2.0);
+        simple::AtomState last_state = last.atom_state();
+        simple::AtomState next_state = next.atom_state();
+        increment_sq = 0.0;
+        size_t na = simple::BasePolymer::nb() + 1;
+        std::vector<simple::Atom> last_atoms
+            = last_state.get_polymers().at(0).get_atoms();
+        std::vector<simple::Atom> next_atoms
+            = next_state.get_polymers().at(0).get_atoms();
+        Vector pos1, pos2;
+        for (size_t i = 0; i < na; ++i){
+            pos1 = last_atoms.at(i).position;
+            pos2 = next_atoms.at(i).position;
+            increment_sq += normsq(subtract(pos2, pos1));
         }
         value += sqrt(increment_sq);
     }
@@ -123,7 +142,7 @@ namespace geodesic{
         OmegaProj(vector(0.0,0.0,0.0), vector(0.0,0.0,0.0),
                 0, false, false, false, false){}
     void OmegaProj::update(const geodesic::Record &current){
-        Vector vec = current.state().get_polymers().at(0).get_bonds().at(_link_number - 1).position;
+        Vector vec = current.bond_state().get_polymers().at(0).get_bonds().at(_link_number - 1).position;
         update(vec);
     }
     /**************************************************************************
@@ -148,7 +167,7 @@ namespace geodesic{
         _finnorm = norm(_fin);
     }
     void Psi::update(const geodesic::Record &current){
-         simple::BondState state = current.state();
+         simple::BondState state = current.bond_state();
          std::vector<simple::Bond> bonds
              = state.get_polymers().at(0).get_bonds();
          Vector omega = bonds.at(_link_number-1).position;
@@ -213,8 +232,8 @@ namespace geodesic{
     }
     void DeltaTheta::update(const geodesic::Record &last,
                             const geodesic::Record &next){
-        simple::BondState last_state = last.state();
-        simple::BondState next_state = next.state();
+        simple::BondState last_state = last.bond_state();
+        simple::BondState next_state = next.bond_state();
         std::vector<simple::Bond> last_bonds
         = last_state.get_polymers().at(0).get_bonds();
         std::vector<simple::Bond> next_bonds

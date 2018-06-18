@@ -93,8 +93,8 @@ namespace geodesic{
         Psi();
         Psi( size_t link_number,
              Vector fin,
-             bool print_inst_val,   // print out inst value in log & state?
-             bool e_format = false);// use precision notation when writing out?
+             bool print_inst_val = false,// print out inst value in log & state?
+             bool e_format = false);     // use precision notation when writing out?
     };
     /**
     * In-plane step deltaPsi, updated by the force_loop(computer)
@@ -109,8 +109,8 @@ namespace geodesic{
             size_t link_number,
             bool calculate_mean,
             bool calculate_error,
-            bool print_inst_val,   // print out inst value in log & state?
-            bool e_format = false  // use precision notation when writing out?
+            bool print_inst_val=false,// print out inst value in log & state?
+            bool e_format = false     // use precision notation when writing out?
         );
         DeltaPsi();
     };
@@ -125,8 +125,8 @@ namespace geodesic{
         ~Theta(){};
         Theta(
             size_t link_number,
-            bool print_inst_val,   // print out inst value in log & state?
-            bool e_format = false  // use precision notation when writing out?
+            bool print_inst_val=false,// print out inst value in log & state?
+            bool e_format = false     // use precision notation when writing out?
         );
         Theta();
     };
@@ -149,8 +149,8 @@ namespace geodesic{
             Vector fin,
             bool calculate_mean,
             bool calculate_error,
-            bool print_inst_val,   // print out inst value in log & state?
-            bool e_format = false  // use precision notation when writing out?
+            bool print_inst_val=false,// print out inst value in log & state?
+            bool e_format = false     // use precision notation when writing out?
         );
         DeltaTheta();
     };
@@ -166,8 +166,8 @@ namespace geodesic{
             size_t link_number,
             bool calculate_mean,
             bool calculate_error,
-            bool print_inst_val,   // print out inst value in log & state?
-            bool e_format = false  // use precision notation when writing out?
+            bool print_inst_val=false,// print out inst value in log & state?
+            bool e_format = false     // use precision notation when writing out?
         );
         DeltaPhi();
     };

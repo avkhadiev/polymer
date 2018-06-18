@@ -18,9 +18,6 @@
 #include "simple_atom.h"
 #include "simple_bond.h"
 
-#define DEFAULT_NB 0
-#define DEFAULT_M 1.0
-#define DEFAULT_D 3.0
 namespace simple {
     /***************************************************************************
     *                               BASE POLYMER

@@ -68,8 +68,10 @@ public:
     std::string geodir_data;    /**> dir for storing geosim observables     */
     double el;                  /**> landscape energy mass                  */
     double dtau;                /**> change in progress variable            */
+    double epsilon;             /**> how close you need to get              */
     int save_md_path;           /**> 0 = don't save md_path, save o/w       */
-    const double max_propag_steps = 5000;
+    int reverse_path;           /**> 1 = switch initial and final points    */
+    const double max_propag_steps = 1000000;
     const double max_escape_steps = 1000;
     // i/o settings
     std::string cndir;          /**> directory for simulation config i/o    */

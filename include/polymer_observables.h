@@ -5,6 +5,7 @@
 #define POLYMER_POLYMER_OBSERVABLES_H
 #include "observable.h"
 #include "general_observables.h"
+#include "geodesic_observables.h"
 namespace polymer{
     /**
     * kinetic energy of a polymer, updated in integrator
@@ -122,25 +123,68 @@ namespace polymer{
         );
         ~AngMomComponent(){};
     };
-    ///**
-    //* a component of CM of a polymer, updated in main loop
-    //*/
-    //class RCMComponent :
-    //    public observable::RCMComponent {
-    //private:
-    //    virtual Vector rcm(const simple::AtomState& state);
-    //    void _update(Vector rcm, Vector component);
-//public:
-    //    virtual bool update_method_specified() const {return true;};
-    //    virtual void update(const simple::AtomState& state);
-    //    RCMComponent(Vector component,
-    //        size_t molecule_index,
-    //        bool calculate_mean,
-    //        bool calculate_error,
-    //        bool print_inst_val,   // print out inst value in log & state?
-    //        bool e_format = false  // use precision notation when writing)
-    //    );
-    //    ~RCMComponent(){};
-    //};
+    /**
+    * a component of CM of a polymer, updated in main loop
+    */
+    class RCMComponent :
+        public observable::RCMComponent {
+    private:
+        virtual Vector rcm(const simple::AtomState& state);
+        void _update(Vector rcm, Vector component);
+    public:
+        virtual bool update_method_specified() const {return true;};
+        virtual void update(const simple::AtomState& state);
+        RCMComponent(Vector component,
+            size_t molecule_index,
+            bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = false  // use precision notation when writing)
+        );
+        ~RCMComponent(){};
+    };
+    /**
+    * the length of a given bond of the polymer
+    */
+    class BondLength :
+        public geodesic::LinkObservable {
+    private:
+        size_t _molecule_index;
+    public:
+        virtual bool update_method_specified() const {return true;};
+        virtual void update(const simple::AtomState& state);
+        BondLength(size_t molecule_index,
+            size_t bond_index,
+            bool calculate_mean,
+            bool calculate_error,
+            bool print_inst_val,   // print out inst value in log & state?
+            bool e_format = true  // use precision notation when writing)
+        );
+        ~BondLength(){};
+    };
+    /**
+    * a component of an atomic position of the polymer
+    */
+    class PolAtomPosComponent :
+        public Observable {
+    private:
+        Vector _component;
+        size_t _molecule_index;
+        size_t _atom_index;
+        void _update(Vector r, Vector component);
+    public:
+        virtual bool update_method_specified() const {return true;};
+        virtual void update(const simple::AtomState& state);
+        void amend_names();            // indicate which component in the name
+        PolAtomPosComponent(Vector component,
+            size_t molecule_index,
+            size_t atom_index,
+            bool calculate_mean = false,
+            bool calculate_error = false,
+            bool print_inst_val = false,// print out inst value in log & state?
+            bool e_format = false       // use precision notation when writing?
+        );
+        ~PolAtomPosComponent(){};
+    };
 } // namespace polymer
 #endif

@@ -40,9 +40,13 @@ namespace geodesic{
         void merge(const Path& new_path);           /**> append new path    */
         /* if overwrite = true, truncates and outputs header string */
         void write(std::string file, bool overwrite);
+        /* allows to slice the path in n parts and get the mth slice        */
+        /* n should be less than or equal to one less the number of records */
+        /* m should be less than or equal to n                              */
+        Path get_slice(size_t n_slices, size_t mth_slice); 
     protected:
         void _increment_length( const Record& last_record,
-                                const Record& next_record);
+                                const Record& next_record );
         /* state header string                                              */
         virtual std::string _header_str() const;
         virtual void _read_header(std::ifstream& readout);

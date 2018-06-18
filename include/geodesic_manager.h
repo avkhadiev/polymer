@@ -30,7 +30,8 @@ namespace geodesic{
         Manager();
         Manager(Potential* polymer_potential,
             Potential* solvent_potential,
-            Potential* inter_potential);
+            Potential* inter_potential,
+            ObservableContainer* container);
         ~Manager();
         /**
         * Read states from cndir + sim_name + "_cn.cfg" and store the sequence
@@ -53,11 +54,13 @@ namespace geodesic{
         Record final() const;
     protected:
         ForceUpdater _fupd;
-        std::vector<simple::BondState> _states;
+        ObservableContainer *_obs;
+        std::vector<simple::AtomState> _states;
         bool _states_read;
         Record _initial;
         Record _final;
         double _pe(simple::BondState& state);
+        double _pe(simple::AtomState& state);
     };
 } // namespace geodesic
 #endif

@@ -326,19 +326,6 @@ run_geodesic_simulation/fast:
 .PHONY : run_geodesic_simulation/fast
 
 #=============================================================================
-# Target rules for targets named geodesic_manager_test
-
-# Build rule for target.
-geodesic_manager_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 geodesic_manager_test
-.PHONY : geodesic_manager_test
-
-# fast build rule for target.
-geodesic_manager_test/fast:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/build
-.PHONY : geodesic_manager_test/fast
-
-#=============================================================================
 # Target rules for targets named simulations
 
 # Build rule for target.
@@ -636,7 +623,6 @@ src/geodesic_manager.o: src/geodesic_manager.cpp.o
 
 # target to build an object file
 src/geodesic_manager.cpp.o:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.o
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_manager.cpp.o
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_manager.cpp.o
 .PHONY : src/geodesic_manager.cpp.o
@@ -647,7 +633,6 @@ src/geodesic_manager.i: src/geodesic_manager.cpp.i
 
 # target to preprocess a source file
 src/geodesic_manager.cpp.i:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.i
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_manager.cpp.i
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_manager.cpp.i
 .PHONY : src/geodesic_manager.cpp.i
@@ -658,37 +643,9 @@ src/geodesic_manager.s: src/geodesic_manager.cpp.s
 
 # target to generate assembly for a file
 src/geodesic_manager.cpp.s:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager.cpp.s
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_manager.cpp.s
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_manager.cpp.s
 .PHONY : src/geodesic_manager.cpp.s
-
-src/geodesic_manager_test.o: src/geodesic_manager_test.cpp.o
-
-.PHONY : src/geodesic_manager_test.o
-
-# target to build an object file
-src/geodesic_manager_test.cpp.o:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.o
-.PHONY : src/geodesic_manager_test.cpp.o
-
-src/geodesic_manager_test.i: src/geodesic_manager_test.cpp.i
-
-.PHONY : src/geodesic_manager_test.i
-
-# target to preprocess a source file
-src/geodesic_manager_test.cpp.i:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.i
-.PHONY : src/geodesic_manager_test.cpp.i
-
-src/geodesic_manager_test.s: src/geodesic_manager_test.cpp.s
-
-.PHONY : src/geodesic_manager_test.s
-
-# target to generate assembly for a file
-src/geodesic_manager_test.cpp.s:
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_manager_test.cpp.s
-.PHONY : src/geodesic_manager_test.cpp.s
 
 src/geodesic_observables.o: src/geodesic_observables.cpp.o
 
@@ -697,7 +654,6 @@ src/geodesic_observables.o: src/geodesic_observables.cpp.o
 # target to build an object file
 src/geodesic_observables.cpp.o:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_observables.cpp.o
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_observables.cpp.o
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_observables.cpp.o
 .PHONY : src/geodesic_observables.cpp.o
 
@@ -708,7 +664,6 @@ src/geodesic_observables.i: src/geodesic_observables.cpp.i
 # target to preprocess a source file
 src/geodesic_observables.cpp.i:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_observables.cpp.i
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_observables.cpp.i
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_observables.cpp.i
 .PHONY : src/geodesic_observables.cpp.i
 
@@ -719,7 +674,6 @@ src/geodesic_observables.s: src/geodesic_observables.cpp.s
 # target to generate assembly for a file
 src/geodesic_observables.cpp.s:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_observables.cpp.s
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_observables.cpp.s
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_observables.cpp.s
 .PHONY : src/geodesic_observables.cpp.s
 
@@ -730,7 +684,6 @@ src/geodesic_path.o: src/geodesic_path.cpp.o
 # target to build an object file
 src/geodesic_path.cpp.o:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.o
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.o
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_path.cpp.o
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_path.cpp.o
 .PHONY : src/geodesic_path.cpp.o
@@ -742,7 +695,6 @@ src/geodesic_path.i: src/geodesic_path.cpp.i
 # target to preprocess a source file
 src/geodesic_path.cpp.i:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.i
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.i
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_path.cpp.i
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_path.cpp.i
 .PHONY : src/geodesic_path.cpp.i
@@ -754,7 +706,6 @@ src/geodesic_path.s: src/geodesic_path.cpp.s
 # target to generate assembly for a file
 src/geodesic_path.cpp.s:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_path.cpp.s
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_path.cpp.s
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_path.cpp.s
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_path.cpp.s
 .PHONY : src/geodesic_path.cpp.s
@@ -823,7 +774,6 @@ src/geodesic_record.o: src/geodesic_record.cpp.o
 # target to build an object file
 src/geodesic_record.cpp.o:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.o
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.o
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_record.cpp.o
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.o
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_record.cpp.o
@@ -836,7 +786,6 @@ src/geodesic_record.i: src/geodesic_record.cpp.i
 # target to preprocess a source file
 src/geodesic_record.cpp.i:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.i
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.i
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_record.cpp.i
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.i
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_record.cpp.i
@@ -849,7 +798,6 @@ src/geodesic_record.s: src/geodesic_record.cpp.s
 # target to generate assembly for a file
 src/geodesic_record.cpp.s:
 	$(MAKE) -f CMakeFiles/geodesic_path_test.dir/build.make CMakeFiles/geodesic_path_test.dir/src/geodesic_record.cpp.s
-	$(MAKE) -f CMakeFiles/geodesic_manager_test.dir/build.make CMakeFiles/geodesic_manager_test.dir/src/geodesic_record.cpp.s
 	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/geodesic_record.cpp.s
 	$(MAKE) -f CMakeFiles/geodesic_record_test.dir/build.make CMakeFiles/geodesic_record_test.dir/src/geodesic_record.cpp.s
 	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/geodesic_record.cpp.s
@@ -1380,6 +1328,36 @@ src/settings_parser_test.cpp.s:
 	$(MAKE) -f CMakeFiles/settings_parser_test.dir/build.make CMakeFiles/settings_parser_test.dir/src/settings_parser_test.cpp.s
 .PHONY : src/settings_parser_test.cpp.s
 
+src/shove_integrator.o: src/shove_integrator.cpp.o
+
+.PHONY : src/shove_integrator.o
+
+# target to build an object file
+src/shove_integrator.cpp.o:
+	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/shove_integrator.cpp.o
+	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/shove_integrator.cpp.o
+.PHONY : src/shove_integrator.cpp.o
+
+src/shove_integrator.i: src/shove_integrator.cpp.i
+
+.PHONY : src/shove_integrator.i
+
+# target to preprocess a source file
+src/shove_integrator.cpp.i:
+	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/shove_integrator.cpp.i
+	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/shove_integrator.cpp.i
+.PHONY : src/shove_integrator.cpp.i
+
+src/shove_integrator.s: src/shove_integrator.cpp.s
+
+.PHONY : src/shove_integrator.s
+
+# target to generate assembly for a file
+src/shove_integrator.cpp.s:
+	$(MAKE) -f CMakeFiles/simulations.dir/build.make CMakeFiles/simulations.dir/src/shove_integrator.cpp.s
+	$(MAKE) -f CMakeFiles/geodesics.dir/build.make CMakeFiles/geodesics.dir/src/shove_integrator.cpp.s
+.PHONY : src/shove_integrator.cpp.s
+
 src/simple_atom.o: src/simple_atom.cpp.o
 
 .PHONY : src/simple_atom.o
@@ -1906,7 +1884,6 @@ help:
 	@echo "... simple_bond_test"
 	@echo "... vector_test"
 	@echo "... run_geodesic_simulation"
-	@echo "... geodesic_manager_test"
 	@echo "... simulations"
 	@echo "... simple_state_test"
 	@echo "... polymer"
@@ -1935,9 +1912,6 @@ help:
 	@echo "... src/geodesic_manager.o"
 	@echo "... src/geodesic_manager.i"
 	@echo "... src/geodesic_manager.s"
-	@echo "... src/geodesic_manager_test.o"
-	@echo "... src/geodesic_manager_test.i"
-	@echo "... src/geodesic_manager_test.s"
 	@echo "... src/geodesic_observables.o"
 	@echo "... src/geodesic_observables.i"
 	@echo "... src/geodesic_observables.s"
@@ -2004,6 +1978,9 @@ help:
 	@echo "... src/settings_parser_test.o"
 	@echo "... src/settings_parser_test.i"
 	@echo "... src/settings_parser_test.s"
+	@echo "... src/shove_integrator.o"
+	@echo "... src/shove_integrator.i"
+	@echo "... src/shove_integrator.s"
 	@echo "... src/simple_atom.o"
 	@echo "... src/simple_atom.i"
 	@echo "... src/simple_atom.s"

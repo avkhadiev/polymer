@@ -29,7 +29,9 @@ namespace geodesic{
         bool operator==(const Record &other) const;
         bool operator!=(const Record &other) const;
         ConfigHandler cfg_handler;
+        const simple::BondState& bond_state() const;
         simple::BondState& bond_state();
+        const simple::AtomState& atom_state() const;
         simple::AtomState& atom_state();
         // simple::BondState state() const;
         // simple::BondState& modifiable_state();
