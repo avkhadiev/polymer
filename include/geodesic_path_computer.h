@@ -179,8 +179,6 @@ namespace geodesic{
         Psi psi1, psi2;                             /** remaining angle */
     private:
         ShoveIntegrator _integrator;
-        std::vector<bool> _move_atom;
-        bool _is_path_complete(Record &cur, const Record &fin, double epsilon);
         void _assign_velocities(Record &cur, const Record &fin, double dr);
     };
     /***************************************************************************
@@ -197,7 +195,20 @@ namespace geodesic{
         /**> TODO */
         virtual void escape(Record &cur, const Record &fin, double param);
     private:
-        bool _is_path_complete(Record &cur, const Record &fin, double epsilon);
+        // stores the change in configuration space vector to be applied
+        std::vector<Vector> deltaR;
+        void move_at_once(Record &cur, const Record &fin, double dr);
+        // initial step: ignores constraints, modifies deltaR
+        void _move0(const Record &cur, const Record &fin, double dR);
+        // projections (1 - del C del C), modifies deltaR and &cur
+        // violates constraints to second order
+        void _move1(Record &cur);
+        // modifies deltaR and &cur to restore constraints to second order
+        void _move2(Record &cur);
+        void move_by_bond(Record &cur, const Record &fin, double dr);
+        Vector _rb(Vector r1, Vector r2);
+        void _project_dR(size_t jbond, Vector rb);
+        void _correct(size_t jbond, Vector r1, Vector r2, const Record &cur);
     };
 } // namespace geodesic
 #endif

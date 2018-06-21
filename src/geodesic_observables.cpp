@@ -175,7 +175,7 @@ namespace geodesic{
          double norml = norm(omega) * _finnorm;
          value = acos(sprod/norml);
          if (std::isnan(value)){
-             fprintf(stderr, "%s %f\n", "bad cosine", sprod/norml);
+             fprintf(stderr, "Psi Observable: %s %f\n", "bad cosine", sprod/norml);
          }
     }
     /**************************************************************************

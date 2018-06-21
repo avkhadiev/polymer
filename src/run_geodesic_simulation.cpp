@@ -126,6 +126,14 @@ int main(int argc, char **argv){
                 &r1x, &r2x, &r3x, &r1y, &r2y, &r3y, &r1z, &r2z, &r3z};
         ObservableContainer container3 = ObservableContainer(observables_vec3);
         ObservableContainer& obs3 = container3;
+        std::vector<Observable*> observables_vec4
+            = { &pe_polymer,
+                &w_polymer, &wc_polymer,
+                &rcmx, &rcmy, &rcmz,
+                &bl1, &bl2,
+                &r1x, &r2x, &r3x, &r1y, &r2y, &r3y, &r1z, &r2z, &r3z};
+        ObservableContainer container4 = ObservableContainer(observables_vec3);
+        ObservableContainer& obs4 = container4;
         // setup potentials
         LJPotential pp = LJPotential(settings.epp, settings.sp,
             &pe_polymer, &w_polymer);
@@ -188,6 +196,8 @@ int main(int argc, char **argv){
             = geodesic::SHOVE(&pp, &ss, &ps, settings.tol, settings.epsilon);
         obs3.add_observable(&shove_cmp.psi1);
         obs3.add_observable(&shove_cmp.psi2);
+        geodesic::PLERP plerp_cmp
+            = geodesic::PLERP(&pp, &ss, &ps, settings.epsilon);
         // initialize geodesic simulations
         simple::SLERPGeodesicSimulation slerp_sim
             = simple::SLERPGeodesicSimulation(args::sim_name + "SLERP",
@@ -246,19 +256,45 @@ int main(int argc, char **argv){
                 settings.itape,   // save path w/ forays every itape steps
                 settings.max_propag_steps,    // max propagation steps
                 settings.max_escape_steps);   // max escape steps
+        simple::PlerpGeodesicSimulation plerp_sim
+            = simple::PlerpGeodesicSimulation(args::sim_name + "PLERP",
+                ini_path,
+                fin_path,
+                settings.geodir_output,     // dir for path file with no forays
+                settings.geodir_output,     // dir fpr path file with forays
+                settings.geodir_data,       // dir for path observables
+                obs4,
+                &plerp_cmp,
+                settings.el,
+                settings.should_write_data,
+                settings.dtau,    // max step in cfg space / sigma
+                settings.icalc,   // calculate every icalc steps
+                settings.iblock,  // average every iblock calcsteps
+                settings.iprint,  // print status every iprint steps
+                settings.isave,   // save path + obs every isave steps
+                settings.itape,   // save path w/ forays every itape steps
+                settings.max_propag_steps,    // max propagation steps
+                settings.max_escape_steps);   // max escape steps
         fprintf(stderr, "%s\n", "Simulation initialized");
         // save simulation settings in a file
         settings.write(settings.geodir_input, args::sim_name);
         fprintf(stderr, "%s\n", "Computing paths...");
+        /**********************************************************************/
         slerp_sim.compute_path();
         fprintf(stderr, "%s\n", "SLERP path computed!");
         slerp_sim.write_run_summary();
         // shortstep_sim.compute_path();
         // fprintf(stderr, "%s\n", "ShortStep path computed!");
         // shortstep_sim.write_run_summary();
+        /**********************************************************************/
         shove_sim.compute_path();
         fprintf(stderr, "%s\n", "SHOVE path computed!");
         shove_sim.write_run_summary();
+        /**********************************************************************/
+        plerp_sim.compute_path();
+        fprintf(stderr, "%s\n", "PLERP path computed!");
+        plerp_sim.write_run_summary();
+        /**********************************************************************/
         // get slices of the path
         // geodesic::Path first_half = shove_sim.path().get_slice(2, 1);
         // geodesic::Path second_half = shove_sim.path().get_slice(2, 2);

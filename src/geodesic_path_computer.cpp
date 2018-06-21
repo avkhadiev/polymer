@@ -35,6 +35,11 @@ namespace geodesic{
                 is_path_complete = false;
             }
         }
+        //if(is_path_complete){
+        //    fprintf(stderr, "%s:\n%s\n",
+        //        "TERMINATED PATH",
+        //        cur.atom_state().to_string(true, false).c_str());
+        //}
         return is_path_complete;
     }
     /***************************************************************************
@@ -121,40 +126,57 @@ namespace geodesic{
         return is_path_complete;
     }
     bool SLERP::move(Record &cur, const Record &fin, double dr){
-        bool was_moved = false;
-        double max_dpsi = asin(dr / simple::BasePolymer::d());
+        bool keep_going = false;
+        cur.atom_state().update(cur.bond_state());
+        // CALCULATE DTAU
+        simple::AtomState& cur_state = cur.atom_state();
+        const simple::AtomState& fin_state = fin.atom_state();
+        // working with a single polymer
+        simple::AtomPolymer& cur_polymer = cur_state.polymers.at(0);
+        const simple::AtomPolymer fin_polymer = fin_state.polymers.at(0);
+        Vector cur_pos, fin_pos, cur_direction;
+        double r_normsq = 0.0;
+        // assign unit velocities to each atoms in the direction towards final
+        // position, and find the atom farthest from its destination
+        // zero all forces
+        for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
+            cur_pos = cur_polymer.atoms.at(i).position;
+            fin_pos = fin_polymer.atoms.at(i).position;
+            cur_direction = subtract(fin_pos, cur_pos);
+            r_normsq += normsq(cur_direction);
+        }
+        double r_norm = sqrt(r_normsq);
+        if (dr > r_norm) {
+            dr = r_norm;
+        }
+        double dtau = dr / r_norm;
+        // MOVE LINKS
         size_t nb = simple::BasePolymer::nb();
         std::vector<Omega> links;
         links.resize(nb);
-        std::vector<simple::Bond>& ini_bonds
+        std::vector<simple::Bond>& cur_bonds
             = cur.bond_state().polymers.at(0).bonds;
         const std::vector<simple::Bond>& fin_bonds
             = fin.bond_state().get_polymers().at(0).get_bonds();
         /* initialize a vector of links to propagate path */
-        double max_psi = max_dpsi;              // smallest required distance
         for (size_t i = 0; i < nb; ++i){
-            links.at(i) = Omega(ini_bonds.at(i), fin_bonds.at(i));
-            if (links.at(i).psi() > max_psi){
-                max_psi = links.at(i).psi();
-            }
-        }
-        double dtau = max_dpsi / max_psi;
-        for (size_t i = 0; i < nb; ++i){
-            //if (links.at(i).should_move()) {
+            links.at(i) = Omega(cur_bonds.at(i), fin_bonds.at(i));
             links.at(i).update(links.at(i).at(dtau));
-            //}
         }
         _update_record_from_links(cur, links);
         psi1.value = links.at(0).psi();
         psi2.value = links.at(1).psi();
         cur.atom_state().update(cur.bond_state());
         if (dtau < 1.0){
-            was_moved = true;
+            keep_going = true;
         }
         else {
-            was_moved = false;
+            keep_going = false;
+            //fprintf(stderr, "%s:\n%s\n",
+            //    "TERMINATED PATH",
+            //    cur.atom_state().to_string(true, false).c_str());
         }
-        return was_moved;
+        return keep_going;
     }
     void SLERP::escape(Record &cur, const Record &fin, double param){
         fprintf(stderr, "%s\n", "geodesic::SLERP::escape(): not yet implemented");
@@ -330,100 +352,62 @@ namespace geodesic{
                         epsilon ),
         psi1(1, vector(0.0, 0.0, 0.0)),
         psi2(2, vector(0.0, 0.0, 0.0)),
-        _integrator(tol),
-        _move_atom() {
-        _move_atom.resize(simple::BasePolymer::nb() + 1);
+        _integrator(tol){
     }
     SHOVE::~SHOVE(){};
-    bool SHOVE::_is_path_complete(
-        Record &cur,
-        const Record &fin,
-        double epsilon){
-        simple::AtomState& cur_state = cur.atom_state();
-        const simple::AtomState& fin_state = fin.atom_state();
-        bool is_path_complete = true;
-        // check (single polymer) positions
-        simple::AtomPolymer& cur_polymer = cur_state.polymers.at(0);
-        const simple::AtomPolymer fin_polymer = fin_state.polymers.at(0);
-        Vector cur_pos;
-        Vector fin_pos;
-        for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
-            cur_pos = cur_polymer.atoms.at(i).position;
-            fin_pos = fin_polymer.atoms.at(i).position;
-            if (norm(subtract(cur_pos, fin_pos)) > epsilon) {
-                is_path_complete = false;
-                _move_atom[i] = true;
-            }
-            else{
-                _move_atom[i] = false;
-            }
-        }
-        // DEBUGGING
-        if ((DEBUG) && (is_path_complete)) {
-            cur.bond_state().update(cur.atom_state());
-            fprintf(stderr, "%s\n", "CURRENT");
-            fprintf(stderr, "%s\n", cur.bond_state().to_string(true, false).c_str());
-            fprintf(stderr, "%s\n", "FINAL");
-            fprintf(stderr, "%s\n", fin.bond_state().to_string(true, false).c_str());
-        }
-        return is_path_complete;
-    }
     void SHOVE::_assign_velocities(
         Record &cur,
         const Record &fin,
-        double dr) {
-        simple::AtomState& cur_state = cur.atom_state();
-        const simple::AtomState& fin_state = fin.atom_state();
-        // working with a single polymer
-        simple::AtomPolymer& cur_polymer = cur_state.polymers.at(0);
-        const simple::AtomPolymer fin_polymer = fin_state.polymers.at(0);
-        Vector cur_pos, cur_direction;
-        Vector cur_force = vector(0.0, 0.0, 0.0);
-        Vector fin_pos;
-        double max_dist = epsilon();
-        double weights[simple::BasePolymer::nb() + 1];
-        // assign unit velocities to each atoms in the direction towards final
-        // position, and find the atom farthest from its destination
-        // zero all forces
-        for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
-            cur_polymer.atoms.at(i).force = cur_force;
-            if (_move_atom.at(i)){
-                cur_pos = cur_polymer.atoms.at(i).position;
-                fin_pos = fin_polymer.atoms.at(i).position;
-                cur_direction = subtract(fin_pos, cur_pos);
-                weights[i] = norm(cur_direction);
-                cur_polymer.atoms.at(i).velocity
-                    = divide(cur_direction, weights[i]);
-                if (weights[i] > max_dist) {
-                    max_dist = weights[i];
-                }
-            }
-            else {
-                weights[i] = 0.0;
-                cur_polymer.atoms.at(i).velocity = vector(0.0, 0.0, 0.0);
-            }
+        double dR) {
+        size_t natoms = simple::BasePolymer::nb() + 1;
+        std::vector<simple::Atom>& cur_atoms
+            = cur.atom_state().polymers.at(0).atoms;
+        const std::vector<simple::Atom> fin_atoms
+            = fin.atom_state().get_polymers().at(0).get_atoms();
+        Vector cur_dir;
+        Vector cur_pos, fin_pos;
+        double R_norm_sq = 0.0;
+        for (size_t j = 0; j < natoms; ++j){
+            cur_pos = cur_atoms.at(j).position;
+            fin_pos = fin_atoms.at(j).position;
+            cur_dir = subtract(fin_pos, cur_pos);
+            cur_atoms.at(j).velocity = cur_dir;
+            R_norm_sq += normsq(cur_dir);
         }
-        // get an array of weights for the speeds of atoms,
-        // and assign the speeds
-        if (max_dist < dr) {
-            dr = max_dist;
+        double R_norm = sqrt(R_norm_sq);
+        if (dR > R_norm) {
+            dR = R_norm;
         }
-        for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
-            if (_move_atom.at(i)){
-                weights[i] = weights[i] / max_dist;
-                cur_polymer.atoms.at(i).velocity = multiply(cur_polymer.atoms.at(i).velocity, dr * weights[i]);
-            }
+        double weight = dR / R_norm;
+        for (size_t j = 0; j < natoms; ++j){
+            cur_atoms.at(j).velocity
+                = multiply(cur_atoms.at(j).velocity, weight);
+        }
+        Vector rb;      // vector whose outerpoduct w itself gives the matrix
+        Vector dr;      // difference of deltas of j+1 atom and jth atom
+        double x, y, z;
+        for (size_t j = 0; j < natoms - 1; ++j){
+            // get current dr = delta r_{j+1} - delta r_{j}
+            // will be continuously updated
+            dr = subtract(cur_atoms.at(j+1).velocity, cur_atoms.at(j).velocity);
+            // this unit bond vector is fixed in time
+            rb = subtract(cur_atoms.at(j+1).position, cur_atoms.at(j).position);
+            rb = divide(rb, norm(rb));
+            x = rb.x * rb.x * dr.x + rb.x * rb.y * dr.y + rb.x * rb.z * dr.z;
+            y = rb.y * rb.x * dr.x + rb.y * rb.y * dr.y + rb.y * rb.z * dr.z;
+            z = rb.z * rb.x * dr.x + rb.z * rb.y * dr.y + rb.z * rb.z * dr.z;
+            dr = vector(x, y, z);
+            cur_atoms.at(j).velocity   += multiply(dr, 0.5);
+            cur_atoms.at(j+1).velocity -= multiply(dr, 0.5);
+            //fprintf(stderr, "%s:%s\n",
+            //    "Delta R",
+            //    vector_to_string(deltaR.at(j)).c_str());
         }
     }
     bool SHOVE::move(Record &cur, const Record &fin, double dr){
         // this function will record which atoms need to be moved at all
         // in the vector _move_atom
-        bool moved = false;
-        if (!_is_path_complete(cur, fin, _epsilon)){
-            _assign_velocities(cur, fin, dr);
-            _integrator.move(1.0, cur.atom_state());
-            moved = true;
-        }
+        bool keep_going = false;
         cur.bond_state().update(cur.atom_state());
         // compute new values of psi
         std::vector<simple::Bond> ini_bonds
@@ -437,11 +421,223 @@ namespace geodesic{
         fin_omega2 = fin_bonds.at(1).position;
         psi1.value = acos(dot(cur_omega1, fin_omega1));
         psi2.value = acos(dot(cur_omega2, fin_omega2));
-        //fprintf(stderr,
-        //    "%s\n", cur.atom_state().to_string(true, false).c_str());
-        return moved;
+        if (!_is_path_complete(cur, fin, _epsilon)){
+            _assign_velocities(cur, fin, dr);
+            _integrator.move(1.0, cur.atom_state());
+            keep_going = true;
+        }
+        return keep_going;
     }
     void SHOVE::escape(Record &cur, const Record &fin, double param){
         fprintf(stderr, "%s\n", "geodesic::SLERP::escape(): not yet implemented");
+    }
+    PLERP::PLERP(Potential* polymer_potential,
+        Potential* solvent_potential,
+        Potential* inter_potential,
+        double epsilon) :
+        PathComputer(   polymer_potential,
+                        solvent_potential,
+                        inter_potential,
+                        epsilon ),
+        deltaR() {
+        deltaR.resize(simple::BasePolymer::nb() + 1);
+    }
+    PLERP::~PLERP(){}
+    bool PLERP::move(Record &cur, const Record &fin, double dR){
+        bool keep_going = false;
+        move_at_once(cur, fin, dR);
+        if (!_is_path_complete(cur, fin, _epsilon)){
+            keep_going = true;
+        }
+        cur.bond_state().update(cur.atom_state());
+        return keep_going;
+    }
+    void PLERP::move_at_once(Record &cur, const Record &fin, double dR){
+        _move0(cur, fin, dR);
+        _move1(cur);
+        _move2(cur);
+    }
+    void PLERP::move_by_bond(Record &cur, const Record &fin, double dR){
+        // gets naive displacement for dR
+        _move0(cur, fin, dR);
+        size_t natoms = simple::BasePolymer::nb() + 1;
+        std::vector<simple::Atom>& cur_atoms
+            = cur.atom_state().polymers.at(0).atoms;
+        Vector r1, r2;
+        for (size_t j = 0; j < natoms - 1; ++j){
+            r1 = cur_atoms.at(j).position;
+            r2 = cur_atoms.at(j+1).position;
+            // apply jth projection to the naive displacement
+            // affects atoms j, j+1, modifies del r_j, del r_{j+1}
+            _project_dR(j, _rb(r1, r2));
+            // calculate the proposed positions j, j+1 using projected naive
+            // displacements
+            r1 += deltaR.at(j);
+            r2 += deltaR.at(j+1);
+            // given the proposed positions, correct the displacements yet again
+            // to preserve the constratins of the link
+            // and its closest neighbors.
+            // modifies del r_j, del r_{j+1}
+            _correct(j, r1, r2, cur);
+            // use the modified displacements to apply the changes
+            cur_atoms.at(j).position += deltaR.at(j);
+            cur_atoms.at(j+1).position += deltaR.at(j+1);
+        }
+    }
+    void PLERP::_move0(const Record &cur, const Record &fin, double dR){
+        size_t natoms = simple::BasePolymer::nb() + 1;
+        const std::vector<simple::Atom> cur_atoms
+            = cur.atom_state().get_polymers().at(0).get_atoms();
+        const std::vector<simple::Atom> fin_atoms
+            = fin.atom_state().get_polymers().at(0).get_atoms();
+        Vector cur_dir;
+        Vector cur_pos, fin_pos;
+        double R_norm_sq = 0.0;
+        for (size_t j = 0; j < natoms; ++j){
+            cur_pos = cur_atoms.at(j).position;
+            fin_pos = fin_atoms.at(j).position;
+            cur_dir = subtract(fin_pos, cur_pos);
+            deltaR.at(j) = cur_dir;
+            R_norm_sq += normsq(cur_dir);
+        }
+        double R_norm = sqrt(R_norm_sq);
+        if (dR > R_norm) {
+            dR = R_norm;
+        }
+        double weight = dR / R_norm;
+        for (size_t j = 0; j < natoms; ++j){
+            deltaR.at(j) = multiply(deltaR.at(j), weight);
+            //fprintf(stderr, "%s:%s\n",
+            //    "Delta R",
+            //    vector_to_string(deltaR.at(j)).c_str());
+        }
+    }
+    Vector PLERP::_rb(Vector r1, Vector r2){
+        Vector r12 = subtract(r2, r1);
+        return divide(r12, norm(r12));
+    }
+    void PLERP::_project_dR(size_t j, Vector rb){
+        Vector dr = subtract(deltaR.at(j+1), deltaR.at(j));
+        double x, y, z;
+        x = rb.x * rb.x * dr.x + rb.x * rb.y * dr.y + rb.x * rb.z * dr.z;
+        y = rb.y * rb.x * dr.x + rb.y * rb.y * dr.y + rb.y * rb.z * dr.z;
+        z = rb.z * rb.x * dr.x + rb.z * rb.y * dr.y + rb.z * rb.z * dr.z;
+        dr = vector(x, y, z);
+        deltaR.at(j)   += multiply(dr, 0.5);
+        deltaR.at(j+1) -= multiply(dr, 0.5);
+    }
+    void PLERP::_correct(size_t j, Vector r1, Vector r2, const Record &cur){
+        const std::vector<simple::Atom> cur_atoms
+            = cur.atom_state().get_polymers().at(0).get_atoms();
+        int nbonds = simple::BasePolymer::nb();
+        double dsq = pow(simple::BasePolymer::d(), 2.0);
+        double cr = 0.0;
+        double c_last, c_this, c_next;
+        Vector del_cr_1 = vector(0.0, 0.0, 0.0);
+        Vector del_cr_2 = vector(0.0, 0.0, 0.0);
+        Vector r0, r3;
+        Vector r_b;
+        r_b = subtract(r2, r1);
+        c_this = normsq(r_b) - dsq;
+        cr += pow(c_this, 2.0);
+        del_cr_1 += multiply(r_b, - 4.0 * c_this);
+        del_cr_2 += multiply(r_b, 4.0 * c_this);
+        if (j != nbonds - 1){
+            r3 = cur_atoms.at(j+2).position;
+            r_b = subtract(r3, r2);
+            c_next = normsq(r_b) - dsq;
+            cr += pow(c_next, 2.0);
+            del_cr_2 += multiply(r_b, - 4.0 * c_next);
+        }
+        if (j != 0){
+            r0 = cur_atoms.at(j-1).position;
+            r_b = subtract(r1, r0);
+            c_last = normsq(r_b) - dsq;
+            cr += pow(c_last, 2.0);
+            del_cr_1 += multiply(r_b, 4.0 * c_last);
+        }
+        double norm_del_cr_1 = norm(del_cr_1);
+        double norm_del_cr_2 = norm(del_cr_2);
+        double a = - cr / (norm_del_cr_1 + norm_del_cr_2);
+        deltaR.at(j)   += multiply(divide(del_cr_1, norm_del_cr_1), a);
+        deltaR.at(j+1) += multiply(divide(del_cr_2, norm_del_cr_2), a);
+    }
+    void PLERP::_move1(Record &cur){
+        size_t natoms = simple::BasePolymer::nb() + 1;
+        std::vector<simple::Atom>& cur_atoms
+            = cur.atom_state().polymers.at(0).atoms;
+        Vector rb;      // vector whose outerpoduct w itself gives the matrix
+        Vector dr;      // difference of deltas of j+1 atom and jth atom
+        double x, y, z;
+        for (size_t j = 0; j < natoms - 1; ++j){
+            // get current dr = delta r_{j+1} - delta r_{j}
+            // will be continuously updated
+            dr = subtract(deltaR.at(j+1), deltaR.at(j));
+            // this unit bond vector is fixed in time
+            rb = subtract(cur_atoms.at(j+1).position, cur_atoms.at(j).position);
+            rb = divide(rb, norm(rb));
+            x = rb.x * rb.x * dr.x + rb.x * rb.y * dr.y + rb.x * rb.z * dr.z;
+            y = rb.y * rb.x * dr.x + rb.y * rb.y * dr.y + rb.y * rb.z * dr.z;
+            z = rb.z * rb.x * dr.x + rb.z * rb.y * dr.y + rb.z * rb.z * dr.z;
+            dr = vector(x, y, z);
+            deltaR.at(j)   += multiply(dr, 0.5);
+            deltaR.at(j+1) -= multiply(dr, 0.5);
+            //fprintf(stderr, "%s:%s\n",
+            //    "Delta R",
+            //    vector_to_string(deltaR.at(j)).c_str());
+        }
+        for (size_t j = 0; j < natoms; ++j){
+            cur_atoms.at(j).position += deltaR.at(j);
+        }
+    }
+    void PLERP::_move2(Record &cur){
+        size_t natoms = simple::BasePolymer::nb() + 1;
+        double dsq = pow(simple::BasePolymer::d(), 2.0);
+        std::vector<simple::Atom>& cur_atoms
+            = cur.atom_state().polymers.at(0).atoms;
+        Vector rb;
+        double cr = 0.0;
+        double constraint = 0.0;
+        Vector del_crj;
+        double delcr_norm_sq = 0.0;
+        // calculate first element
+        del_crj = vector(0.0, 0.0, 0.0);
+        deltaR.at(0) = vector(0.0, 0.0, 0.0);
+        rb = subtract(cur_atoms.at(1).position, cur_atoms.at(0).position);
+        constraint = normsq(rb) - dsq;
+        cr += pow(constraint, 2.0);
+        del_crj += multiply(rb, -4.0 * constraint);
+        deltaR.at(0) += del_crj;
+        delcr_norm_sq += normsq(del_crj);
+        for (size_t j = 1; j < natoms - 1; ++j){
+            deltaR.at(j) = vector(0.0, 0.0, 0.0);
+            del_crj = vector(0.0, 0.0, 0.0);
+            del_crj += multiply(rb, 4.0 * constraint);
+            rb = subtract(cur_atoms.at(j+1).position, cur_atoms.at(j).position);
+            constraint = normsq(rb) - dsq;
+            cr += pow(constraint, 2.0);
+            del_crj += multiply(rb, -4.0 * constraint);
+            deltaR.at(j) += del_crj;
+            delcr_norm_sq += normsq(del_crj);
+        }
+        //fprintf(stderr, "C(r): %f\n", cr);
+        //fprintf(stderr, "|del C(r)|^2: %f\n", delcr_norm_sq);
+        double weight = -1.0 * cr / delcr_norm_sq;
+        // calculate last element
+        deltaR.at(natoms-1) = vector(0.0, 0.0, 0.0);
+        del_crj = vector(0.0, 0.0, 0.0);
+        del_crj += multiply(rb, 4.0 * constraint);
+        deltaR.at(natoms-1) += del_crj;
+        // calculate and apply the steps
+        for (size_t j = 0; j < natoms; ++j){
+            deltaR.at(j) = multiply(deltaR.at(j), weight);
+            //fprintf(stderr, "%s:%s\n",
+            //    "Delta R",
+            //    vector_to_string(deltaR.at(j)).c_str());
+            cur_atoms.at(j).position += deltaR.at(j);
+        }
+    }
+    void PLERP::escape(Record &cur, const Record &fin, double param){
+        fprintf(stderr, "%s\n", "geodesic::PLERP::escape(): not yet implemented");
     }
 } // namespace geodesic

@@ -36,17 +36,18 @@ def make_title(sim, yl, ell):
             + mathenv("\\ell=" + "%5.3f" % ell))
 
 sim_name = 'test'
-sims = ['slerp','shove']#,'md']
-lbls = ['Slerp','new algorithm']#,'MD']
-fdir = "test/geodesic/exact/"
+sims = ['shove', 'plerp']#,'md']
+lbls = ['Old Plerp', 'New Plerp']#,'MD']
+fdir = "test/geodesic/"
 outdir = "/Users/Arthur/stratt/lab_notebook/"
 # xlabel, xunits
 xl = "\\tau = \\ell^{(m)}/\\,\\ell^{\\mathrm{f}}"
 xu = "1"
 xr = [-0.01, 1.01]
 fs = 14  # fontsize
-observables = ['omega_proj', 'psi']
-ylabels = ['\\hat{\\Omega} \\cdot \\hat{n}', '\\psi', '\\left|1 - \\left|\\hat{\\Omega}\\right|\\right|']
+observables = ['omega_norm']
+# ylabels = ['\\hat{\\Omega} \\cdot \\hat{n}', '\\psi', '\\left|1 - \\left|\\hat{\\Omega}\\right|\\right|']
+ylabels = ['\\left|1 - \\left|\\hat{\\Omega}\\right|\\right|']
 yunits = ['1', '\\mathrm{rad}', '1']
 yranges = [[-1.01, 1.01], [-0.2, pi + 0.2], [-0.1, 2.1]]
 # indices = [1, 2]                              # only plot first link
@@ -62,7 +63,7 @@ for (obs, yl, yu, yr) in zip(observables, ylabels, yunits, yranges):
     # plt.grid(True)
     for (sim, c, l, lbl) in zip(sims, colors, styles, lbls):
         data = pd.read_csv(fdir + sim_name + sim + "_inst_data.csv")
-        meta = pd.read_csv(fdir + sim_name + sim + "_meta_data.csv")
+        # meta = pd.read_csv(fdir + sim_name + sim + "_meta_data.csv")
         lengths = data['ell'].values
         ell = lengths[-1]
         tau = lengths / ell                     # affine parameter
@@ -72,11 +73,11 @@ for (obs, yl, yu, yr) in zip(observables, ylabels, yunits, yranges):
         if ((sim == 'slerp') and (obs == 'delta_theta')):
             plt.plot(tau[0:idx], np.zeros((tau[0:idx]).shape), color = c, linestyle = l, label = (lbl + " link"))
             plt.plot(tau[0:idx], np.zeros((tau[0:idx]).shape), color = c, linestyle = l, label = (lbl + " link"))
-        elif ((obs == 'omega_norm') and (sim != 'shove')):
+        elif ((obs == 'omega_norm') and ((sim != 'shove') and ((sim != 'plerp'))) ):
             continue
         else:
             col = colname(obs, 2)
-            tex = meta.query(search("short_name", col))['tex_name'].item()  # wut label to use?
+            # tex = meta.query(search("short_name", col))['tex_name'].item()  # wut label to use?
             var = data[col].values
             if (obs == 'omega_norm'):
                 plt.semilogy(tau[0:idx], abs(1 - var[0:idx]), color = c, linestyle = l, label = (lbl + " link"))

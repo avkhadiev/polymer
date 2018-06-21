@@ -66,14 +66,14 @@ def make_name(observable, atom, coordinate):
     return observable + "_" + str(atom) + "_" + str(coordinate);
 
 sim_names = ['test', 'test', 'test']
-sims = ['md', 'shove', 'slerp']#, 'md']
-sim_lbls = ['MD', 'Plerp', 'Slerp']
+sims = ['md', 'shove', 'slerp']#, 'slerp']#, 'md']
+sim_lbls = ['MD', 'Old Plerp', 'Slerp']
 styles = ['-', '--', ':']                       # correspond to algorithm
 fdir = "test/geodesic/"
 outdir = "/Users/Arthur/stratt/lab_notebook/"
 # observable to plot, which atoms, and how to plot them
 observable = 'rpol_atom_1'
-atoms = ['1', '7', '11']
+atoms = ['1', '34', '51']
 colors = ['b', 'r', 'k']                        # correspond to atom
 # unit, label, ranges, and other settings
 unit = '\\mathrm{\\sigma}'
@@ -118,7 +118,7 @@ for sim_name, sim, sim_lbl, a_style in zip(sim_names, sims, sim_lbls, styles):
 plt.tight_layout()
 # Shrink current axis
 box = ax.get_position()
-ax.set_position([box.x0, box.y0, box.width * 0.75, box.height])
+ax.set_position([box.x0, box.y0, box.width * 0.70, box.height])
 # Put a legend to the right of the current axis
 plt.legend(prop={'size': fs - 2.0}, frameon = False,
     loc='center left', bbox_to_anchor=(1, 0.5))

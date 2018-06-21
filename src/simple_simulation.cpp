@@ -632,4 +632,27 @@ namespace simple{
         sigma, icalc, iblock, iprint, isave, itape,
         maxiter, max_escape_iter){}
     ShoveGeodesicSimulation::~ShoveGeodesicSimulation(){}
+    PlerpGeodesicSimulation::PlerpGeodesicSimulation(std::string name,
+        std::string initial,
+        std::string final,
+        std::string cndir,
+        std::string tpdir,
+        std::string dtdir,
+        ObservableContainer& container,
+        geodesic::PLERP* comp,
+        double landscape_energy,
+        bool should_write_data,
+        double sigma,               // max step in configuration space
+        size_t icalc,               // calculate every 10 steps
+        size_t iblock,              // average every 100 calcsteps
+        size_t iprint,              // print status every 1000 steps
+        size_t isave,               // save config + obs every 1000 steps
+        size_t itape,               // save config every 100 steps
+        size_t maxiter,             // max propagation steps
+        size_t max_escape_iter) :   // max escape steps
+    GeodesicSimulation(name, initial, final, cndir, tpdir, dtdir,
+        container, comp, landscape_energy, should_write_data,
+        sigma, icalc, iblock, iprint, isave, itape,
+        maxiter, max_escape_iter){}
+    PlerpGeodesicSimulation::~PlerpGeodesicSimulation(){}
 } // namespace simple
