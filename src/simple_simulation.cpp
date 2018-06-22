@@ -424,7 +424,9 @@ namespace simple{
         else{
             // output header information if truncation was done
             if (truncate){
-                bool output_header = true;
+                bool output_header = false;
+                stream << _path.header_str() << std::endl;
+                // header output as a part of the path already
                 _initial.write(stream, output_header);
             }
         }
@@ -536,6 +538,8 @@ namespace simple{
         }
         // write last status once run is complete
         _write_status();
+        fprintf(stderr, "%s %5.7f\n",
+            "Euclidian distance was", _path.euc_sep.value);
         // compute how close each atom is to its final position
         simple::AtomPolymer cur = rec.atom_state().polymers.at(0);
         simple::AtomPolymer fin = _path.final().atom_state().polymers.at(0);

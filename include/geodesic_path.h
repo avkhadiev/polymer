@@ -22,6 +22,7 @@ namespace geodesic{
         std::list<Record> _path;                 /**> omits boundary values */
     public:
         Length length;
+        Length euc_sep;
         Record initial() const {return _initial;};  /**> boundary value 1   */
         Record final() const {return _final;};      /**> boundary value 2   */
         Path& operator= (const Path &fraction);
@@ -43,7 +44,7 @@ namespace geodesic{
         /* allows to slice the path in n parts and get the mth slice        */
         /* n should be less than or equal to one less the number of records */
         /* m should be less than or equal to n                              */
-        Path get_slice(size_t n_slices, size_t mth_slice); 
+        Path get_slice(size_t n_slices, size_t mth_slice);
     protected:
         void _increment_length( const Record& last_record,
                                 const Record& next_record );
@@ -51,6 +52,7 @@ namespace geodesic{
         virtual std::string _header_str() const;
         virtual void _read_header(std::ifstream& readout);
     public:
+        std::string header_str() const {return _header_str();};
         Path();
         Path(Record initial, Record final);         /**> minimal path       */
         Path(std::list<Record>& records);           /**> general path       */

@@ -97,9 +97,6 @@ namespace geodesic{
         virtual bool move(Record &cur, const Record &fin, double dtau);
         /**> TODO */
         virtual void escape(Record &cur, const Record &fin, double param);
-    public:
-        Psi psi1, psi2;                  /** remaining angle */
-        DeltaPsi delta_psi1, delta_psi2; /** in-plane step   */
     private:
         bool _is_path_complete(std::vector< Omega>& links, double epsilon);
         void _update_bond_from_link(simple::Bond& bond, const Omega& omega);
@@ -148,10 +145,6 @@ namespace geodesic{
         virtual bool move(Record &cur, const Record &fin, double dtau);
         /**> TODO */
         virtual void escape(Record &cur, const Record &fin, double param);
-    public:
-        Theta theta1, theta2;                    /** out-of-plane parameter */
-        DeltaTheta delta_theta1, delta_theta2;   /** out-of-plane step      */
-        DeltaPhi delta_phi1, delta_phi2;         /** totals step            */
     private:
         bool _is_path_complete(std::vector< Omega>& links, double epsilon);
         void _update_bond_from_link(simple::Bond& bond, const Omega& omega);
@@ -176,7 +169,6 @@ namespace geodesic{
         virtual bool move(Record &cur, const Record &fin, double dr);
         /**> TODO */
         virtual void escape(Record &cur, const Record &fin, double param);
-        Psi psi1, psi2;                             /** remaining angle */
     private:
         ShoveIntegrator _integrator;
         void _assign_velocities(Record &cur, const Record &fin, double dr);

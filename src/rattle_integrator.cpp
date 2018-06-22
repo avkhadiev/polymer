@@ -175,6 +175,9 @@ simple::AtomPolymer RattleIntegrator::_move_correct_half_step(
     _moved = _moving;
     std::fill(_moving.begin(), _moving.end(), false);
     }
+    //fprintf(stderr, "%s %d\n",
+    //    "RATTLE MOVE A: iterations",
+    //    iter);
     if (iter >= _maxiter){
         fprintf(stderr, "%s (%d)\n",
             "RATTLE MOVE A: maximum number of iterations reached. Stopping correction",

@@ -101,8 +101,6 @@ namespace geodesic{
     void Manager::output_observables(Path& path,
         std::string dtdir, std::string name){
         // make observables
-        bool compute_mean = false;
-        bool compute_err = false;
         bool print_val = true;
         bool e_format = false;
         // Length
@@ -116,35 +114,12 @@ namespace geodesic{
         ini_omega2 = ini_bonds.at(1).position;
         fin_omega1 = fin_bonds.at(0).position;
         fin_omega2 = fin_bonds.at(1).position;
-        OmegaProj omega_proj1
-            = OmegaProj(ini_omega1, fin_omega1, 1,
-                compute_mean, compute_err, print_val, e_format);
-        OmegaProj omega_proj2
-            = OmegaProj(ini_omega2, fin_omega2, 2,
-                compute_mean, compute_err, print_val, e_format);
-        // angles
-        Psi psi1 = Psi(1, fin_omega1, print_val, e_format);
-        Psi psi2 = Psi(2, fin_omega2, print_val, e_format);
-        DeltaTheta delta_theta1
-            = DeltaTheta(1, fin_omega1,
-                compute_mean, compute_err, print_val, e_format);
-        DeltaTheta delta_theta2
-            = DeltaTheta(2, fin_omega2,
-                compute_mean, compute_err, print_val, e_format);
         if (_obs){
             _obs->add_observable(&length);
-            _obs->add_observable(&omega_proj1);
-            _obs->add_observable(&omega_proj2);
-            _obs->add_observable(&psi1);
-            _obs->add_observable(&psi2);
-            _obs->add_observable(&delta_theta1);
-            _obs->add_observable(&delta_theta2);
         }
         else {
             std::vector<Observable*> observables_vec
-                = { &length,
-                    &omega_proj1, &omega_proj2,
-                    &psi1, &psi2, &delta_theta1, &delta_theta2};
+                = { &length };
             ObservableContainer obs = ObservableContainer(observables_vec);
             _obs = &obs;
         }
@@ -164,12 +139,6 @@ namespace geodesic{
         {
             ++step;
             length.update(*rec, *(std::next(rec)));
-            omega_proj1.update(*(std::next(rec)));
-            omega_proj2.update(*(std::next(rec)));
-            psi1.update(*(std::next(rec)));
-            psi2.update(*(std::next(rec)));
-            delta_theta1.update(*rec, *(std::next(rec)));
-            delta_theta2.update(*rec, *(std::next(rec)));
             _obs->calculate_observables(rec->atom_state());
             _obs->record_observables();
             if (step % iprint == 0) {

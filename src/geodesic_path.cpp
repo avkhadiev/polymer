@@ -14,30 +14,36 @@ namespace geodesic{
         _final(),
         _path(),
         // print_inst_value, e_format
-        length(true, false){}
+        length(true, false),
+        euc_sep(false, false){}
     Path::Path(Record initial, Record final) :
         _initial(initial),
         _final(final),
         _path(),
         // print_inst_value, e_format
-        length(true, false)
+        length(true, false),
+        euc_sep(false, false)
     {
         _path.clear();
         //this is a ``bare'', empty path with just two endpoints ---
         // the length is to be computed; so far, it is zero
         //recompute_set_theta();
         length.value = 0.0;
+        euc_sep.value = 0.0;
+        euc_sep.update(_initial, _final);
     }
     Path::Path(std::list<Record>& records) :
         _initial(records.front()),
         _final(records.back()),
         _path(records),
         // print_inst_value, e_format
-        length(true, false){
+        length(true, false),
+        euc_sep(false, false){
             // omit boundary values in path record
             _path.pop_front();
             _path.pop_back();
             recompute_length();
+            //fprintf(stderr, "%s\n", _header_str().c_str());
         }
     Path::~Path() {
         _path.clear();
@@ -47,7 +53,8 @@ namespace geodesic{
         _final(),
         _path(),
         // print_inst_value, e_format
-        length(true, false)
+        length(true, false),
+        euc_sep(false, false)
     {
         std::ifstream readout;
         readout.open(fin, std::ifstream::in);
@@ -99,13 +106,13 @@ namespace geodesic{
     /***************************************************************************
     *                           BINARY OPERATORS
     ***************************************************************************/
-    // A simplistic implementation of operator= (see better implementation below)
     Path& Path::operator= (const Path &other)
     {
         _initial = other.initial();
         _final = other.final();
-        // TODO compare length
         _path = other._path;
+        euc_sep.value = other.euc_sep.value;
+        length.value = other.euc_sep.value;
         return *this;
     }
     /***************************************************************************
@@ -137,8 +144,9 @@ namespace geodesic{
         length.update(last_record, next_record);
     }
     void Path::recompute_length(){
-        //length._zero();
-
+        length.value = 0.0;
+        euc_sep.value = 0.0;
+        euc_sep.update(initial(), final());
         if (_path.size() == 0){
             // no intermediate values
             _increment_length(initial(), final());
@@ -275,13 +283,18 @@ namespace geodesic{
     std::string Path::_header_str() const{
         bool verbose = false;
         std::string header
-            //= length.to_string() + "\n"
-            = initial().atom_state().header_str(verbose);
+            = euc_sep.print_value() + "\n"
+            + initial().atom_state().header_str(verbose);
         return header;
     }
     void Path::_read_header(std::ifstream& readout){
         std::string line;
-        /*state header string                                     */
+        std::getline(readout, line);
+        std::istringstream ss(line.c_str());
+        std::istream_iterator<std::string> begin(ss);
+        std::istream_iterator<std::string> end;
+        std::vector<std::string> args(begin, end);
+        euc_sep.value = atof(args.at(0).c_str());
         std::getline(readout, line);
         simple::BaseState::read_header(line);
     }

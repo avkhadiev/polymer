@@ -115,7 +115,7 @@ public:
     // must have # blocks > 1
     void average_run();
     // I/O
-    std::string to_string(bool verbose = true) const;
+    std::string to_string(bool verbose = false) const;
     // outputs instantaneous value
     std::string status_string() const;
     void read_status(std::string line);

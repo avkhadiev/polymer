@@ -105,33 +105,13 @@ int main(int argc, char **argv){
         polymer::AngMomComponent lz
             = polymer::AngMomComponent(vector(0.0, 0.0, 1.0),
                 !calc_mean, !calc_err, !print_val);
-        polymer::PolAtomPosComponent r1x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 0);
-        polymer::PolAtomPosComponent r2x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 1);
-        polymer::PolAtomPosComponent r3x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, 2);
-        polymer::PolAtomPosComponent r1y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 0);
-        polymer::PolAtomPosComponent r2y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 1);
-        polymer::PolAtomPosComponent r3y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, 2);
-        polymer::PolAtomPosComponent r1z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 0);
-        polymer::PolAtomPosComponent r2z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 1);
-        polymer::PolAtomPosComponent r3z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, 2);
         std::vector<Observable*> observables_vec
             = {&time,
                 &ke_polymer, &pe_polymer,
                 &temp_kin_polymer,
                 &w_polymer, &wc_polymer,
                 &px, &py, &pz,
-                &lx, &ly, &lz,
-                &r1x, &r1y, &r1z, &r2x, &r2y,
-                &r2z, &r3x, &r3y, &r3z };
+                &lx, &ly, &lz };
         ObservableContainer container = ObservableContainer(observables_vec);
         ObservableContainer& obs = container;
         bool is_planar;
@@ -175,21 +155,34 @@ int main(int argc, char **argv){
         }
         // scale time units if no potential
         if (no_potential){
-            double omega_avg = settings.temperature / settings.d;
-            double scale_factor = 2 * PI / omega_avg;
+            size_t ndof =
+                std::max(0,
+                    (3 * ((simple::BaseState::nm())
+                        - (int)remove_linear_momentum
+                        - (int)remove_angular_momentum)
+                    + 2 * (simple::BaseState::nm()
+                        * simple::BasePolymer::nb())
+                    )
+                );
+            size_t natoms = simple::BasePolymer::nb() + 1;
+            double omega_avg
+                = sqrt(ndof/natoms * settings.temperature)
+                    / (settings.d * settings.mp);
+            double scale_factor
+                = 2 * PI / omega_avg;
             double dt_old = settings.dt;
             double runtime_old = settings.runtime;
             settings.dt = dt_old * scale_factor;
             settings.runtime = runtime_old * scale_factor;
             fprintf(stderr, "%s\n", "Zero potential requires change in units:");
-            fprintf(stderr, "%s %5.3f %s %5.3f %s %5.3f\n",
+            fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
                 "dt change from",
                 dt_old,
                 "to",
                 settings.dt,
                 "with scale factor",
                 scale_factor);
-            fprintf(stderr, "%s %5.3f %s %5.3f %s %5.3f\n",
+            fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
                 "runtime change from",
                 runtime_old,
                 "to",

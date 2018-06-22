@@ -50,7 +50,6 @@ int main(int argc, char **argv){
         simple::BasePolymer::set_nb(settings.nb);
         // normalize tolerance for entire chain
         settings.epsilon = settings.epsilon / sqrt(settings.nb + 1);
-        fprintf(stderr, "%s %f\n", "normalized epsilon (per atom)", settings.epsilon);
         // change in units if potential is zero
         bool no_potential = false;
         if ((settings.epp == 0.0)
@@ -67,81 +66,22 @@ int main(int argc, char **argv){
         simple::BasePolymer::set_m(settings.mp);
         simple::BasePolymer::set_d(settings.d);
         // setup observables
-        bool calc_mean = true;
-        bool calc_err = true;
-        bool print_val = true;
-        polymer::PE pe_polymer = polymer::PE(!calc_mean, !calc_err, !print_val);
-        polymer::Virial w_polymer = polymer::Virial(!calc_mean, !calc_err, !print_val);
-        int a1 = 0;
-        int a2 = settings.nb / 3;
-        int a3 = settings.nb / 2;
-        polymer::ConstraintVirial wc_polymer
-            = polymer::ConstraintVirial(!calc_mean, !calc_err, !print_val);
-        polymer::PolAtomPosComponent r1x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, a1);
-        polymer::PolAtomPosComponent r2x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, a2);
-        polymer::PolAtomPosComponent r3x
-            = polymer::PolAtomPosComponent(vector(1.0, 0.0, 0.0), 0, a3);
-        polymer::PolAtomPosComponent r1y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, a1);
-        polymer::PolAtomPosComponent r2y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, a2);
-        polymer::PolAtomPosComponent r3y
-            = polymer::PolAtomPosComponent(vector(0.0, 1.0, 0.0), 0, a3);
-        polymer::PolAtomPosComponent r1z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, a1);
-        polymer::PolAtomPosComponent r2z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, a2);
-        polymer::PolAtomPosComponent r3z
-            = polymer::PolAtomPosComponent(vector(0.0, 0.0, 1.0), 0, a3);
-        std::vector<Observable*> observables_vec
-            = { &pe_polymer,
-                &w_polymer, &wc_polymer,
-                &r1x, &r2x, &r3x, &r1y, &r2y, &r3y, &r1z, &r2z, &r3z };
+        std::vector<Observable*> observables_vec = {};
         ObservableContainer container = ObservableContainer(observables_vec);
         ObservableContainer& obs = container;
         ObservableContainer container2 = ObservableContainer(observables_vec);
-        //ObservableContainer& obs2 = container2;
-        polymer::RCMComponent rcmx
-            = polymer::RCMComponent(vector(1.0, 0.0, 0.0), 0,
-                !calc_mean, !calc_err, !print_val);
-        polymer::RCMComponent rcmy
-            = polymer::RCMComponent(vector(0.0, 1.0, 0.0), 0,
-                !calc_mean, !calc_err, !print_val);
-        polymer::RCMComponent rcmz
-            = polymer::RCMComponent(vector(0.0, 0.0, 1.0), 0,
-                !calc_mean, !calc_err, !print_val);
-        polymer::BondLength bl1
-            = polymer::BondLength(0, 0,
-                !calc_mean, !calc_err, !print_val);
-        polymer::BondLength bl2
-            = polymer::BondLength(0, 1,
-                !calc_mean, !calc_err, !print_val);
-        std::vector<Observable*> observables_vec3
-            = { &pe_polymer,
-                &w_polymer, &wc_polymer,
-                &rcmx, &rcmy, &rcmz,
-                &bl1, &bl2,
-                &r1x, &r2x, &r3x, &r1y, &r2y, &r3y, &r1z, &r2z, &r3z};
+        std::vector<Observable*> observables_vec3 = {};
         ObservableContainer container3 = ObservableContainer(observables_vec3);
         ObservableContainer& obs3 = container3;
-        std::vector<Observable*> observables_vec4
-            = { &pe_polymer,
-                &w_polymer, &wc_polymer,
-                &rcmx, &rcmy, &rcmz,
-                &bl1, &bl2,
-                &r1x, &r2x, &r3x, &r1y, &r2y, &r3y, &r1z, &r2z, &r3z};
+        std::vector<Observable*> observables_vec4 = {};
         ObservableContainer container4 = ObservableContainer(observables_vec3);
         ObservableContainer& obs4 = container4;
         // setup potentials
-        LJPotential pp = LJPotential(settings.epp, settings.sp,
-            &pe_polymer, &w_polymer);
+        LJPotential pp = LJPotential(settings.epp, settings.sp);
         SolventConfigHandler solvent_config = SolventConfigHandler(settings.ss, settings.rho_s, settings.nc);
         AdjustedLJPotential ss = AdjustedLJPotential(settings.ess, settings.ss, settings.rc_ss, solvent_config.box());
         AdjustedLJPotential ps = AdjustedLJPotential(settings.eps, 0.5 * (settings.ss + settings.sp), settings.rc_ps, solvent_config.box());
         // create endpoint records in separate files
-        fprintf(stderr, "%s\n", "Creating endpoint records from MD file...");
         geodesic::Manager manager = geodesic::Manager(&pp, &ss, &ps, &container2);
         manager.read_states(settings.cndir, args::sim_name);
         manager.write_geodesic_inputs(settings.geodir_input, args::sim_name);
@@ -178,24 +118,8 @@ int main(int argc, char **argv){
         // initialize path computers
         geodesic::SLERP slerp_cmp
             = geodesic::SLERP(&pp, &ss, &ps, settings.epsilon);
-        obs.add_observable(&slerp_cmp.psi1);
-        obs.add_observable(&slerp_cmp.psi2);
-        obs.add_observable(&slerp_cmp.delta_psi1);
-        obs.add_observable(&slerp_cmp.delta_psi2);
-        //geodesic::ShortStep shortstep_cmp
-        //    = geodesic::ShortStep(&pp, &ss, &ps, 0.0001);
-        //obs2.add_observable(&shortstep_cmp.psi1);
-        //obs2.add_observable(&shortstep_cmp.psi2);
-        //obs2.add_observable(&shortstep_cmp.delta_psi1);
-        //obs2.add_observable(&shortstep_cmp.delta_psi2);
-        //obs2.add_observable(&shortstep_cmp.theta1);
-        //obs2.add_observable(&shortstep_cmp.theta2);
-        //obs2.add_observable(&shortstep_cmp.delta_theta1);
-        //obs2.add_observable(&shortstep_cmp.delta_theta2);
         geodesic::SHOVE shove_cmp
             = geodesic::SHOVE(&pp, &ss, &ps, settings.tol, settings.epsilon);
-        obs3.add_observable(&shove_cmp.psi1);
-        obs3.add_observable(&shove_cmp.psi2);
         geodesic::PLERP plerp_cmp
             = geodesic::PLERP(&pp, &ss, &ps, settings.epsilon);
         // initialize geodesic simulations
@@ -218,25 +142,6 @@ int main(int argc, char **argv){
                 settings.itape,   // save path w/ forays every itape steps
                 settings.max_propag_steps,    // max propagation steps
                 settings.max_escape_steps);   // max escape steps
-        //simple::ShortStepGeodesicSimulation shortstep_sim
-        //    = simple::ShortStepGeodesicSimulation(args::sim_name + "ShortStep",
-        //        ini_path,
-        //        fin_path,
-        //        settings.geodir_output,     // dir for path file with no forays
-        //        settings.geodir_output,     // dir fpr path file with forays
-        //        settings.geodir_data,       // dir for path observables
-        //        obs2,
-        //        &shortstep_cmp,
-        //        settings.el,
-        //        settings.should_write_data,
-        //        settings.dtau,    // step in affine parameter
-        //        settings.icalc,   // calculate every icalc steps
-        //        settings.iblock,  // average every iblock calcsteps
-        //        settings.iprint,  // print status every iprint steps
-        //        settings.isave,   // save path + obs every isave steps
-        //        settings.itape,   // save path w/ forays every itape steps
-        //        settings.max_propag_steps,    // max propagation steps
-        //        settings.max_escape_steps);   // max escape steps
         simple::ShoveGeodesicSimulation shove_sim
             = simple::ShoveGeodesicSimulation(args::sim_name + "SHOVE",
                 ini_path,
@@ -275,17 +180,12 @@ int main(int argc, char **argv){
                 settings.itape,   // save path w/ forays every itape steps
                 settings.max_propag_steps,    // max propagation steps
                 settings.max_escape_steps);   // max escape steps
-        fprintf(stderr, "%s\n", "Simulation initialized");
         // save simulation settings in a file
         settings.write(settings.geodir_input, args::sim_name);
-        fprintf(stderr, "%s\n", "Computing paths...");
         /**********************************************************************/
         slerp_sim.compute_path();
         fprintf(stderr, "%s\n", "SLERP path computed!");
         slerp_sim.write_run_summary();
-        // shortstep_sim.compute_path();
-        // fprintf(stderr, "%s\n", "ShortStep path computed!");
-        // shortstep_sim.write_run_summary();
         /**********************************************************************/
         shove_sim.compute_path();
         fprintf(stderr, "%s\n", "SHOVE path computed!");

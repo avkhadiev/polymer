@@ -49,9 +49,7 @@ namespace geodesic{
         Potential* solvent_potential,
         Potential* inter_potential,
         double epsilon) :
-    PathComputer(polymer_potential,solvent_potential,inter_potential,epsilon),
-    psi1(1, vector(0.0, 0.0, 0.0)),
-    psi2(2, vector(0.0, 0.0, 0.0)){}
+    PathComputer(polymer_potential,solvent_potential,inter_potential,epsilon){}
     SLERP::~SLERP(){};
     SLERP::Omega::Omega() :
         _should_move(true),
@@ -164,8 +162,6 @@ namespace geodesic{
             links.at(i).update(links.at(i).at(dtau));
         }
         _update_record_from_links(cur, links);
-        psi1.value = links.at(0).psi();
-        psi2.value = links.at(1).psi();
         cur.atom_state().update(cur.bond_state());
         if (dtau < 1.0){
             keep_going = true;
@@ -189,11 +185,7 @@ namespace geodesic{
         Potential* solvent_potential,
         Potential* inter_potential,
         double epsilon) :
-    SLERP(polymer_potential, solvent_potential, inter_potential, epsilon),
-    theta1(1, true, true),
-    theta2(2, true, true),
-    delta_theta1(1, vector(0.0, 0.0, 0.0), false, false, true, true),
-    delta_theta2(2, vector(0.0, 0.0, 0.0), false, false, true, true){}
+    SLERP(polymer_potential, solvent_potential, inter_potential, epsilon){}
     ShortStep::~ShortStep(){};
     ShortStep::Omega::Omega() :
         SLERP::Omega::Omega(),
@@ -317,20 +309,12 @@ namespace geodesic{
             }
             was_moved = true;
             _update_record_from_links(cur, links);
-            psi1.value = links.at(0).psi();
-            delta_psi1.value = links.at(0).psi() * dtau;
-            psi2.value = links.at(1).psi();
-            delta_psi2.value = links.at(1).psi() * dtau;
             double dtheta;
             if (links.at(0).theta_computed()){
-                theta1.value = links.at(0).theta();
                 dtheta = links.at(0).theta() * dtau;
-                delta_theta1.value = dtheta;
             }
             if (links.at(1).theta_computed()){
-                theta2.value = links.at(1).theta();
                 dtheta = links.at(1).theta() * dtau;
-                delta_theta2.value = dtheta;
             }
         }
         else {
@@ -350,8 +334,6 @@ namespace geodesic{
                         solvent_potential,
                         inter_potential,
                         epsilon ),
-        psi1(1, vector(0.0, 0.0, 0.0)),
-        psi2(2, vector(0.0, 0.0, 0.0)),
         _integrator(tol){
     }
     SHOVE::~SHOVE(){};
@@ -419,8 +401,6 @@ namespace geodesic{
         fin_omega1 = fin_bonds.at(0).position;
         cur_omega2 = ini_bonds.at(1).position;
         fin_omega2 = fin_bonds.at(1).position;
-        psi1.value = acos(dot(cur_omega1, fin_omega1));
-        psi2.value = acos(dot(cur_omega2, fin_omega2));
         if (!_is_path_complete(cur, fin, _epsilon)){
             _assign_velocities(cur, fin, dr);
             _integrator.move(1.0, cur.atom_state());
@@ -445,8 +425,8 @@ namespace geodesic{
     PLERP::~PLERP(){}
     bool PLERP::move(Record &cur, const Record &fin, double dR){
         bool keep_going = false;
-        move_at_once(cur, fin, dR);
         if (!_is_path_complete(cur, fin, _epsilon)){
+            move_at_once(cur, fin, dR);
             keep_going = true;
         }
         cur.bond_state().update(cur.atom_state());
