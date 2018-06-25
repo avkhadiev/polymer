@@ -4,6 +4,7 @@
 #ifndef PARSING_H
 #define PARSING_H
 #include <string>
+#include <algorithm>
 #include <map>
 // parses a string and replaces all replace_what characters with replace_with
 std::string replace_characters(std::string s,

@@ -1,17 +1,11 @@
 // 2017 Artur Avkhadiev
 /*! \file parsing.cpp
 */
-#include <string>
-#include <map>
 #include <../include/parsing.h>
 std::string replace_characters(std::string s,
     char replace_what,
     char replace_with){
-    std::transform(s.begin(), s.end(),
-        s.begin(),
-        [replace_what, replace_with](char ch) {
-            return ch == replace_what ? replace_with : ch;
-        });
+    std::replace(s.begin(), s.end(), replace_what, replace_with); 
     return s;
 }
 std::string parse_string(std::string s){
