@@ -174,21 +174,23 @@ int main(int argc, char **argv){
             double runtime_old = settings.runtime;
             settings.dt = dt_old * scale_factor;
             settings.runtime = runtime_old * scale_factor;
-            fprintf(stderr, "%s\n", "Zero potential requires change in units:");
-            fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
-                "dt change from",
-                dt_old,
-                "to",
-                settings.dt,
-                "with scale factor",
-                scale_factor);
-            fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
-                "runtime change from",
-                runtime_old,
-                "to",
-                settings.runtime,
-                "with scale factor",
-                scale_factor);
+            if (VERBOSE){
+                fprintf(stderr, "%s\n", "Zero potential requires change in units:");
+                fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
+                    "dt change from",
+                    dt_old,
+                    "to",
+                    settings.dt,
+                    "with scale factor",
+                    scale_factor);
+                fprintf(stderr, "%s %5.7f %s %5.7f %s %5.7f\n",
+                    "runtime change from",
+                    runtime_old,
+                    "to",
+                    settings.runtime,
+                    "with scale factor",
+                    scale_factor);
+                }
         }
         if (DEBUG){
             fprintf(stdout, "%s\n%s",
@@ -234,7 +236,7 @@ int main(int argc, char **argv){
         //    observables::setup(config, settings::zero_observables);
         //}
         // save simulation settings in a file
-        settings.write(settings.cndir, args::sim_name);
+        // settings.write(settings.cndir, args::sim_name);
         sim.relax(20.0);
         sim.evolve(settings.runtime);
         sim.write_run_summary();

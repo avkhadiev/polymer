@@ -65,6 +65,8 @@ int main(int argc, char **argv){
         }
         simple::BasePolymer::set_m(settings.mp);
         simple::BasePolymer::set_d(settings.d);
+        // no observable output except at the end
+        settings.isave = 0;
         // setup observables
         std::vector<Observable*> observables_vec = {};
         ObservableContainer container = ObservableContainer(observables_vec);
@@ -88,32 +90,39 @@ int main(int argc, char **argv){
         std::string ini_path
             = settings.geodir_input + manager.ini_fname(args::sim_name);
         std::string fin_path
-            = settings.geodir_output + manager.fin_fname(args::sim_name);
+            = settings.geodir_input + manager.fin_fname(args::sim_name);
         if (settings.reverse_path){
             std::string temp = ini_path;
             ini_path = fin_path;
             fin_path = temp;
         }
-        fprintf(stderr, "%s:\n%s: %s\n%s: %s\n",
-            "Endpoint files are created",
-            "initial record",
-            ini_path.c_str(),
-            "final record",
-            fin_path.c_str());
+        //fprintf(stderr, "%s:\n%s: %s\n%s: %s\n",
+        //    "Endpoint files are created",
+        //    "initial record",
+        //    ini_path.c_str(),
+        //    "final record",
+        //    fin_path.c_str());
         // output MD path file, if necessary
         if (settings.save_md_path) {
-            bool overwrite = true;
+            // removed writing path
+            //bool overwrite = true;
             std::string mdfile = args::sim_name + "md_path.txt";
             std::string md_file
                 = settings.geodir_output + mdfile;
-            fprintf(stderr, "%s %s\n",
-                "Output MD path file to", md_file.c_str());
+            //fprintf(stderr, "%s %s\n",
+            //    "Output MD path file to", md_file.c_str());
             geodesic::Path md_path = manager.MD_path();
             if (settings.reverse_path) {
                 md_path.reverse();
             }
-            md_path.write(md_file, overwrite);
-            manager.output_observables(md_path, settings.geodir_output, args::sim_name + "md");
+            fprintf(stdout, "%5.7f\n", md_path.euc_sep.value);
+            fprintf(stdout, "%5.7f\n",
+                md_path.euc_sep.value / sqrt((simple::BasePolymer::nb() + 1)));
+            fprintf(stdout, "%5.7f\n", md_path.length.value);
+            //md_path.write(md_file, overwrite);
+            if (settings.should_write_data){
+                manager.output_observables(md_path, settings.geodir_output, args::sim_name + "md");
+            }
         }
         // initialize path computers
         geodesic::SLERP slerp_cmp
@@ -184,15 +193,12 @@ int main(int argc, char **argv){
         settings.write(settings.geodir_input, args::sim_name);
         /**********************************************************************/
         slerp_sim.compute_path();
-        fprintf(stderr, "%s\n", "SLERP path computed!");
         slerp_sim.write_run_summary();
         /**********************************************************************/
         shove_sim.compute_path();
-        fprintf(stderr, "%s\n", "SHOVE path computed!");
         shove_sim.write_run_summary();
         /**********************************************************************/
         plerp_sim.compute_path();
-        fprintf(stderr, "%s\n", "PLERP path computed!");
         plerp_sim.write_run_summary();
         /**********************************************************************/
         // get slices of the path

@@ -105,15 +105,6 @@ namespace geodesic{
         bool e_format = false;
         // Length
         Length length = Length(print_val, e_format);
-        // omega projections
-        std::vector<simple::Bond> ini_bonds, fin_bonds;
-        ini_bonds = path.initial().bond_state().get_polymers().at(0).get_bonds();
-        fin_bonds = path.final().bond_state().get_polymers().at(0).get_bonds();
-        Vector ini_omega1, ini_omega2, fin_omega1, fin_omega2;
-        ini_omega1 = ini_bonds.at(0).position;
-        ini_omega2 = ini_bonds.at(1).position;
-        fin_omega1 = fin_bonds.at(0).position;
-        fin_omega2 = fin_bonds.at(1).position;
         if (_obs){
             _obs->add_observable(&length);
         }

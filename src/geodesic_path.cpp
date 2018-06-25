@@ -112,7 +112,7 @@ namespace geodesic{
         _final = other.final();
         _path = other._path;
         euc_sep.value = other.euc_sep.value;
-        length.value = other.euc_sep.value;
+        length.value = other.length.value;
         return *this;
     }
     /***************************************************************************
@@ -159,6 +159,7 @@ namespace geodesic{
                 // several intermediate valuues
                 std::list<Record>::const_iterator rec;
                 for (rec = _path.begin();
+
                      rec != std::prev(_path.end());
                      std::advance(rec, 1)){
                     _increment_length(*rec, *(std::next(rec)));

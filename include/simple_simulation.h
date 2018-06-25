@@ -65,13 +65,13 @@ namespace simple{
             std::string fout = _tpdir + _tpfname;
             bool truncate = false;
             _prepare_outstream(stream, fout, truncate);
-            fprintf(stdout, "%s\n", "Tape file opened for writing.");
+            //fprintf(stdout, "%s\n", "Tape file opened for writing.");
         };
         void _prepare_cfstream(std::ofstream &stream){
             std::string fout = _cndir + _cnfname;
             bool truncate = true;
             _prepare_outstream(stream, fout, truncate);
-            fprintf(stdout, "%s\n", "Config file opened for writing.");
+            //fprintf(stdout, "%s\n", "Config file opened for writing.");
         };
         void _write_data();             /**> writeout data                */
         void _write_run_summary();      /**> writeut run averages         */
@@ -164,8 +164,6 @@ namespace simple{
     public:
         observable::PE _pe;
         // temporary observables to check algorithm implementation
-        geodesic::OmegaProj omega_proj1;
-        geodesic::OmegaProj omega_proj2;
         geodesic::Path path() const {return _path;};
         double landscape_energy() const {return _el;};
         void set_landscape_energy(double el) {_el = el;};

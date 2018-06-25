@@ -190,8 +190,8 @@ namespace simple{
         // if doesn't exist, create new one
         else{
             truncate = true;                    //**> now will truncate */
-            fprintf(stderr, "%s\n",
-                "stream file doesn't exist, creating new one.");
+            //fprintf(stderr, "%s\n",
+            //    "stream file doesn't exist, creating new one.");
             stream.open(fout, std::ofstream::out | std::ofstream::trunc);
         }
     }
@@ -324,11 +324,11 @@ namespace simple{
             // to save the ultimate configuration after the run
             if (_step % itape != 0) _write_config(tpstream);
             tpstream.close();
-            fprintf(stdout, "%s\n", "Tape file closed.");
+            //fprintf(stdout, "%s\n", "Tape file closed.");
         }
         if (_isave != 0){
             cfstream.close();
-            fprintf(stdout, "%s\n", "Config file closed.");
+            //fprintf(stdout, "%s\n", "Config file closed.");
         }
         _obs.run_end();
     }
@@ -362,53 +362,22 @@ namespace simple{
         _maxiter(maxiter),
         _max_escape_iter(max_escape_iter),
         //  mean  err  print e_format
-        _pe(false, false, false, false),
-        omega_proj1(vector(0.0,0.0,0.0), vector(0.0,0.0,0.0), 1,
-                    false, false, false, false),
-        omega_proj2(vector(0.0,0.0,0.0), vector(0.0,0.0,0.0), 2,
-                    false, false, false, false)
+        _pe(false, false, false, false)
     {
         // add potential energy and omega projections as observables
         _obs.add_observable(&_pe);
         _obs.add_observable(_path.get_length());
-        // TEMPRORARY OBSERVABLES : CHECKING CONVERGENCE
-        std::vector<simple::Bond> ini_bonds
-            = _path.initial().bond_state().get_polymers().at(0).get_bonds();
-        std::vector<simple::Bond> fin_bonds
-            = _path.final().bond_state().get_polymers().at(0).get_bonds();
-        Vector ini_omega1, ini_omega2, fin_omega1, fin_omega2;
-        ini_omega1 = ini_bonds.at(0).position;
-        fin_omega1 = fin_bonds.at(0).position;
-        //fprintf(stderr, "%s: %s\n%s: %s\n",
-            //"ini_omega1", vector_to_string(ini_omega1).c_str(),
-            //"fin_omega1", vector_to_string(fin_omega1).c_str());
-        //fprintf(stderr, "%s x %s = %s\n",
-            //vector_to_string(ini_omega1).c_str(),
-            //vector_to_string(fin_omega1).c_str(),
-            //vector_to_string(cross(ini_omega1, fin_omega1)).c_str());
-        ini_omega2 = ini_bonds.at(1).position;
-        fin_omega2 = fin_bonds.at(1).position;
-        //fprintf(stderr, "%s: %s\n%s: %s\n",
-            //"ini_omega2", vector_to_string(ini_omega2).c_str(),
-            //"fin_omega2", vector_to_string(fin_omega2).c_str());
-        //fprintf(stderr, "%s x %s = %s\n",
-            //vector_to_string(ini_omega2).c_str(),
-            //vector_to_string(fin_omega2).c_str(),
-            //vector_to_string(cross(ini_omega2, fin_omega2)).c_str());
-        omega_proj1.set_ini(ini_omega1);
-        omega_proj1.set_fin(fin_omega1);
-        omega_proj2.set_ini(ini_omega2);
-        omega_proj2.set_fin(fin_omega2);
-        _obs.add_observable(&omega_proj1);
-        _obs.add_observable(&omega_proj2);
         _prepare_observables();
         /*********************************************************************/
-        if (_dtau == 0.0){
+        if (_dtau <= 0.0){
             fprintf(stderr, "%s. %s: %f\n",
-                "Cannot have zero step in progress variable tau",
+                "Cannot have zero or negative step in progress variable tau",
                 "Setting default value", 0.001);
             _dtau = 0.001;
         }
+        // set up the upper bound on the number of steps ---
+        // this is just a fuse to halt paths that most likely won't converge
+        _maxiter = (size_t)(ceil(_path.euc_sep.value * 100 / _dtau));
     }
     GeodesicSimulation::~GeodesicSimulation(){}
     void GeodesicSimulation::_prepare_outstream(std::ofstream &stream,
@@ -473,7 +442,6 @@ namespace simple{
         bool calc;
         bool escaped;
         size_t escape_iter;
-        // FIXME add this as a parameter in simulation initializer
         double delta_pe = pow(10.0, -8.0);
         _calcstep = 0;
         _blockstep = 0;
@@ -485,11 +453,10 @@ namespace simple{
             _prepare_pfstream(pfstream);
             //rec.write(pfstream, output_header);
         }
-        // removed condition: (_step < _maxiter) &&
-        while( _comp->move(rec, _path.final(), _dtau) ){
+        while( _comp->move(rec, _path.final(), _dtau) && (_step < _maxiter) ){
             _comp->update_PE(rec);
             if (rec.pe() > _el + delta_pe){
-                fprintf(stderr, "%s\n", "Forbidden area encountered!");
+                fprintf(stdout, "%s\n", "Forbidden area encountered!");
                 // TODO
                 escaped = false;
                 escape_iter = 0;
@@ -502,23 +469,21 @@ namespace simple{
                     //_comp->update_PE(rec);
                     //if (rec.pe() <= _el) escaped = true;
                 }
-                fprintf(stderr, "%s\n", "Forbidden area escaped!");
+                fprintf(stdout, "%s\n", "Forbidden area escaped!");
             }
             _path.append(rec);
             // take care of observables and bookkeeping
             _step = _step + 1;
-            if (_step % iprint == 0) {
-                fprintf(stderr, "%s\n", "********************************");
-                fprintf(stderr, "%s %zu\n", "STEP", _step);
-                fprintf(stderr, "%s\n", "********************************");
-            }
+            //if (_step % iprint == 0) {
+            //    fprintf(stderr, "%s\n", "********************************");
+            //    fprintf(stderr, "%s %zu\n", "STEP", _step);
+            //    fprintf(stderr, "%s\n", "********************************");
+            //}
             _step % icalc == 0? calc = true : calc = false;
             if (calc) {
                 ++_calcstep;
                 _pe.value = rec.pe();                 /* update observable */
                 // temporary observables for checking algorithm implementation:
-                omega_proj1.update(rec);
-                omega_proj2.update(rec);
                 // manage observable calculation and averaging
                 _calculate_observables(iblock,   _path.current_tail().atom_state());
                 // printing updates and saving a configuration will only happen
@@ -536,23 +501,35 @@ namespace simple{
             }
             rec = _path.current_tail();
         }
+        bool converged;
+        if (_step >= _maxiter){
+            converged = false;
+        }
+        else {
+            converged = true;
+        }
+        fprintf(stdout, "%d\n", (int)converged);
         // write last status once run is complete
-        _write_status();
-        fprintf(stderr, "%s %5.7f\n",
-            "Euclidian distance was", _path.euc_sep.value);
+        //_write_status();
         // compute how close each atom is to its final position
         simple::AtomPolymer cur = rec.atom_state().polymers.at(0);
         simple::AtomPolymer fin = _path.final().atom_state().polymers.at(0);
-        fprintf(stderr, "%s %zu %s\n", "Path computed in", _step, "steps");
+        //fprintf(stdout, "%zu\n", _step);
         double diffsq = 0.0;
         for (size_t i = 0; i < BasePolymer::nb() + 1; ++i){
             diffsq += normsq(subtract(fin.atoms.at(i).position,
                                  cur.atoms.at(i).position));
         }
-        fprintf(stderr, "%s: %3.8f\n",
-            "Config space distance from the endpoint", sqrt(diffsq));
-        fprintf(stderr, "%s: %s\n",
-            "Final R_CM:", vector_to_string(cur.rcm()).c_str());
+        double diff = sqrt(diffsq);
+        //fprintf(stdout, "%s: %5.7f\n",
+        //    "Config space distance to the endpoint",
+        //    diff);
+        if (converged){
+            //fprintf(stdout, "%s\n",
+            //    "Will add that distance to the path length");
+            _path.length.value += diff;
+        }
+        fprintf(stdout, "%5.7f\n", _path.length.value);
         // output last data results if they haven't been output just now
         _record_observables();
         if ((_should_write_data) and (_calcstep % iblock != 0)) {
@@ -563,7 +540,6 @@ namespace simple{
             output_header = false;
             _path.final().write(pfstream, output_header);
             pfstream.close();
-            fprintf(stdout, "%s\n", "Path file closed.");
         }
         _obs.run_end();
     }
