@@ -1,7 +1,8 @@
-# Ignore build, lib and test dirs
+# Ignore build, lib, configs, and test dirs
 build
 lib/*
 test/*
+configs/*
 
 # Ignore cmake files
 CMakeFiles/*
