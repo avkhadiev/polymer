@@ -23,6 +23,7 @@ namespace geodesic{
         simple::AtomState& cur_state = cur.atom_state();
         const simple::AtomState& fin_state = fin.atom_state();
         bool is_path_complete = true;
+	double diffsq = 0.0;
         // check (single polymer) positions
         simple::AtomPolymer& cur_polymer = cur_state.polymers.at(0);
         const simple::AtomPolymer fin_polymer = fin_state.polymers.at(0);
@@ -31,10 +32,12 @@ namespace geodesic{
         for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
             cur_pos = cur_polymer.atoms.at(i).position;
             fin_pos = fin_polymer.atoms.at(i).position;
-            if (norm(subtract(cur_pos, fin_pos)) > epsilon) {
-                is_path_complete = false;
-            }
+            diffsq += normsq(subtract(cur_pos, fin_pos)); 
         }
+	double diff = sqrt(diffsq);
+	if (diff > epsilon){
+	    is_path_complete = false;
+	}
         //if(is_path_complete){
         //    fprintf(stderr, "%s:\n%s\n",
         //        "TERMINATED PATH",

@@ -9,6 +9,7 @@
 #include <functional>         /** std::ref */
 #include <queue>              /** std::queue */
 #include <limits>             /**> controls output precision */
+#include <iterator>
 #include <stdexcept>
 #include "observable.h"
 #include "simple_state.h"
@@ -16,7 +17,7 @@ namespace observable{
     class BlockRecord {
     private:
         Observable *_obs;
-        std::queue<const double> _inst_values;
+        std::queue<double> _inst_values;
     public:
         Observable *obs() {return _obs;};
         friend class ObservableContainer;

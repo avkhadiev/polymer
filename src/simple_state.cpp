@@ -164,14 +164,14 @@ namespace simple {
         // set the stream's position indicator to the end of the stream before each output operation.
         if (overwrite) {
             // if overwrite is allowed, try to open in truncate mode
-            writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+            writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
         }
         if (!overwrite) {
             // if overwrite is forbidden, try to open the file in append mode
-            writeout.open(fout, std::ofstream::out | std::ofstream::app);
+            writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::app);
             if (!writeout.is_open()) {
             // if file does not exist, open in truncate mode
-                writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+                writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
             }
         }
         // now file has to be opened
@@ -416,7 +416,7 @@ namespace simple {
         std::string fin;                  /*>> stores path to input file */
         fin = indir + fname;              /*>> stores path to input directory */
         std::ifstream readout;
-        readout.open(fin, std::ifstream::in);
+        readout.open(fin.c_str(), std::ifstream::in);
         if (!readout.is_open()) {
             std::string err_msg = "read_state_to_file: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), fin.c_str());
@@ -464,7 +464,7 @@ namespace simple {
         std::string fin;                  /*>> stores path to input file */
         fin = indir + fname;              /*>> stores path to input directory */
         std::ifstream readout;
-        readout.open(fin, std::ifstream::in);
+        readout.open(fin.c_str(), std::ifstream::in);
         if (!readout.is_open()) {
             std::string err_msg = "read_state_to_file: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), fin.c_str());

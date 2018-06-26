@@ -48,8 +48,8 @@ int main(int argc, char **argv){
         simple::BaseState::set_nm(settings.np);
         simple::BaseState::set_nsolvents(4 * pow(settings.nc, 3.0));
         simple::BasePolymer::set_nb(settings.nb);
-        // normalize tolerance for entire chain
-        settings.epsilon = settings.epsilon / sqrt(settings.nb + 1);
+        // normalize tolerance for entire chain - CANCELLED: CONDITION TOO TIGHT GIVEN TOLERANCE
+        // settings.epsilon = settings.epsilon / sqrt(settings.nb + 1);
         // change in units if potential is zero
         bool no_potential = false;
         if ((settings.epp == 0.0)

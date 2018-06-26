@@ -8,6 +8,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <iterator>
 #include "default_macros.h"
 #include "simple_solvent.h"
 #include "simple_polymer.h"

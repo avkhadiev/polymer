@@ -52,7 +52,8 @@ int main(int argc, char **argv){
     if (!read_arguments(argc, argv)) res = 1;
     else {
         SettingsParser settings = SettingsParser(args::config_file);
-        // state setup
+        // fprintf(stderr, "%s\n", "settings parser set up");
+	// state setup
         simple::BaseState::set_nm(settings.np);
         simple::BaseState::set_nsolvents(4 * pow(settings.nc, 3.0));
         simple::BasePolymer::set_nb(settings.nb);
@@ -207,6 +208,7 @@ int main(int argc, char **argv){
             = VerletIntegrator(force_loop, NULL, solvent_config.box());
         Integrator& integrator = rattle;
         // simulation setup
+        // fprintf(stderr, "%s\n", "setting up simulation");
         simple::MDSimulation sim
             = simple::MDSimulation(args::sim_name,
                 settings.cndir,
@@ -223,6 +225,7 @@ int main(int argc, char **argv){
                 settings.iprint,
                 settings.isave,
                 settings.itape);
+        // fprintf(stderr, "%s\n", "simulation set up");
         //if (!sim.is_input_given()){
         /**
         * The state is now set up.

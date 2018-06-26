@@ -12,6 +12,7 @@
 #ifndef POLYMER_SIMPLE_ATOM_H
 #define POLYMER_SIMPLE_ATOM_H
 #include <string>
+#include <iterator>
 #include <iostream>
 #include "vector.h"
 namespace simple {

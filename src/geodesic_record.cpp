@@ -134,15 +134,15 @@ namespace geodesic{
         // set the stream's position indicator to the end of the stream before each output operation.
         if (overwrite) {
             // if overwrite is allowed, try to open in truncate mode
-            writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+            writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
             overwritten = true;
         }
         if (!overwrite) {
             // if overwrite is forbidden, try to open the file in append mode
-            writeout.open(fout, std::ofstream::out | std::ofstream::app);
+            writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::app);
             if (!writeout.is_open()) {
             // if file does not exist, open in truncate mode
-                writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+                writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
                 overwritten = true;
             }
         }

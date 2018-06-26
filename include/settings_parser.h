@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <iterator>
 #include "parsing.h"
 #include "default_macros.h"
 class SettingsParser{

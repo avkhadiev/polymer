@@ -185,7 +185,7 @@ void ObservableContainer::_prepare_inst_datafile(std::string datadir,
           + inst_datafile
           + ".csv";
     std::ofstream writeout;
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     if (writeout.is_open()){
         if (nobservables() > 0) {
             writeout << "block" << ",";
@@ -218,7 +218,7 @@ void ObservableContainer::_prepare_block_datafile(std::string datadir,
           + block_datafile
           + ".csv";
     std::ofstream writeout;
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     if (writeout.is_open()){
         if (_observables_to_average > 0) {
             writeout << "block" << ",";
@@ -278,7 +278,7 @@ void ObservableContainer::_prepare_run_summary_file(std::string datadir,
           + run_summary
           + ".csv";
   std::ofstream writeout;
-  writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+  writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
   if (writeout.is_open()){
       if (_observables_to_average > 0) {
           writeout << "nblocks" << ",";
@@ -341,7 +341,7 @@ void ObservableContainer::_record_meta_data(std::string datadir,
           + meta_datafile
           + ".csv";
     std::ofstream writeout;
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     if (writeout.is_open()){
         if (nobservables() > 0) {
             writeout << "long_name" << ",";
@@ -397,7 +397,7 @@ void ObservableContainer::write_data(std::string datadir, std::string sim_name){
               + "_"
               + block_datafile
               + ".csv";
-        writeout.open(fout, std::ofstream::out | std::ofstream::app);
+        writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::app);
         if (writeout.is_open()){
             _write_block_data(writeout);
         }
@@ -502,7 +502,7 @@ void ObservableContainer::write_run_summary(std::string datadir, std::string sim
               + "_"
               + run_summary
               + ".csv";
-        writeout.open(fout, std::ofstream::out | std::ofstream::app);
+        writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::app);
         if (writeout.is_open()){
             if (_observables_to_average > 0) {
                 writeout << _blockstep << ",";

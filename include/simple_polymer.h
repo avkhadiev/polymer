@@ -13,7 +13,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
+#include <iterator>
 #include "vector.h"
 #include "simple_atom.h"
 #include "simple_bond.h"

@@ -122,7 +122,7 @@ void LJPotential::writeout_parameters_to_file(std::string outdir,
     std::ofstream writeout;
     // open writeout for output operations and s
     // try to open in truncate mode
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     // now file has to be opened
     if (writeout.is_open()) {
         // if file could be opened...
@@ -328,7 +328,7 @@ void AdjustedLJPotential::writeout_parameters_to_file(std::string outdir,
     std::ofstream writeout;
     // open writeout for output operations and s
     // try to open in truncate mode
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     // now file has to be opened
     if (writeout.is_open()) {
         // if file could be opened...

@@ -214,7 +214,7 @@ void SettingsParser::read_io(std::ifstream& stream){
 }
 void SettingsParser::read(std::string fin){
     std::ifstream readout;
-    readout.open(fin, std::ifstream::in);
+    readout.open(fin.c_str(), std::ifstream::in);
     if (!readout.is_open()) {
         std::string err_msg = "read_config: unable to open file at";
         fprintf(stderr, "%s %s\n", err_msg.c_str(), fin.c_str());
@@ -350,7 +350,7 @@ void SettingsParser::write(std::string outdir, std::string sim_name) const{
     std::ofstream writeout;
     std::string fout = outdir + sim_name + ".cfg";
     // open writeout for output operations in truncate mode
-    writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+    writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
     if (writeout.is_open()) {
         // if file could be opened...
         write_potential(writeout);

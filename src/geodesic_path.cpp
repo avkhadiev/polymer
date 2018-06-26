@@ -57,7 +57,7 @@ namespace geodesic{
         euc_sep(false, false)
     {
         std::ifstream readout;
-        readout.open(fin, std::ifstream::in);
+        readout.open(fin.c_str(), std::ifstream::in);
         if (!readout.is_open()) {
             std::string err_msg = "Path: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), fin.c_str());
@@ -190,14 +190,14 @@ namespace geodesic{
         // set the stream's position indicator to the end of the stream before each output operation.
         if (overwrite) {
             // if overwrite is allowed, try to open in truncate mode
-            writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+            writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
         }
         if (!overwrite) {
             // if overwrite is forbidden, try to open the file in append mode
             writeout.open(fout, std::ofstream::out | std::ofstream::app);
             if (!writeout.is_open()) {
                 // if file does not exist, open in truncate mode
-                writeout.open(fout, std::ofstream::out | std::ofstream::trunc);
+                writeout.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
                 overwrite = true;
             }
         }

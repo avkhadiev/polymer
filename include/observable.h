@@ -8,6 +8,7 @@
 #include <utility>      /* std::pair, std::make_pair */
 #include <cmath>        /* pow */
 #include <stdexcept>
+#include <iterator>
 #include "vector.h"
 #include "parsing.h"
 #include "simple_state.h"

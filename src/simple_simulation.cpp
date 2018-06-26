@@ -148,7 +148,7 @@ namespace simple{
     void MDSimulation::_read_config(){
         std::string fin = _infile;
         std::ifstream readout;
-        readout.open(fin, std::ifstream::in);
+        readout.open(fin.c_str(), std::ifstream::in);
         if (!readout.is_open()) {
             std::string err_msg = "read_config: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), fin.c_str());
@@ -180,19 +180,19 @@ namespace simple{
         if (stat(fout.c_str(), &buffer) == 0) {
             if (truncate){
                 // if requested, overwrite the information
-                stream.open(fout, std::ofstream::out | std::ofstream::trunc);
+                stream.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
             }
             else {
                 // otherwise append the information
-                stream.open(fout, std::ofstream::out | std::ofstream::app);
+                stream.open(fout.c_str(), std::ofstream::out | std::ofstream::app);
             }
         }
         // if doesn't exist, create new one
         else{
             truncate = true;                    //**> now will truncate */
-            //fprintf(stderr, "%s\n",
+            // fprintf(stderr, "%s\n",
             //    "stream file doesn't exist, creating new one.");
-            stream.open(fout, std::ofstream::out | std::ofstream::trunc);
+            stream.open(fout.c_str(), std::ofstream::out | std::ofstream::trunc);
         }
     }
     void MDSimulation::_prepare_outstream(std::ofstream &stream,
@@ -521,9 +521,9 @@ namespace simple{
                                  cur.atoms.at(i).position));
         }
         double diff = sqrt(diffsq);
-        //fprintf(stdout, "%s: %5.7f\n",
-        //    "Config space distance to the endpoint",
-        //    diff);
+        fprintf(stdout, "%s: %5.7f\n",
+            "Config space distance to the endpoint",
+            diff);
         if (converged){
             //fprintf(stdout, "%s\n",
             //    "Will add that distance to the path length");
