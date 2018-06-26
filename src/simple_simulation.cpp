@@ -521,9 +521,9 @@ namespace simple{
                                  cur.atoms.at(i).position));
         }
         double diff = sqrt(diffsq);
-        fprintf(stdout, "%s: %5.7f\n",
-            "Config space distance to the endpoint",
-            diff);
+        // fprintf(stdout, "%s: %5.7f\n",
+        //     "Config space distance to the endpoint",
+        //     diff);
         if (converged){
             //fprintf(stdout, "%s\n",
             //    "Will add that distance to the path length");

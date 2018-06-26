@@ -3,6 +3,9 @@ build
 lib/*
 test/*
 configs/*
+logs/*
+errs/*
+jobs/*
 
 # Ignore cmake files
 CMakeFiles/*
@@ -17,6 +20,8 @@ Makefile
 
 # Ignore google-test folders
 googletest*/*
+gmock*
+gtest*
 
 # Ignore any executables
 bin/*
