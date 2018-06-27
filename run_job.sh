@@ -1,6 +1,6 @@
 #!/bin/bash
 root=$HOME/polymer
-task_id=$SGE_TASK_ID
+task_id=$1
 njobs=1000
 chains=(2 20)
 max_task_id=$(( ${#chains[@]} * $njobs ))
@@ -18,9 +18,11 @@ else
 			cfg="${root}/configs/${nlinks}.cfg"
 			sim=${nlinks}_$(( ((task_id - 1) % njobs) + 1 ))
 			err="${root}/errs/${sim}.log"
-			$root/bin/run_md_simulation $sim $cfg 1>/dev/null 2>$err
+			echo "Running MD"
+			$root/bin/run_md_simulation $sim $cfg 1> /dev/null 2> $err 
+			echo "MD ran, running geodesics" 
 			log="${root}/logs/${sim}.log"
-    			$root/bin/run_geodesic_simulation ${sim} ${cfg} 1>${log} 2>${err}
+    			$root/bin/run_geodesic_simulation ${sim} ${cfg} 1> $log 2>$err
 		fi
 	done
 fi
