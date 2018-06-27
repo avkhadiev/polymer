@@ -488,7 +488,13 @@ namespace simple{
                 _calculate_observables(iblock,   _path.current_tail().atom_state());
                 // printing updates and saving a configuration will only happen
                 // if observables are being calculated
-                if (_step % iprint == 0) _write_status();
+                if (_step % iprint == 0) {
+                    _write_status();
+                    //simple::AtomPolymer cur = rec.atom_state().polymers.at(0);
+                    //Vector rcm = cur.rcm();
+                    //fprintf(stdout, "%s: %3.10f %3.10f %3.10f\n",
+                    //    "Rcm", rcm.x, rcm.y, rcm.z);
+                }
                 if (_step % isave == 0) _write_config(pfstream);
             }
             // TODO add tape file?

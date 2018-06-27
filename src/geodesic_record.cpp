@@ -46,7 +46,7 @@ namespace geodesic{
         Record::Record()
     {
         std::ifstream readout;
-        readout.open(file, std::ifstream::in);
+        readout.open(file.c_str(), std::ifstream::in);
         if (!readout.is_open()) {
             std::string err_msg = "Record: unable to open file at";
             fprintf(stderr, "%s %s\n", err_msg.c_str(), file.c_str());

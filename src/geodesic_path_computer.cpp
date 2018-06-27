@@ -32,7 +32,7 @@ namespace geodesic{
         for (size_t i = 0; i < simple::BasePolymer::nb() + 1; ++i){
             cur_pos = cur_polymer.atoms.at(i).position;
             fin_pos = fin_polymer.atoms.at(i).position;
-            diffsq += normsq(subtract(cur_pos, fin_pos)); 
+            diffsq += normsq(subtract(cur_pos, fin_pos));
         }
 	double diff = sqrt(diffsq);
 	if (diff > epsilon){

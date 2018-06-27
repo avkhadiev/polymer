@@ -78,7 +78,7 @@ namespace geodesic{
     void Manager::write_geodesic_inputs(std::string outdir, std::string sim_name) const{
         bool overwrite = true;
         std::string ini_path = outdir + ini_fname(sim_name);
-        std::string fin_path = outdir + fin_fname(sim_name);;
+        std::string fin_path = outdir + fin_fname(sim_name);
         initial().write(ini_path, overwrite);
         final().write(fin_path, overwrite);
     }
